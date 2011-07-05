@@ -23,7 +23,7 @@
 
 
 #include <fstream>
-
+#include <string.h>
 #include "imageloader.h"
 #include "md2model.h"
 
