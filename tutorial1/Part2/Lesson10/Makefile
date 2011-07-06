@@ -21,3 +21,5 @@ clean:
 run:
 	./$(PROG)
 
+text:
+	firefox text.php.html & 
