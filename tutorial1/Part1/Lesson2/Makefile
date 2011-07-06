@@ -1,6 +1,7 @@
 CC = g++
 CFLAGS = -Wall
 PROG = transform
+BROWSER = firefox
 
 SRCS = main.cpp
 
@@ -16,7 +17,10 @@ $(PROG):	$(SRCS)
 	$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS)
 
 clean:
-	rm -f $(PROG)
+	rm -f $(PROG) *~
 
 run:
-	./transform
+	./$(PROG)
+
+text:
+	$(BROWSER) text.php.html &
