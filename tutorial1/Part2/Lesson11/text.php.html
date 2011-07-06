@@ -1,0 +1,979 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+	<title>OpenGL Video Tutorial - Putting It All Together</title>
+	<meta name="title" content="OpenGL Video Tutorial - Putting It All Together">
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<meta name="description" content="Free beginner-friendly OpenGL / GLUT tutorial for C++, including both video and text versions.">
+	<meta name="keywords" content="OpenGL, GLUT, OpenGL tutorial, OpenGL tutorials, free, GLUT tutorial, GLUT tutorials, OpenGL video tutorial, OpenGL video tutorials, video, videos, GLUT video tutorial, GLUT video tutorials, video tutorial, video tutorials, 3D, 3-D, Windows, Mac, OS X, Mac OS X, MacOSX, Linux, C, C++, Visual C++, programming, 3D programming, 3-D programming, reference, forum, forums">
+	<meta name="author" content="Bill Jacobs">
+	<meta name="designer" content="Bill Jacobs">
+	<meta name="copyright" content="© 2007 - 2008 Bill Jacobs">
+	<link href="text.php_files/styles.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 6]>
+		<style type="text/css">
+			#container {
+				width: expression(document.documentElement.clientWidth < 808 ? "808px" : "auto");
+			}
+		</style>
+	<![endif]-->
+	<!--[if gte IE 5]>
+		<style type="text/css">
+			#topads {
+				width: expression(document.body.clientWidth > 160 ? "160px" : "auto");
+			}
+		</style>
+	<![endif]-->
+</head>
+
+<body bgcolor="#B0E0FF">
+<div id="container">
+	<div id="header">
+		<img src="text.php_files/top_icon.png" alt="3D Video Tutorials Rock.com logo" height="101" width="165"><h1>OpenGL tutorial</h1>
+	</div>
+	
+	<div id="menu1">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Reference</a></li>
+		</ul>
+	</div>
+	
+	<div id="content">
+		<div id="mainbody">
+
+<center><h1>Lesson 11: Putting It All Together</h1></center>
+<center><div class="lessonlinks">
+	<div class="watchnow"><a href="http://www.videotutorialsrock.com/opengl_tutorial/blockhead/video.php">Watch the video now!</a></div>
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/blockhead/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/blockhead/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/blockhead/blockhead.zip">Download source</a></li></ul>
+</div></center>
+<center><div class="horizontaladslong">
+	<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</div></center>
+<center><h2>Overview</h2></center>
+<p>
+If you haven't skipped anything, you've just learned about terrain, 
+drawing text, animation, and collision detection.  We're going to look 
+at a program that uses all of these topics, in order to crystallize what
+ we've learned.  Our program features a bunch of blocky looking guys 
+running around and bouncing off of each other, as shown below:
+</p>
+<center><img src="text.php_files/screenshot.png" alt="Screenshot" border="3" height="434" width="408"></center>
+<center><h2>The Code</h2></center>
+<p>
+Let's just dive right into some code.
+</p><div class="codeblock"><pre><span class="codekeyword">const</span> <span class="codekeyword">float</span> PI = 3.1415926535f;
+<span class="codekeyword">const</span> <span class="codekeyword">int</span> NUM_GUYS = 100;
+<span class="codecomment">//The width of the terrain in units, after scaling</span>
+<span class="codekeyword">const</span> <span class="codekeyword">float</span> TERRAIN_WIDTH = 50.0f;
+<span class="codecomment">//The amount of time between each time that we handle collisions</span>
+<span class="codekeyword">const</span> <span class="codekeyword">float</span> TIME_BETWEEN_HANDLE_COLLISIONS = 0.01f;</pre></div><p>
+We start with some constants, beginning with the constant <kbd>PI</kbd>.
+  I have no idea what this constant was supposed to be when I wrote it. 
+ I know that pi is some kind of Greek letter, but where the heck did I 
+come up with 3.14159?  If I'd spelled it "<kbd>PIE</kbd>", then it might make a little sense.  As it is, this constant is just a mystery to me.
+</p><p>
+Next, we have the number of guys that are running around on the terrain.
+  We have a constant indicating the width of the terrain, after scaling 
+it.  There's also a constant indicating the amount of time between 
+handling collisions.  As in the lesson on collision detection, we'll 
+alternate between advancing all of the guys by some amount of time and 
+handling all of the collisions betweeen guys.  So <kbd>TIME_BETWEEN_HANDLE_COLLISIONS</kbd> is the number of seconds by which we advance the guys between handling collisions.
+</p><div class="codeblock"><pre><span class="codecomment">//Returns a random float from 0 to &lt; 1</span>
+<span class="codekeyword">float</span> randomFloat() {
+    <span class="codekeyword">return</span> (<span class="codekeyword">float</span>)rand() / ((<span class="codekeyword">float</span>)RAND_MAX + 1);
+}</pre></div><p>
+This function returns a random value from 0 to 1.
+</p><div class="codeblock"><pre><span class="codecomment">//Represents a terrain, by storing a set of heights and normals at 2D locations</span>
+<span class="codekeyword">class</span> Terrain {
+    <span class="codecomment">//...</span>
+};
+
+<span class="codecomment">//Loads a terrain from a heightmap.  The heights of the terrain range from</span>
+<span class="codecomment">//-height / 2 to height / 2.</span>
+Terrain* loadTerrain(<span class="codekeyword">const</span> <span class="codekeyword">char</span>* filename, <span class="codekeyword">float</span> height) {
+    <span class="codecomment">//...</span>
+}</pre></div><p>
+Now we have our <kbd>Terrain</kbd> class and the <kbd>loadTerrain</kbd> function, which are exactly the same as in the lesson on terrains.
+</p><div class="codeblock"><pre><span class="codecomment">//Returns the approximate height of the terrain at the specified (x, z) position</span>
+<span class="codekeyword">float</span> heightAt(Terrain* terrain, <span class="codekeyword">float</span> x, <span class="codekeyword">float</span> z) {</pre></div><p>
+We have a new function called <kbd>heightAt</kbd>, which determines the 
+height of a terrain at a particular fractional (x, z) coordinate.  We'll
+ do this by taking a weighted average of the four heights of the grid 
+points for the grid cell in which the point lies.  This is a little 
+different from the height indicated by the way we draw terrains; if you 
+remember, we broke up each grid cell into two triangles when drawing 
+them.  But if the terrain is sufficiently smooth, it shouldn't matter 
+very much.  Anyway, I think that the weighted average approach gives a 
+more appropriate height.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Make (x, z) lie within the bounds of the terrain</span>
+    <span class="codekeyword">if</span> (x &lt; 0) {
+        x = 0;
+    }
+    <span class="codekeyword">else</span> <span class="codekeyword">if</span> (x &gt; terrain-&gt;width() - 1) {
+        x = terrain-&gt;width() - 1;
+    }
+    <span class="codekeyword">if</span> (z &lt; 0) {
+        z = 0;
+    }
+    <span class="codekeyword">else</span> <span class="codekeyword">if</span> (z &gt; terrain-&gt;length() - 1) {
+        z = terrain-&gt;length() - 1;
+    }</pre></div><p>
+First, the function makes sure that (x, z) lies within the bounds of the terrain.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Compute the grid cell in which (x, z) lies and how close we are to the</span>
+    <span class="codecomment">//left and outward edges</span>
+    <span class="codekeyword">int</span> leftX = (<span class="codekeyword">int</span>)x;
+    <span class="codekeyword">if</span> (leftX == terrain-&gt;width() - 1) {
+        leftX--;
+    }
+    <span class="codekeyword">float</span> fracX = x - leftX;
+    
+    <span class="codekeyword">int</span> outZ = (<span class="codekeyword">int</span>)z;
+    <span class="codekeyword">if</span> (outZ == terrain-&gt;width() - 1) {
+        outZ--;
+    }
+    <span class="codekeyword">float</span> fracZ = z - outZ;</pre></div><p>
+Next, <kbd>heightAt</kbd> computes <kbd>leftX</kbd> and <kbd>outZ</kbd>, which indicate the grid cell in which (x, z) lies, and <kbd>fracX</kbd> and <kbd>fracZ</kbd>, the distance from (<kbd>leftX</kbd>, <kbd>outZ</kbd>).
+</p><div class="codeblock"><pre>    <span class="codecomment">//Compute the four heights for the grid cell</span>
+    <span class="codekeyword">float</span> h11 = terrain-&gt;getHeight(leftX, outZ);
+    <span class="codekeyword">float</span> h12 = terrain-&gt;getHeight(leftX, outZ + 1);
+    <span class="codekeyword">float</span> h21 = terrain-&gt;getHeight(leftX + 1, outZ);
+    <span class="codekeyword">float</span> h22 = terrain-&gt;getHeight(leftX + 1, outZ + 1);
+    
+    <span class="codecomment">//Take a weighted average of the four heights</span>
+    <span class="codekeyword">return</span> (1 - fracX) * ((1 - fracZ) * h11 + fracZ * h12) +
+        fracX * ((1 - fracZ) * h21 + fracZ * h22);
+}</pre></div><p>
+We determine the four heights of the grid cell in which (x, z) lies and return a weighted average of them.
+</p><div class="codeblock"><pre><span class="codecomment">//The amount by which the Guy class's step function advances the state of a guy</span>
+<span class="codekeyword">const</span> <span class="codekeyword">float</span> GUY_STEP_TIME = 0.01f;</pre></div><p>
+Each block guy will keep track of some information about itself.  They'll have their own <kbd>advance</kbd> and <kbd>step</kbd> methods.  The state of each guy will be updated over small intervals of time, each interval having a duration of <kbd>GUY_STEP_TIME</kbd> seconds.
+</p><div class="codeblock"><pre><span class="codecomment">//Represents a guy</span>
+<span class="codekeyword">class</span> Guy {
+    <span class="codekeyword">private</span>:
+        MD2Model* model;
+        Terrain* terrain;</pre></div><p>
+Here's our <kbd>Guy</kbd> class, which keeps track of all information 
+regarding a single block guy.  Each guy stores the terrain on which he's
+ walking and the model for a guy.
+</p><div class="codeblock"><pre>        <span class="codekeyword">float</span> terrainScale; <span class="codecomment">//The scaling factor for the terrain</span>
+        <span class="codekeyword">float</span> x0;
+        <span class="codekeyword">float</span> z0;</pre></div><p>
+Each guy stores a scaling factor for the terrain, the amount by which it is scaled so that it is <kbd>TERRAIN_WIDTH</kbd> units wide.  They also keep track of their positions.
+</p><div class="codeblock"><pre>        <span class="codekeyword">float</span> animTime; <span class="codecomment">//The current position in the animation of the model</span></pre></div><p>
+Each guy has a field indicating its position in the current animation.  If you remember from the lesson on animation, our <kbd>MD2Model</kbd> class had an <kbd>advance</kbd>
+ method indicating the current position in the animation.  However, in 
+this program, each guy will be at a different position in the animation.
+  For this program, I've altered the <kbd>MD2Model</kbd> class by removing the <kbd>advance</kbd> method, and by changing the <kbd>draw</kbd> method to take as a parameter the animation time.
+</p><div class="codeblock"><pre>        <span class="codekeyword">float</span> radius0; <span class="codecomment">//The approximate radius of the guy</span></pre></div><p>
+The <kbd>radius0</kbd> field indicates the approximate radius of a guy. 
+ This number will be used to determine the amount by which to scale the 
+guy when we draw him.  It'll also be used for collision detection; we'll
+ approximate each guy as a cylinder for the purposes of collision 
+detection.
+</p><div class="codeblock"><pre>        <span class="codekeyword">float</span> speed;
+        <span class="codecomment">//The angle at which the guy is currently walking, in radians.  An angle</span>
+        <span class="codecomment">//of 0 indicates the positive x direction, while an angle of PI / 2</span>
+        <span class="codecomment">//indicates the positive z direction.  The angle always lies between 0</span>
+        <span class="codecomment">//and 2 * PI.</span>
+        <span class="codekeyword">float</span> angle;
+        <span class="codecomment">//The amount of time until step() should next be called</span>
+        <span class="codekeyword">float</span> timeUntilNextStep;</pre></div><p>
+We have a few more fields here.  <kbd>speed</kbd> indicates the speed of the guy in units per second.  <kbd>angle</kbd> indicates the direction in which the guy is walking, such that 0 indicates the positive x direction and <kbd>PI / 2</kbd>
+ indicates the positive z direction.  This is the way that angles are 
+frequently represented in the x-y plane (although technically we're 
+concerned with the x-z plane).  <kbd>timeUntilNextStep</kbd> is the amount of time until we next call <kbd>step()</kbd>.
+</p><div class="codeblock"><pre>        <span class="codekeyword">bool</span> isTurningLeft; <span class="codecomment">//Whether the guy is currently turning left</span>
+        <span class="codekeyword">float</span> timeUntilSwitchDir; <span class="codecomment">//The amount of time until switching direction</span></pre></div><p>
+Each guy is turning either left or right while he walks.  <kbd>isTurningLeft</kbd> indicates the direction that a guy is currently turning.  Every so often, each guy will change directions; <kbd>timeUntilSwitchDir</kbd> is the amount of time in which a guy will switch.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Advances the state of the guy by GUY_STEP_TIME seconds (without</span>
+        <span class="codecomment">//altering animTime)</span>
+        <span class="codekeyword">void</span> step() {
+            <span class="codecomment">//Update the turning direction information</span>
+            timeUntilSwitchDir -= GUY_STEP_TIME;
+            <span class="codekeyword">while</span> (timeUntilSwitchDir &lt;= 0) {
+                timeUntilSwitchDir += 20 * randomFloat() + 15;
+                isTurningLeft = !isTurningLeft;
+            }</pre></div><p>
+Here's the <kbd>step</kbd> method for guys.  First, we take care of updating information regarding the direction the guy is turning.
+</p><div class="codeblock"><pre>            <span class="codecomment">//Update the position and angle</span>
+            <span class="codekeyword">float</span> maxX = terrainScale * (terrain-&gt;width() - 1) - radius0;
+            <span class="codekeyword">float</span> maxZ = terrainScale * (terrain-&gt;length() - 1) - radius0;</pre></div><p>
+We compute <kbd>maxX</kbd> and <kbd>maxZ</kbd>, which indicate the farthest the guy can be in the positive x and z directions.
+</p><div class="codeblock"><pre>            x0 += velocityX() * GUY_STEP_TIME;
+            z0 += velocityZ() * GUY_STEP_TIME;</pre></div><p>
+We increase the <kbd>x0</kbd> and <kbd>z0</kbd> fields to move the guy forward.  The <kbd>velocityX()</kbd> and <kbd>velocityZ</kbd> methods, which we'll see later, give us the velocity of the guy based on his speed and the direction he is walking.
+</p><div class="codeblock"><pre>            <span class="codekeyword">bool</span> hitEdge = false;
+            <span class="codekeyword">if</span> (x0 &lt; radius0) {
+                x0 = radius0;
+                hitEdge = true;
+            }
+            <span class="codekeyword">else</span> <span class="codekeyword">if</span> (x0 &gt; maxX) {
+                x0 = maxX;
+                hitEdge = true;
+            }
+            
+            <span class="codekeyword">if</span> (z0 &lt; radius0) {
+                z0 = radius0;
+                hitEdge = true;
+            }
+            <span class="codekeyword">else</span> <span class="codekeyword">if</span> (z0 &gt; maxZ) {
+                z0 = maxZ;
+                hitEdge = true;
+            }</pre></div><p>
+If the guy has now exceeded an edge of the map, we move his to the exact edge of the map and set the <kbd>hitEdge</kbd> variable to true.
+</p><div class="codeblock"><pre>            <span class="codekeyword">if</span> (hitEdge) {
+                <span class="codecomment">//Turn more quickly if we've hit the edge</span>
+                <span class="codekeyword">if</span> (isTurningLeft) {
+                    angle -= 0.5f * speed * GUY_STEP_TIME;
+                }
+                <span class="codekeyword">else</span> {
+                    angle += 0.5f * speed * GUY_STEP_TIME;
+                }
+            }
+            <span class="codekeyword">else</span> <span class="codekeyword">if</span> (isTurningLeft) {
+                angle -= 0.05f * speed * GUY_STEP_TIME;
+            }
+            <span class="codekeyword">else</span> {
+                angle += 0.05f * speed * GUY_STEP_TIME;
+            }</pre></div><p>
+This code makes the guy turn, by adjusting the <kbd>angle</kbd> 
+variable.  If the guy is at the edge of the terrain, he turns more 
+quickly, so that he doesn't face the edge of the terrain for very long.
+</p><div class="codeblock"><pre>            <span class="codekeyword">while</span> (angle &gt; 2 * PI) {
+                angle -= 2 * PI;
+            }
+            <span class="codekeyword">while</span> (angle &lt; 0) {
+                angle += 2 * PI;
+            }
+        }</pre></div><p>
+These two while loops ensure that <kbd>angle</kbd> lies between 0 and <kbd>2 * PI</kbd>.
+</p><div class="codeblock"><pre>    <span class="codekeyword">public</span>:
+        Guy(MD2Model* model1,
+            Terrain* terrain1,
+            <span class="codekeyword">float</span> terrainScale1) {
+            model = model1;
+            terrain = terrain1;
+            terrainScale = terrainScale1;
+            
+            animTime = 0;
+            timeUntilNextStep = 0;
+            
+            <span class="codecomment">//Initialize certain fields to random values</span>
+            radius0 = 0.4f * randomFloat() + 0.25f;
+            x0 = randomFloat() *
+                (terrainScale * (terrain-&gt;width() - 1) - radius0) + radius0;
+            z0 = randomFloat() *
+                (terrainScale * (terrain-&gt;length() - 1) - radius0) + radius0;
+            speed = 1.5f * randomFloat() + 2.0f;
+            isTurningLeft = randomFloat() &lt; 0.5f;
+            angle = 2 * PI * randomFloat();
+            timeUntilSwitchDir = randomFloat() * (20 * randomFloat() + 15);
+        }</pre></div><p>
+The constructor for the <kbd>Guy</kbd> class just initializes some variables, some of which are set to random values.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Advances the state of the guy by the specified amount of time, by</span>
+        <span class="codecomment">//calling step() the appropriate number of times and adjusting animTime</span>
+        <span class="codekeyword">void</span> advance(<span class="codekeyword">float</span> dt) {
+            <span class="codecomment">//Adjust animTime</span>
+            animTime += 0.45f * dt * speed / radius0;
+            <span class="codekeyword">if</span> (animTime &gt; -100000000 &amp;&amp; animTime &lt; 1000000000) {
+                animTime -= (<span class="codekeyword">int</span>)animTime;
+                <span class="codekeyword">if</span> (animTime &lt; 0) {
+                    animTime += 1;
+                }
+            }
+            <span class="codekeyword">else</span> {
+                animTime = 0;
+            }
+            
+            <span class="codecomment">//Call step() the appropriate number of times</span>
+            <span class="codekeyword">while</span> (dt &gt; 0) {
+                <span class="codekeyword">if</span> (timeUntilNextStep &lt; dt) {
+                    dt -= timeUntilNextStep;
+                    step();
+                    timeUntilNextStep = GUY_STEP_TIME;
+                }
+                <span class="codekeyword">else</span> {
+                    timeUntilNextStep -= dt;
+                    dt = 0;
+                }
+            }
+        }</pre></div><p>
+The <kbd>advance()</kbd> method advances the state of a guy by a given amount of time.  It just changes <kbd>animTime</kbd> and calls <kbd>step()</kbd> the appropriate number of times.
+</p><div class="codeblock"><pre>        <span class="codekeyword">void</span> draw() {
+            <span class="codekeyword">if</span> (model == NULL) {
+                <span class="codekeyword">return</span>;
+            }
+            
+            <span class="codekeyword">float</span> scale = radius0 / 2.5f;
+            
+            glPushMatrix();
+            glTranslatef(x0, scale * 10.0f + y(), z0);
+            glRotatef(90 - angle * 180 / PI, 0, 1, 0);
+            glColor3f(1, 1, 1);
+            glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+            glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
+            glScalef(scale, scale, scale);
+            model-&gt;draw(animTime);
+            glPopMatrix();
+        }</pre></div><p>
+This method takes care of drawing one of our blocky friends.  If the model is <kbd>NULL</kbd>, we don't draw anything.  Otherwise, we translate, rotate, and scale, and then call <kbd>draw</kbd>
+ on the model.  The scaling factor is proportional to the radius of the 
+guy.  The translation moves to the location of the guy.  It calls the <kbd>y()</kbd> method that we'll see later, which uses <kbd>heightAt</kbd> to find out the height of the terrain at the guy's position.  You'll notice that we're moving a little above <kbd>y()</kbd>, since we need to move above the surface of the terrain to the center of the guy.
+</p><p>
+After translating, we rotate by <kbd>90 - angle * 180 / PI</kbd>, in 
+order to have the guy face the direction that he's walking.  We have to 
+take 90 minus the angle for it to work.  This is because a rotation of 0
+ would have the guy walking in the positive z direction, whereas an 
+angle of 0 indicates that the guy is walking in the positive x 
+direction.  So basically, this converts from the angle variable to the 
+amount of rotation that we need.
+</p><p>
+We set the color to white, so that we don't have any kind of weird 
+coloring applied to the model.  We do a couple of rotations that make it
+ so that the model, which I oriented the wrong way when I made him in 
+Blender, is oriented correctly.
+</p><div class="codeblock"><pre>        <span class="codekeyword">float</span> x() {
+            <span class="codekeyword">return</span> x0;
+        }
+        
+        <span class="codekeyword">float</span> z() {
+            <span class="codekeyword">return</span> z0;
+        }</pre></div><p>
+We have methods for returning the position of a guy.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Returns the current height of the guy on the terrain</span>
+        <span class="codekeyword">float</span> y() {
+            <span class="codekeyword">return</span> terrainScale *
+                heightAt(terrain, x0 / terrainScale, z0 / terrainScale);
+        }</pre></div><p>
+The <kbd>y()</kbd> method uses the <kbd>heightAt</kbd> function to figure out the vertical position of the guy.
+</p><div class="codeblock"><pre>        <span class="codekeyword">float</span> velocityX() {
+            <span class="codekeyword">return</span> speed * cos(angle);
+        }
+        
+        <span class="codekeyword">float</span> velocityZ() {
+            <span class="codekeyword">return</span> speed * sin(angle);
+        }</pre></div><p>
+These methods tell us the velocity of the guy in the x and z directions.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Returns the approximate radius of the guy</span>
+        <span class="codekeyword">float</span> radius() {
+            <span class="codekeyword">return</span> radius0;
+        }
+        
+        <span class="codecomment">//Returns the angle at which the guy is currently walking, in radians.</span>
+        <span class="codecomment">//An angle of 0 indicates the positive x direction, while an angle of</span>
+        <span class="codecomment">//PI / 2 indicates the positive z direction.</span>
+        <span class="codekeyword">float</span> walkAngle() {
+            <span class="codekeyword">return</span> angle;
+        }</pre></div><p>
+These methods return the radius and angle of a guy.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Adjusts the angle at which this guy is walking in response to a</span>
+        <span class="codecomment">//collision with the specified guy</span>
+        <span class="codekeyword">void</span> bounceOff(Guy* otherGuy) {
+            <span class="codekeyword">float</span> vx = velocityX();
+            <span class="codekeyword">float</span> vz = velocityZ();
+            
+            <span class="codekeyword">float</span> dx = otherGuy-&gt;x0 - x0;
+            <span class="codekeyword">float</span> dz = otherGuy-&gt;z0 - z0;
+            <span class="codekeyword">float</span> m = sqrt(dx * dx + dz * dz);
+            dx /= m;
+            dz /= m;
+            
+            <span class="codekeyword">float</span> dotProduct = vx * dx + vz * dz;
+            vx -= 2 * dotProduct * dx;
+            vz -= 2 * dotProduct * dz;
+            
+            <span class="codekeyword">if</span> (vx != 0 || vz != 0) {
+                angle = atan2(vz, vx);
+            }
+        }
+};</pre></div><p>
+The <kbd>bounceOff</kbd> method is used for handling collisions.  It 
+makes the guy change direction so that he bounces of another guy.  It 
+operates similarly to the bouncing in the program on collision 
+detection, but works in two dimensions.  It computes the direction from 
+the first guy to the other guy, takes the dot product of that vector and
+ the velocity vector, and subtracts twice the dot product times the 
+direction from the velocity.  It uses the resultant vector to determine 
+the new angle in which the guy will walk, using the <kbd>atan2</kbd> C function.  <kbd>atan2</kbd>
+ just returns the angle of a vector, where the first parameter is the y 
+component of the vector and the second parameter is the x component of 
+the vector.
+</p>
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_1_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_1" name="aswift_1" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</center>
+
+<center><h2>Collision Detection Code</h2></center>
+<p>
+Next, we have a bunch of code related to collision detection.
+</p>
+<div class="codeblock"><pre><span class="codekeyword">struct</span> GuyPair {
+    Guy* guy1;
+    Guy* guy2;
+};</pre></div><p>
+We have a <kbd>GuyPair</kbd> function which stores potential collisions.
+</p><div class="codeblock"><pre><span class="codekeyword">const</span> <span class="codekeyword">int</span> MAX_QUADTREE_DEPTH = 6;
+<span class="codekeyword">const</span> <span class="codekeyword">int</span> MIN_GUYS_PER_QUADTREE = 2;
+<span class="codekeyword">const</span> <span class="codekeyword">int</span> MAX_GUYS_PER_QUADTREE = 5;</pre></div><p>
+For this program, we're using a quadtree for collision detection, the 
+two-dimensional analog of the octree we used in the program with all of 
+the bouncing balls.  We have some parameters for the quadtree indicating
+ when to divide or un-divide a particular quadtree node.
+</p><div class="codeblock"><pre><span class="codecomment">//Our data structure for making collision detection faster</span>
+<span class="codekeyword">class</span> Quadtree {
+    <span class="codekeyword">private</span>:
+        <span class="codekeyword">float</span> minX;
+        <span class="codekeyword">float</span> minZ;
+        <span class="codekeyword">float</span> maxX;
+        <span class="codekeyword">float</span> maxZ;
+        <span class="codekeyword">float</span> centerX; <span class="codecomment">//(minX + maxX) / 2</span>
+        <span class="codekeyword">float</span> centerZ; <span class="codecomment">//(minZ + maxZ) / 2</span></pre></div><p>
+We've been through octrees before, but let's run though our <kbd>Quadtree</kbd> class to make sure that we still understand how everything works.  We have the <kbd>minX</kbd>, <kbd>minZ</kbd>, <kbd>maxX</kbd>, and <kbd>maxZ</kbd> fields, which indicate the rectangle for a given node, and <kbd>centerX</kbd> and <kbd>centerZ</kbd>, the coordinates of the center of that rectangle.
+</p><div class="codeblock"><pre>        <span class="codecomment">/* The children of this, if this has any.  children[0][*] are the
+         * children with x coordinates ranging from minX to centerX.
+         * children[1][*] are the children with x coordinates ranging from
+         * centerX to maxX.  Similarly for the other dimension of the children
+         * array.
+         */</span>
+        Quadtree *children[2][2];
+        <span class="codecomment">//Whether this has children</span>
+        <span class="codekeyword">bool</span> hasChildren;
+        <span class="codecomment">//The guys in this, if this doesn't have any children</span>
+        set&lt;Guy*&gt; guys;
+        <span class="codecomment">//The depth of this in the tree</span>
+        <span class="codekeyword">int</span> depth;
+        <span class="codecomment">//The number of guys in this, including those stored in its children</span>
+        <span class="codekeyword">int</span> numGuys;</pre></div><p>
+We have the <kbd>children</kbd> field, which is a two-dimensional array of <kbd>Quadtree</kbd> objects storing the children of a node, if there are any.  The <kbd>hasChildren</kbd> field tells us whether a quadtree node has any children.  The <kbd>guys</kbd> set stores all of the guys in a node, if the node has no children.  <kbd>depth</kbd> indicates the depth of a node in the quadtree.  <kbd>numGuys</kbd> is the number of guys in a node or any of its children.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Adds a guy to or removes one from the children of this</span>
+        <span class="codekeyword">void</span> fileGuy(Guy* guy, <span class="codekeyword">float</span> x, <span class="codekeyword">float</span> z, <span class="codekeyword">bool</span> addGuy) {
+            <span class="codecomment">//Figure out in which child(ren) the guy belongs</span>
+            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> xi = 0; xi &lt; 2; xi++) {
+                <span class="codekeyword">if</span> (xi == 0) {
+                    <span class="codekeyword">if</span> (x - guy-&gt;radius() &gt; centerX) {
+                        <span class="codekeyword">continue</span>;
+                    }
+                }
+                <span class="codekeyword">else</span> <span class="codekeyword">if</span> (x + guy-&gt;radius() &lt; centerX) {
+                    <span class="codekeyword">continue</span>;
+                }
+                
+                <span class="codekeyword">for</span>(<span class="codekeyword">int</span> zi = 0; zi &lt; 2; zi++) {
+                    <span class="codekeyword">if</span> (zi == 0) {
+                        <span class="codekeyword">if</span> (z - guy-&gt;radius() &gt; centerZ) {
+                            <span class="codekeyword">continue</span>;
+                        }
+                    }
+                    <span class="codekeyword">else</span> <span class="codekeyword">if</span> (z + guy-&gt;radius() &lt; centerZ) {
+                        <span class="codekeyword">continue</span>;
+                    }
+                    
+                    <span class="codecomment">//Add or remove the guy</span>
+                    <span class="codekeyword">if</span> (addGuy) {
+                        children[xi][zi]-&gt;add(guy);
+                    }
+                    <span class="codekeyword">else</span> {
+                        children[xi][zi]-&gt;remove(guy, x, z);
+                    }
+                }
+            }
+        }</pre></div><p>
+<kbd>fileGuy</kbd> figures out in which of the children a particular guy
+ belongs and either adds the guy to or removes the guy from these 
+children, depending on whether <kbd>addGuy</kbd> is true.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Creates children of this, and moves the guys in this to the children</span>
+        <span class="codekeyword">void</span> haveChildren() {
+            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> x = 0; x &lt; 2; x++) {
+                <span class="codekeyword">float</span> minX2;
+                <span class="codekeyword">float</span> maxX2;
+                <span class="codekeyword">if</span> (x == 0) {
+                    minX2 = minX;
+                    maxX2 = centerX;
+                }
+                <span class="codekeyword">else</span> {
+                    minX2 = centerX;
+                    maxX2 = maxX;
+                }
+                
+                <span class="codekeyword">for</span>(<span class="codekeyword">int</span> z = 0; z &lt; 2; z++) {
+                    <span class="codekeyword">float</span> minZ2;
+                    <span class="codekeyword">float</span> maxZ2;
+                    <span class="codekeyword">if</span> (z == 0) {
+                        minZ2 = minZ;
+                        maxZ2 = centerZ;
+                    }
+                    <span class="codekeyword">else</span> {
+                        minZ2 = centerZ;
+                        maxZ2 = maxZ;
+                    }
+                    
+                    children[x][z] =
+                        <span class="codekeyword">new</span> Quadtree(minX2, maxX2, minZ2, maxZ2, depth + 1);
+                }
+            }
+            
+            <span class="codecomment">//Remove all guys from "guys" and add them to the new children</span>
+            <span class="codekeyword">for</span>(set&lt;Guy*&gt;::iterator it = guys.begin(); it != guys.end();
+                    it++) {
+                Guy* guy = *it;
+                fileGuy(guy, guy-&gt;x(), guy-&gt;z(), true);
+            }
+            guys.clear();
+            
+            hasChildren = true;
+        }</pre></div><p>
+The <kbd>haveChildren</kbd> method divides a quadtree node, placing all of the guys into four new child nodes.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Adds all guys in this or one of its descendants to the specified set</span>
+        <span class="codekeyword">void</span> collectGuys(set&lt;Guy*&gt; &amp;gs) {
+            <span class="codekeyword">if</span> (hasChildren) {
+                <span class="codekeyword">for</span>(<span class="codekeyword">int</span> x = 0; x &lt; 2; x++) {
+                    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> z = 0; z &lt; 2; z++) {
+                        children[x][z]-&gt;collectGuys(gs);
+                    }
+                }
+            }
+            <span class="codekeyword">else</span> {
+                <span class="codekeyword">for</span>(set&lt;Guy*&gt;::iterator it = guys.begin(); it != guys.end();
+                        it++) {
+                    Guy* guy = *it;
+                    gs.insert(guy);
+                }
+            }
+        }</pre></div><p>
+The <kbd>collectGuys</kbd> method puts all of the guys in a particular node or any of its children into a given set.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Destroys the children of this, and moves all guys in its descendants</span>
+        <span class="codecomment">//to the "guys" set</span>
+        <span class="codekeyword">void</span> destroyChildren() {
+            <span class="codecomment">//Move all guys in descendants of this to the "guys" set</span>
+            collectGuys(guys);
+            
+            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> x = 0; x &lt; 2; x++) {
+                <span class="codekeyword">for</span>(<span class="codekeyword">int</span> z = 0; z &lt; 2; z++) {
+                    <span class="codekeyword">delete</span> children[x][z];
+                }
+            }
+            
+            hasChildren = false;
+        }</pre></div><p>
+The <kbd>destroyChildren</kbd> method un-divides a quadtree node by collecting all of the guys in its children into the <kbd>guys</kbd> set and deleting the children.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Removes the specified guy at the indicated position</span>
+        <span class="codekeyword">void</span> remove(Guy* guy, <span class="codekeyword">float</span> x, <span class="codekeyword">float</span> z) {
+            numGuys--;
+            
+            <span class="codekeyword">if</span> (hasChildren &amp;&amp; numGuys &lt; MIN_GUYS_PER_QUADTREE) {
+                destroyChildren();
+            }
+            
+            <span class="codekeyword">if</span> (hasChildren) {
+                fileGuy(guy, x, z, false);
+            }
+            <span class="codekeyword">else</span> {
+                guys.erase(guy);
+            }
+        }</pre></div><p>
+The <kbd>remove</kbd> method removes a guy at a particular position from a node.  It calls <kbd>destroyChildren</kbd> if the node has few children.  It then either uses <kbd>fileGuy</kbd> to remove the guy from its children or just removes the guy from the <kbd>guys</kbd> set.
+</p><div class="codeblock"><pre>    <span class="codekeyword">public</span>:
+        <span class="codecomment">//Constructs a new Quadtree.  d is the depth, which starts at 1.</span>
+        Quadtree(<span class="codekeyword">float</span> minX1, <span class="codekeyword">float</span> minZ1, <span class="codekeyword">float</span> maxX1, <span class="codekeyword">float</span> maxZ1, <span class="codekeyword">int</span> d) {
+            minX = minX1;
+            minZ = minZ1;
+            maxX = maxX1;
+            maxZ = maxZ1;
+            centerX = (minX + maxX) / 2;
+            centerZ = (minZ + maxZ) / 2;
+            
+            depth = d;
+            numGuys = 0;
+            hasChildren = false;
+        }</pre></div><p>
+We have our constructor, which initializes some of the fields.
+</p><div class="codeblock"><pre>        ~Quadtree() {
+            <span class="codekeyword">if</span> (hasChildren) {
+                destroyChildren();
+            }
+        }</pre></div><p>
+The destructor deletes the children if there are any.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Adds a guy to this</span>
+        <span class="codekeyword">void</span> add(Guy* guy) {
+            numGuys++;
+            <span class="codekeyword">if</span> (!hasChildren &amp;&amp; depth &lt; MAX_QUADTREE_DEPTH &amp;&amp;
+                numGuys &gt; MAX_GUYS_PER_QUADTREE) {
+                haveChildren();
+            }
+            
+            <span class="codekeyword">if</span> (hasChildren) {
+                fileGuy(guy, guy-&gt;x(), guy-&gt;z(), true);
+            }
+            <span class="codekeyword">else</span> {
+                guys.insert(guy);
+            }
+        }</pre></div><p>
+The <kbd>add</kbd> method divides the quadree node if there are too many children.  It then either uses <kbd>fileGuy</kbd> to put the guy into the appropriate children, or it adds the guy to the <kbd>guys</kbd> set.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Removes a guy from this</span>
+        <span class="codekeyword">void</span> remove(Guy* guy) {
+            remove(guy, guy-&gt;x(), guy-&gt;z());
+        }</pre></div><p>
+This <kbd>remove</kbd> method calls the other <kbd>remove</kbd> method to remove a guy from his current position.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Changes the position of a guy in this from the specified position to</span>
+        <span class="codecomment">//its current position</span>
+        <span class="codekeyword">void</span> guyMoved(Guy* guy, <span class="codekeyword">float</span> x, <span class="codekeyword">float</span> z) {
+            remove(guy, x, z);
+            add(guy);
+        }</pre></div><p>
+The <kbd>guyMoved</kbd> method is called whenever a guy's position 
+changes.  It operates by removing the guy at his old position and then 
+adding him again.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Adds potential collisions to the specified set</span>
+        <span class="codekeyword">void</span> potentialCollisions(vector&lt;GuyPair&gt; &amp;collisions) {
+            <span class="codekeyword">if</span> (hasChildren) {
+                <span class="codekeyword">for</span>(<span class="codekeyword">int</span> x = 0; x &lt; 2; x++) {
+                    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> z = 0; z &lt; 2; z++) {
+                        children[x][z]-&gt;potentialCollisions(collisions);
+                    }
+                }
+            }
+            <span class="codekeyword">else</span> {
+                <span class="codecomment">//Add all pairs (guy1, guy2) from guys</span>
+                <span class="codekeyword">for</span>(set&lt;Guy*&gt;::iterator it = guys.begin(); it != guys.end();
+                        it++) {
+                    Guy* guy1 = *it;
+                    <span class="codekeyword">for</span>(set&lt;Guy*&gt;::iterator it2 = guys.begin();
+                            it2 != guys.end(); it2++) {
+                        Guy* guy2 = *it2;
+                        <span class="codecomment">//This test makes sure that we only add each pair once</span>
+                        <span class="codekeyword">if</span> (guy1 &lt; guy2) {
+                            GuyPair gp;
+                            gp.guy1 = guy1;
+                            gp.guy2 = guy2;
+                            collisions.push_back(gp);
+                        }
+                    }
+                }
+            }
+        }
+};</pre></div><p>
+The <kbd>potentialCollisions</kbd> method figures out possible 
+collisions between pairs of guys.  It recurses on the children if there 
+are any and takes every pair of guys otherwise.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> potentialCollisions(vector&lt;GuyPair&gt; &amp;cs, Quadtree* quadtree) {
+    quadtree-&gt;potentialCollisions(cs);
+}</pre></div><p>
+The <kbd>potentialCollisions</kbd> function just calls the quadtree's <kbd>potentialCollisions</kbd> method.
+</p><div class="codeblock"><pre><span class="codecomment">//Returns whether guy1 and guy2 are currently colliding</span>
+<span class="codekeyword">bool</span> testCollision(Guy* guy1, Guy* guy2) {
+    <span class="codekeyword">float</span> dx = guy1-&gt;x() - guy2-&gt;x();
+    <span class="codekeyword">float</span> dz = guy1-&gt;z() - guy2-&gt;z();
+    <span class="codekeyword">float</span> r = guy1-&gt;radius() + guy2-&gt;radius();
+    <span class="codekeyword">if</span> (dx * dx + dz * dz &lt; r * r) {
+        <span class="codekeyword">float</span> vx = guy1-&gt;velocityX() - guy2-&gt;velocityX();
+        <span class="codekeyword">float</span> vz = guy1-&gt;velocityZ() - guy2-&gt;velocityZ();
+        <span class="codekeyword">return</span> vx * dx + vz * dz &lt; 0;
+    }
+    <span class="codekeyword">else</span> {
+        <span class="codekeyword">return</span> false;
+    }
+}</pre></div><p>
+<kbd>testCollision</kbd> determines whether there actually is a 
+collision between two particular guys.  A collision occurs when the 
+distance between the guys is less than the sum of their radii, and the 
+guys are currently moving towards each other.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> handleCollisions(vector&lt;Guy*&gt; &amp;guys,
+                      Quadtree* quadtree,
+                      <span class="codekeyword">int</span> &amp;numCollisions) {
+    vector&lt;GuyPair&gt; gps;
+    potentialCollisions(gps, quadtree);
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; gps.size(); i++) {
+        GuyPair gp = gps[i];
+        
+        Guy* g1 = gp.guy1;
+        Guy* g2 = gp.guy2;
+        <span class="codekeyword">if</span> (testCollision(g1, g2)) {
+            g1-&gt;bounceOff(g2);
+            g2-&gt;bounceOff(g1);
+            numCollisions++;
+        }
+    }
+}</pre></div><p>
+The <kbd>handleCollisions</kbd> function goes through potential 
+collisions and finds the ones that are actually collisions.  For each 
+collision, it makes the guys bounce off of each other using the <kbd>bounceOff</kbd> method, and increments a <kbd>numCollisions</kbd>
+ variable, which stores the total number of collisions that have 
+occurred.  If you remember from the screenshot at the beginning, we'll 
+be displaying the total number of collisions, so we need to keep track 
+of this amount.
+</p>
+<center><h2>The Rest of the Code</h2></center>
+<div class="codeblock"><pre><span class="codecomment">//Moves the guys over the given interval of time, without handling collisions</span>
+<span class="codekeyword">void</span> moveGuys(vector&lt;Guy*&gt; &amp;guys, Quadtree* quadtree, <span class="codekeyword">float</span> dt) {
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; guys.size(); i++) {
+        Guy* guy = guys[i];
+        <span class="codekeyword">float</span> oldX = guy-&gt;x();
+        <span class="codekeyword">float</span> oldZ = guy-&gt;z();
+        guy-&gt;advance(dt);
+        quadtree-&gt;guyMoved(guy, oldX, oldZ);
+    }
+}</pre></div><p>
+This function takes care of moving the guys over a certain interval of time, by calling <kbd>advance</kbd> on the guys and calling <kbd>guyMoved</kbd> on the quadtree for each guy.
+</p><div class="codeblock"><pre><span class="codecomment">//Advances the state of the guys over the indicated interval of time</span>
+<span class="codekeyword">void</span> advance(vector&lt;Guy*&gt; &amp;guys,
+             Quadtree* quadtree,
+             <span class="codekeyword">float</span> t,
+             <span class="codekeyword">float</span> &amp;timeUntilHandleCollisions,
+             <span class="codekeyword">int</span> &amp;numCollisions) {
+    <span class="codekeyword">while</span> (t &gt; 0) {
+        <span class="codekeyword">if</span> (timeUntilHandleCollisions &lt;= t) {
+            moveGuys(guys, quadtree, timeUntilHandleCollisions);
+            handleCollisions(guys, quadtree, numCollisions);
+            t -= timeUntilHandleCollisions;
+            timeUntilHandleCollisions = TIME_BETWEEN_HANDLE_COLLISIONS;
+        }
+        <span class="codekeyword">else</span> {
+            moveGuys(guys, quadtree, t);
+            timeUntilHandleCollisions -= t;
+            t = 0;
+        }
+    }
+}</pre></div><p>
+The <kbd>advance</kbd> function moves the guys over a certain interval of time, by alternately using <kbd>moveGuys</kbd> to advance the guys an interval of <kbd>TIME_BETWEEN_HANDLE_COLLISIONS</kbd> and calling <kbd>handleCollisions</kbd>.
+</p><div class="codeblock"><pre><span class="codecomment">//Returns a vector of numGuys new guys</span>
+vector&lt;Guy*&gt; makeGuys(<span class="codekeyword">int</span> numGuys, MD2Model* model, Terrain* terrain) {
+    vector&lt;Guy*&gt; guys;
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; numGuys; i++) {
+        guys.push_back(<span class="codekeyword">new</span> Guy(model,
+                               terrain,
+                               TERRAIN_WIDTH / (terrain-&gt;width() - 1)));
+    }
+    <span class="codekeyword">return</span> guys;
+}</pre></div><p>
+<kbd>makeGuys</kbd> constructs and returns <kbd>numGuys</kbd> new guys.
+</p><div class="codeblock"><pre><span class="codecomment">//Draws the terrain</span>
+<span class="codekeyword">void</span> drawTerrain(Terrain* terrain) 
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(0.3f, 0.9f, 0.0f);
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> z = 0; z &lt; terrain-&gt;length() - 1; z++) {
+        glBegin(GL_TRIANGLE_STRIP);
+        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> x = 0; x &lt; terrain-&gt;width(); x++) {
+            Vec3f normal = terrain-&gt;getNormal(x, z);
+            glNormal3f(normal[0], normal[1], normal[2]);
+            glVertex3f(x, terrain-&gt;getHeight(x, z), z);
+            normal = terrain-&gt;getNormal(x, z + 1);
+            glNormal3f(normal[0], normal[1], normal[2]);
+            glVertex3f(x, terrain-&gt;getHeight(x, z + 1), z + 1);
+        }
+        glEnd();
+    }
+}</pre></div><p>
+The <kbd>drawTerrain</kbd> function takes care of drawing the terrain.  
+The code is the same as the code from the lesson on terrains, although 
+if you remember in the terrain lesson, this code was in the <kbd>drawScene</kbd> function.
+</p><div class="codeblock"><pre><span class="codecomment">//Draws a string at the top of the screen indicating that the specified number</span>
+<span class="codecomment">//of collisions have occurred</span>
+<span class="codekeyword">void</span> drawNumCollisions(<span class="codekeyword">int</span> numCollisions) {
+    ostringstream oss;
+    oss &lt;&lt; "Collisions: " &lt;&lt; numCollisions;
+    string str = oss.str();</pre></div><p>
+The <kbd>drawNumCollisions</kbd> function will take care of drawing the 
+total number of collisions at the top of the screen.  First of all, 
+we'll use string streams to get a string that reads "Collisions: 500", 
+or whatever the number of collisions happens to be.  We used <kbd>#include &lt;sstream&gt;</kbd> at the top of main.cpp to include string streams.  You can use the <kbd>&lt;&lt;</kbd> operator to add to the end of an <kbd>ostringstream</kbd>.  So, we add "Collisions: " to the end of a new string stream, followed by <kbd>numCollisions</kbd>.  Now, the string stream has what we want.  To get a string containing its contents, we call <kbd>str()</kbd> on the stream.  This method returns a C++ <kbd>string</kbd> object rather than a character array, a C-style string.  C++ <kbd>string</kbd>s behave a lot like character arrays; in fact, you can access the character array for a <kbd>string</kbd> object by calling <kbd>c_str()</kbd>.
+</p><div class="codeblock"><pre>    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_LIGHTING);
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glPushMatrix();
+    glTranslatef(0.0f, 1.7f, -5.0f);
+    glScalef(0.2f, 0.2f, 0.2f);
+    t3dDraw2D(str, 0, 0);
+    glPopMatrix();
+    glEnable(GL_LIGHTING);
+}</pre></div><p>
+Now we do our OpenGL thing, translating, coloring, pushing and popping, all that business.  We have a call to <kbd>t3dDraw2D</kbd> to actually draw the string, which we will have center-aligned both horizontally and vertically.
+</p><div class="codeblock"><pre>MD2Model* _model;
+vector&lt;Guy*&gt; _guys;
+Terrain* _terrain;
+<span class="codekeyword">float</span> _angle = 0;
+Quadtree* _quadtree;
+<span class="codecomment">//The amount of time until we next check for and handle all collisions</span>
+<span class="codekeyword">float</span> _timeUntilHandleCollisions = 0;
+<span class="codekeyword">int</span> _numCollisions; <span class="codecomment">//The total number of collisions that have occurred</span></pre></div><p>
+As usual, we have a bunch of variables, which are mostly self-explanatory.  <kbd>_angle</kbd> is the camera angle, and <kbd>_timeUntilHandleCollisions</kbd> is the amount of time until we'll next handle collisions.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> cleanup() {
+    <span class="codekeyword">delete</span> _model;
+    
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; _guys.size(); i++) {
+        <span class="codekeyword">delete</span> _guys[i];
+    }
+    
+    t3dCleanup();
+}</pre></div><p>
+The <kbd>cleanup</kbd> function deletes the model and the <kbd>Guy</kbd> objects, and calls <kbd>t3dCleanup()</kbd> to tell the text drawing functionality to dispose of its resources.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> initRendering() {
+    <span class="codecomment">//...</span>
+    
+    t3dInit(); <span class="codecomment">//Initialize text drawing functionality</span>
+    
+    <span class="codecomment">//Load the model</span>
+    _model = MD2Model::load("blockybalboa.md2");
+    <span class="codekeyword">if</span> (_model != NULL) {
+        _model-&gt;setAnimation("run");
+    }
+}</pre></div><p>
+In <kbd>initRendering</kbd>, we call <kbd>t3dInit</kbd> to set up the 
+text drawing functionality.  We load the model (which I created in 
+Blender).  The model file is named blockybalboa.md2, as our block guys 
+are named Blocky Balboa.  Then, we switch to the running animation.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> drawScene() {
+    <span class="codecomment">//...</span>
+    
+    <span class="codecomment">//Draw the number of collisions that have occurred</span>
+    drawNumCollisions(_numCollisions);
+    
+    <span class="codecomment">//The scaling factor for the terrain</span>
+    <span class="codekeyword">float</span> scale = TERRAIN_WIDTH / (_terrain-&gt;width() - 1);
+    
+    <span class="codecomment">//...</span>
+    
+    <span class="codecomment">//Draw the guys</span>
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; _guys.size(); i++) {
+        _guys[i]-&gt;draw();
+    }
+    
+    <span class="codecomment">//Draw the terrain</span>
+    glScalef(scale, scale, scale);
+    drawTerrain(_terrain);
+    
+    <span class="codecomment">//...</span>
+}</pre></div><p>
+The <kbd>drawScene</kbd> function for the most part calls <kbd>drawNumCollisions</kbd>, the <kbd>Guy</kbd> class's <kbd>draw</kbd> method, and the <kbd>drawTerrain</kbd> function.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> update(<span class="codekeyword">int</span> value) {
+    _angle += 0.3f;
+    <span class="codekeyword">if</span> (_angle &gt; 360) {
+        _angle -= 360;
+    }
+    
+    advance(_guys,
+            _quadtree,
+            0.025f,
+            _timeUntilHandleCollisions,
+            _numCollisions);
+    
+    <span class="codecomment">//...</span>
+}</pre></div><p>
+<kbd>update</kbd> increases the camera angle and calls <kbd>advance</kbd> to advance the positions of the guys.
+</p><div class="codeblock"><pre><span class="codekeyword">int</span> main(<span class="codekeyword">int</span> argc, <span class="codekeyword">char</span>** argv) {
+    <span class="codecomment">//...</span>
+    
+    _terrain = loadTerrain("heightmap.bmp", 30.0f); <span class="codecomment">//Load the terrain</span>
+    _guys = makeGuys(NUM_GUYS, _model, _terrain); <span class="codecomment">//Create the guys</span>
+    <span class="codecomment">//Compute the scaling factor for the terrain</span>
+    <span class="codekeyword">float</span> scaledTerrainLength =
+        TERRAIN_WIDTH / (_terrain-&gt;width() - 1) * (_terrain-&gt;length() - 1);
+    <span class="codecomment">//Construct and initialize the quadtree</span>
+    _quadtree = <span class="codekeyword">new</span> Quadtree(0, 0, TERRAIN_WIDTH, scaledTerrainLength, 1);
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; _guys.size(); i++) {
+        _quadtree-&gt;add(_guys[i]);
+    }
+    
+    <span class="codecomment">//...</span>
+}</pre></div><p>
+The main function takes care of loading the terrain, creating all of the guys, and setting up the quadtree.
+</p><p>
+So that's pretty much a run down of the program.  Hopefully, all this 
+jaberring has helped solidify what you learned in the last few lessons.
+</p>
+
+
+
+
+
+
+
+
+
+<p><i>Next is <a href="http://www.videotutorialsrock.com/opengl_tutorial/special_effects/home.php">"Part 3: Special Effects"</a>.</i></p><center><div class="lessonlinks">
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/blockhead/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/blockhead/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/blockhead/blockhead.zip">Download source</a></li></ul>
+</div></center>
+
+		<center><div class="horizontaladslong">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_2_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_2" name="aswift_2" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+		</div></center>
+	</div>
+</div>
+
+	<div id="footer">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Quick Reference</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/links.php">Links</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/about.php">About</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/contact.php">Contact</a></li>
+		</ul>
+		<center><table><tbody><tr><td>
+<a href="http://validator.w3.org/check/referer" target="_blank"><img src="text.php_files/valid_xhtml.png" alt="Valid XHTML" align="bottom" border="0" height="31" width="88"></a>
+		</td><td><center><p>© 2007 - 2011 Bill Jacobs<br>"Rock on!" - Bill</p></center></td><td>
+<a href="http://jigsaw.w3.org/css-validator/check/referer" target="_blank"><img src="text.php_files/valid_css.png" alt="Valid CSS" align="bottom" border="0" height="31" width="88"></a>
+		</td></tr></tbody></table></center>
+	</div>
+</div>
+
+<script src="text.php_files/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1957485-1";
+urchinTracker();
+</script>
+
+
+
+</body></html>
