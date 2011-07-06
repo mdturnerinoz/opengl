@@ -1,0 +1,315 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+	<title>OpenGL Video Tutorial - Drawing Text</title>
+	<meta name="title" content="OpenGL Video Tutorial - Drawing Text">
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<meta name="description" content="Free beginner-friendly OpenGL / GLUT tutorial for C++, including both video and text versions.">
+	<meta name="keywords" content="OpenGL, GLUT, OpenGL tutorial, OpenGL tutorials, free, GLUT tutorial, GLUT tutorials, OpenGL video tutorial, OpenGL video tutorials, video, videos, GLUT video tutorial, GLUT video tutorials, video tutorial, video tutorials, 3D, 3-D, Windows, Mac, OS X, Mac OS X, MacOSX, Linux, C, C++, Visual C++, programming, 3D programming, 3-D programming, reference, forum, forums">
+	<meta name="author" content="Bill Jacobs">
+	<meta name="designer" content="Bill Jacobs">
+	<meta name="copyright" content="© 2007 - 2008 Bill Jacobs">
+	<link href="text.php_files/styles.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 6]>
+		<style type="text/css">
+			#container {
+				width: expression(document.documentElement.clientWidth < 808 ? "808px" : "auto");
+			}
+		</style>
+	<![endif]-->
+	<!--[if gte IE 5]>
+		<style type="text/css">
+			#topads {
+				width: expression(document.body.clientWidth > 160 ? "160px" : "auto");
+			}
+		</style>
+	<![endif]-->
+</head>
+
+<body bgcolor="#B0E0FF">
+<div id="container">
+	<div id="header">
+		<img src="text.php_files/top_icon.png" alt="3D Video Tutorials Rock.com logo" height="101" width="165"><h1>OpenGL tutorial</h1>
+	</div>
+	
+	<div id="menu1">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Reference</a></li>
+		</ul>
+	</div>
+	
+	<div id="content">
+		<div id="mainbody">
+
+<center><h1>Lesson 8: Drawing Text</h1></center>
+<center><div class="lessonlinks">
+	<div class="watchnow"><a href="http://www.videotutorialsrock.com/opengl_tutorial/draw_text/video.php">Watch the video now!</a></div>
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/draw_text/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/draw_text/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/draw_text/drawtext.zip">Download source</a></li></ul>
+</div></center>
+<center><div class="horizontaladslong">
+	<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</div></center>
+<center><h2>Drawing Text in OpenGL</h2></center>
+<p>
+Drawing text is fairly important on occasion.  There are a few possible 
+approaches to drawing text in OpenGL.  I'll outline four approaches and 
+their pros and cons.
+</p><ol><li>
+You can use bitmaps, not the kind that uses an image file, but a certain
+ OpenGL construct that I haven't shown yet.  Each character is 
+represented as a bitmap.  Each pixel in the bitmap has a bit, which is 1
+ if the pixel is colored and 0 if it is transparent.  Each frame, you'd 
+send the bitmaps for the characters to the graphics card.  The graphics 
+card would then bypass the usual 3D transformations and just draw the 
+pixels right on the top of the window.  I'm not a fan of this approach. 
+ It's slow, as you have to send each bitmap to the graphics card each 
+frame, which is a lot of data.  The method is also inflexible; you can't
+ scale or transform the characters very well.  You can do it in GLUT 
+using <kbd>glutBitmapCharacter</kbd>, whose documentation is at <a href="http://www.opengl.org/documentation/specs/glut/spec3/node75.html#SECTION000110000000000000000">this site</a>.  But again, there are a lot of disadvantages to the technique.
+</li><li>
+You can represent characters using textures.  Each character would 
+correspond to a certain part of some texture, with some of the pixels in
+ the texture white and the rest transparent (which I haven't shown how 
+to do yet).  You would draw a quadrilateral for each character and map 
+the appropriate part of the appropriate texture to it.  This approach is
+ alright; it gives you some flexibility as to how and where you draw 
+characters in 3D.  It's also pretty fast.  But the characters wouldn't 
+scale too well; they'll look pixelated if you zoom in too far.
+</li><li>
+You can draw a bunch of lines in 3D, using <kbd>GL_LINES</kbd> (which I also haven't shown yet, although you can probably guess how <kbd>GL_LINES</kbd>
+ works).  This technique is fast and does allow scaling and otherwise 
+transforming characters.  However, the characters would look better if 
+they covered an area rather than a perimeter.  Also, it's fairly tedious
+ to figure out a set of lines to represent each character.  You can draw
+ outlined text in GLUT using <kbd>glutStrokeCharacter</kbd>, whose documentation is at <a href="http://www.opengl.org/documentation/specs/glut/spec3/node75.html#SECTION000110000000000000000">this site</a>.
+</li><li>
+You can draw a bunch of polygons in 3D.  This technique also allows us 
+to transform characters well.  It even lets us give the characters 3D 
+depth, so that they look 3D rather than flat.  However, it's slower than
+ drawing lines and using textures.  Also, it's even more annoying to 
+figure out how to describe each character as a set of polygons than it 
+is to figure out how to describe one as a set of lines.
+</li></ol>
+<center><h2>How We'll Draw Text</h2></center>
+<p>
+Of the four techniques presented for drawing text in OpenGL, we'll be 
+using the last one.  I've already done most of the work for it.  Using 
+the open-source 3D modeling program <a href="http://www.blender.org/">Blender</a>,
+ I used the "add text" feature to come up with a 3D model for each of 
+the 95 printable ASCII characters.  I used the decimate tool to reduce 
+their polygon count, so that they average around 40 polygons each.  I 
+gave each character some 3D depth, saved each character to a separate 
+file, and used a program to load the files and output them into a 
+special file format I designed.  Then, I wrote code to load the models 
+from the file and display them using handy <kbd>t3dDraw2D</kbd> and <kbd>t3dDraw3D</kbd> functions, which I will describe later.
+</p><p>
+Details aside, the basic idea is that there is a file with all of the 
+positions of the 3D polygons for the different characters.  The <kbd>t3dDraw2D</kbd> and <kbd>t3dDraw3D</kbd>
+ functions take care of drawing the appropriate triangles.  The 
+functions themselves use some OpenGL techniques I haven't show yet, in 
+order to make them draw as quickly as possible.
+</p><p>
+How fast are these functions?  The 2D drawing function draws about 40 
+triangles per character.  Graphics cards can draw millions of triangles 
+per second.  So, we would expect the function to be able to draw about 
+1,000,000 / 40 = 25,000 characters per second, which is about what I 
+observed in a little test I rigged up.  So, if you're not drawing tons 
+of characters, it should be sufficient, but if you are, you might want 
+to switch to using <kbd>glutStrokeCharacter</kbd> to draw lines rather than polygons.
+</p>
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_1_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_1" name="aswift_1" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</center>
+
+<center><h2>The Source Code</h2></center>
+<p>
+We're going to put 3D text on each of the four sides of a square, so that our program will look like this:
+</p>
+<center><img src="text.php_files/screenshot.png" alt="Drawing 3D text screenshot" border="3" height="434" width="408"></center>
+<p>
+Let's look at the source.
+</p><div class="codeblock"><pre><span class="codecomment">//Computes a scaling value so that the strings</span>
+<span class="codekeyword">float</span> computeScale(<span class="codekeyword">const</span> <span class="codekeyword">char</span>* strs[4]) {
+    <span class="codekeyword">float</span> maxWidth = 0;
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 4; i++) {
+        <span class="codekeyword">float</span> width = t3dDrawWidth(strs[i]);
+        <span class="codekeyword">if</span> (width &gt; maxWidth) {
+            maxWidth = width;
+        }
+    }
+    
+    <span class="codekeyword">return</span> 2.6f / maxWidth;
+}</pre></div><p>
+Each side of the square will have a length of 3.  We want the longest string to take up 2.6 units on the square, so we use a <kbd>computeScale</kbd> function to determine the factor by which we should scale the text.  We go through each of the four strings, use <kbd>t3dDrawWidth</kbd>
+ to determine the draw width of the strings as a multiple of the height 
+of the font.  We take 2.6 divided by the maximum width to be our scaling
+ factor.
+</p><div class="codeblock"><pre><span class="codecomment">//The four strings that are drawn</span>
+<span class="codekeyword">const</span> <span class="codekeyword">char</span>* STRS[4] = {"Video", "Tutorials", "Rock", ".com"};</pre></div><p>
+The array <kbd>STRS</kbd> contains the strings that we will draw.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> cleanup() {
+    t3dCleanup();
+}</pre></div><p>
+Our <kbd>cleanup</kbd> function for this project calls <kbd>t3dCleanup()</kbd>, from the header "text3d.h", which frees the memory used by the text drawing functionality.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> initRendering() {
+    <span class="codecomment">//...</span>
+    t3dInit();
+}</pre></div><p>
+In our <kbd>initRendering</kbd> function, we have to set up some stuff 
+for drawing 3D text.  Namely, we have to load the positions of the 
+triangles for each character from the file "charset".  So we call <kbd>t3DInit()</kbd>, which is also from text3d.h.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> drawScene() {
+    <span class="codecomment">//...</span>
+    
+    <span class="codecomment">//Draw the strings along the sides of a square</span>
+    glScalef(_scale, _scale, _scale);
+    glColor3f(0.3f, 1.0f, 0.3f);
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 4; i++) {
+        glPushMatrix();
+        glRotatef(90 * i, 0, 1, 0);
+        glTranslatef(0, 0, 1.5f / _scale);
+        t3dDraw3D(STRS[i], 0, 0, 0.2f);
+        glPopMatrix();
+    }
+    
+    <span class="codecomment">//...</span>
+}</pre></div><p>
+Here's where we draw the 3D text.  First, we scale by the appropriate 
+factor.  Then, for each string, we move to the appropriate side of the 
+cube and use <kbd>t3dDraw3D</kbd> to draw the string.
+</p><p>
+The <kbd>t3dDraw3D</kbd> has five parameters.  You only see four 
+parameters here.  That's because we omitted the fifth parameter, so that
+ it will use the default value.  If you look at text3d.h, you can see 
+the way that this is accomplished in C++:
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> t3dDraw3D(std::string str,
+               <span class="codekeyword">int</span> hAlign, <span class="codekeyword">int</span> vAlign,
+               <span class="codekeyword">float</span> depth,
+               <span class="codekeyword">float</span> lineHeight = 1.5f);</pre></div><p>
+Where we have <kbd>float lineHeight = 1.5f</kbd>, we're telling the compiler to use a default value of 1.5 for the last parameter if it is omitted.
+</p><p>
+The first parameter is the string to draw.  The second is the horizontal
+ alignment of the string; a negative number is a left alignment, 0 is a 
+centered alignment, and a positive number is a right alignment.  The 
+third parameter is the vertical alignment of the string; a negative 
+number is a top alignment, 0 is a centered alignment, and a positive 
+number is a bottom alignment.  (You could draw text with multiple lines 
+if you wanted to, using newline characters.)  The fourth parameter is 
+the 3D depth of the character, as a multiple of the height of the font. 
+ The fifth parameter is the height of each line, as a multiple of the 
+height of the font.  It could be used to indicate the spacing between 
+lines, if we were drawing text with multiple lines.  But we're not, so 
+we'll just use the default value of 1.5.
+</p><p>
+If you want to draw text without depth, where all of the polygons are in the same plane, you could call <kbd>t3dDraw2D</kbd>,
+ which has the same parameters, except that it omits the depth of the 
+text (since there is no depth).  This is faster, since there are fewer 
+polygons to draw, but it doesn't give us the nice-looking 3D text.
+</p><div class="codeblock"><pre><span class="codekeyword">int</span> main(<span class="codekeyword">int</span> argc, <span class="codekeyword">char</span>** argv) {
+    <span class="codecomment">//...</span>
+    
+    _scale = computeScale(STRS);
+    
+    <span class="codecomment">//...</span>
+}</pre></div><p>
+Finally, in our main function, we compute the factor by which we're scaling the text by calling the <kbd>computeScale</kbd> function we saw earlier.
+</p><p>
+There we have it!  We've made some 3D text in OpenGL.
+</p>
+
+
+
+
+
+
+
+
+
+<p><i>Next is <a href="http://www.videotutorialsrock.com/opengl_tutorial/animation/home.php">"Lesson 9: Animation"</a>.</i></p><center><div class="lessonlinks">
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/draw_text/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/draw_text/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/draw_text/drawtext.zip">Download source</a></li></ul>
+</div></center>
+
+		<center><div class="horizontaladslong">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_2_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_2" name="aswift_2" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+		</div></center>
+	</div>
+</div>
+
+	<div id="footer">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Quick Reference</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/links.php">Links</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/about.php">About</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/contact.php">Contact</a></li>
+		</ul>
+		<center><table><tbody><tr><td>
+<a href="http://validator.w3.org/check/referer" target="_blank"><img src="text.php_files/valid_xhtml.png" alt="Valid XHTML" align="bottom" border="0" height="31" width="88"></a>
+		</td><td><center><p>© 2007 - 2011 Bill Jacobs<br>"Rock on!" - Bill</p></center></td><td>
+<a href="http://jigsaw.w3.org/css-validator/check/referer" target="_blank"><img src="text.php_files/valid_css.png" alt="Valid CSS" align="bottom" border="0" height="31" width="88"></a>
+		</td></tr></tbody></table></center>
+	</div>
+</div>
+
+<script src="text.php_files/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1957485-1";
+urchinTracker();
+</script>
+
+
+
+</body></html>

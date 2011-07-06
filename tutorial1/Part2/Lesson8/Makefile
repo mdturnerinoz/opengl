@@ -1,6 +1,7 @@
 CC = g++
 CFLAGS = -Wall
 PROG = drawtext
+BROWSER = firefox
 
 SRCS = main.cpp text3d.cpp
 
@@ -20,3 +21,7 @@ clean:
 
 run:
 	./$(PROG)
+
+text:
+	$(BROWSER) text.php.html &
+

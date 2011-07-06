@@ -1,0 +1,751 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+	<title>OpenGL Video Tutorial - Animation</title>
+	<meta name="title" content="OpenGL Video Tutorial - Animation">
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<meta name="description" content="Free beginner-friendly OpenGL / GLUT tutorial for C++, including both video and text versions.">
+	<meta name="keywords" content="OpenGL, GLUT, OpenGL tutorial, OpenGL tutorials, free, GLUT tutorial, GLUT tutorials, OpenGL video tutorial, OpenGL video tutorials, video, videos, GLUT video tutorial, GLUT video tutorials, video tutorial, video tutorials, 3D, 3-D, Windows, Mac, OS X, Mac OS X, MacOSX, Linux, C, C++, Visual C++, programming, 3D programming, 3-D programming, reference, forum, forums">
+	<meta name="author" content="Bill Jacobs">
+	<meta name="designer" content="Bill Jacobs">
+	<meta name="copyright" content="© 2007 - 2008 Bill Jacobs">
+	<link href="text.php_files/styles.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 6]>
+		<style type="text/css">
+			#container {
+				width: expression(document.documentElement.clientWidth < 808 ? "808px" : "auto");
+			}
+		</style>
+	<![endif]-->
+	<!--[if gte IE 5]>
+		<style type="text/css">
+			#topads {
+				width: expression(document.body.clientWidth > 160 ? "160px" : "auto");
+			}
+		</style>
+	<![endif]-->
+</head>
+
+<body bgcolor="#B0E0FF">
+<div id="container">
+	<div id="header">
+		<img src="text.php_files/top_icon.png" alt="3D Video Tutorials Rock.com logo" height="101" width="165"><h1>OpenGL tutorial</h1>
+	</div>
+	
+	<div id="menu1">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Reference</a></li>
+		</ul>
+	</div>
+	
+	<div id="content">
+		<div id="mainbody">
+
+<center><h1>Lesson 9: Animation</h1></center>
+<center><div class="lessonlinks">
+	<div class="watchnow"><a href="http://www.videotutorialsrock.com/opengl_tutorial/animation/video.php">Watch the video now!</a></div>
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/animation/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/animation/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/animation/animation.zip">Download source</a></li></ul>
+</div></center>
+<center><div class="horizontaladslong">
+	<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</div></center>
+<center><h2>3D Animation</h2></center>
+<p>
+3D animation is a nice thing to have in our programs.  There are a 
+couple of ways to do 3D animation.  We'll do animation using frames.  
+We'll have an external file that stores the positions of certain 
+vertices in our model at particular times in a loop of animation.  To 
+draw the model at a particular time, we'll take the two frames nearest 
+to the particular time and take a weighted average of the vertices' 
+positions; that is, we'll interpolate between the two frames.  There are
+ more flexible approaches to animation, notably, skeletal animation.  
+But we'll stick with the more straightforward approach.  This lesson 
+will be more complicated than previous lessons.
+</p>
+<center><h2>Saving and Loading 3D Animations</h2></center>
+<p>
+There are a bunch of file formats for representing 3D animations.  We'll
+ use MD2, the Quake 2 file format.  Quake 2 may be old, but we'll use 
+MD2 because the file format is open and straightforward and there are a 
+bunch of MD2 files online that other people have made.
+</p><p>
+Another reason we're using MD2 is because <a href="http://www.blender.org/">Blender</a>, an open-source 3D modeling program, is able to export to MD2.  Professionals normally use <a href="http://www.autodesk.com/3dsmax">3ds Max</a> or <a href="http://www.autodesk.com/maya">Maya</a> for 3D modeling.  But those programs cost money, so I'd rather stick with Blender.
+</p><p>
+Unfortunately, at present, the Blender MD2 exporter is quite 
+temperamental and buggy.  I couldn't get it to export animations in 
+version 2.44, which is presently the newest version; I had to use 
+version 2.42.  Hopefully, the exporter will be improved in later 
+versions of Blender.
+</p><p>
+Using Blender, I made the 3D guy for our program, including a texture for him.  Our program has the guy walking, as shown below:
+</p>
+<center><img src="text.php_files/screenshot.png" alt="Animation program screenshot" border="3" height="434" width="408"></center>
+<p>
+This is what editing the guy in Blender looks like:
+</p>
+<center><img src="text.php_files/blender.png" alt="Editing an animation in Blender" border="3" height="355" width="500"></center>
+<br>
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_1_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_1" name="aswift_1" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</center>
+
+<center><h2>Loading and Animating MD2 Files</h2></center>
+<p>
+So now that we've made an MD2 animation of our guy, we'll have to load 
+it in and animate it.  I looked online for the MD2 file format, so that I
+ could figure out how to do that.  In the rest of this lesson, we'll see
+ how exactly the MD2 file format works.
+</p><p>
+We'll put all of the code specific to MD2 files in the md2model.h and md2model.cpp files.  We'll have an <kbd>MD2Model</kbd>
+ class that stores all of the information about an animation and takes 
+care of drawing the animation.  Let's look at the md2model.h file to see
+ what the class looks like:
+</p><div class="codeblock"><pre><span class="codekeyword">struct</span> MD2Vertex {
+    Vec3f pos;
+    Vec3f normal;
+};
+
+<span class="codekeyword">struct</span> MD2Frame {
+    <span class="codekeyword">char</span> name[16];
+    MD2Vertex* vertices;
+};
+
+<span class="codekeyword">struct</span> MD2TexCoord {
+    <span class="codekeyword">float</span> texCoordX;
+    <span class="codekeyword">float</span> texCoordY;
+};
+
+<span class="codekeyword">struct</span> MD2Triangle {
+    <span class="codekeyword">int</span> vertices[3];  <span class="codecomment">//The indices of the vertices in this triangle</span>
+    <span class="codekeyword">int</span> texCoords[3]; <span class="codecomment">//The indices of the texture coordinates of the triangle</span>
+};</pre></div><p>
+
+First, we have a few structures that our <kbd>MD2Model</kbd> class will 
+use.  We have vertices, frames, texture coordinates, and triangles.  
+Each frame has a name, which usually indicates the type of animation in 
+which it is (e.g. "run", "stand").  The frames just store the positions 
+and normals of each of the vertices using a <kbd>vertices</kbd> array.  
+Each frame has the same number of vertices, so that the vertex at index 
+5, frame 1, for instance, represents the same part of the model as the 
+vertex at index 5, frame 2, but is in an different position.  A triangle
+ is defined by the indices of the vertices in the frames' <kbd>vertices</kbd> arrays, and the indices of the texture coordinates in an array that will appear in the <kbd>MD2Model</kbd> class.
+
+</p><div class="codeblock"><pre><span class="codekeyword">class</span> MD2Model {
+    <span class="codekeyword">private</span>:
+        MD2Frame* frames;
+        <span class="codekeyword">int</span> numFrames;
+        MD2TexCoord* texCoords;
+        MD2Triangle* triangles;
+        <span class="codekeyword">int</span> numTriangles;</pre></div><p>
+Here are the main fields that we'll need to draw the model.  We have an array of frames, texture coordinates, and triangles.
+</p><div class="codeblock"><pre>        GLuint textureId;</pre></div><p>
+Here, we have the id of the texture for the figure that we'll animate.
+</p><div class="codeblock"><pre>        <span class="codekeyword">int</span> startFrame; <span class="codecomment">//The first frame of the current animation</span>
+        <span class="codekeyword">int</span> endFrame;   <span class="codecomment">//The last frame of the current animation</span></pre></div><p>
+These are the starting and ending frames to use for animation.
+</p><div class="codeblock"><pre>        <span class="codecomment">/* The position in the current animation.  0 indicates the beginning of
+         * the animation, which is at the starting frame, and 1 indicates the
+         * end of the animation, which is right when the starting frame is
+         * reached again.  It always lies between 0 and 1.
+         */</span>
+        <span class="codekeyword">float</span> time;</pre></div><p>
+Er, just read the comments.
+</p><div class="codeblock"><pre>        MD2Model();
+    <span class="codekeyword">public</span>:
+        ~MD2Model();</pre></div><p>
+Here are our constructor and destructor.  The constructor is private, because only a special <kbd>MD2Model</kbd> method will be able to construct an <kbd>MD2Model</kbd> object.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Switches to the given animation</span>
+        <span class="codekeyword">void</span> setAnimation(<span class="codekeyword">const</span> <span class="codekeyword">char</span>* name);</pre></div><p>
+This method will let us set the current animation, since the MD2 file 
+can actually store several animations in certain ranges of frames.  Our 
+animation, for example, will occupy frames 40 to 45.  Each frame has a 
+name, which will enable us to identify the appropriate frames a the 
+given animation string, as we'll see later.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Advances the position in the current animation.  The entire animation</span>
+        <span class="codecomment">//lasts one unit of time.</span>
+        <span class="codekeyword">void</span> advance(<span class="codekeyword">float</span> dt);</pre></div><p>
+This method will be used to advance the state animation.  By repeatedly calling <kbd>advance</kbd>, we'll animate through the different positions of the 3D figure.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Draws the current state of the animated model.</span>
+        <span class="codekeyword">void</span> draw();</pre></div><p>
+This method takes care of actually drawing the 3D model.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Loads an MD2Model from the specified file.  Returns NULL if there was</span>
+        <span class="codecomment">//an error loading it.</span>
+        <span class="codekeyword">static</span> MD2Model* load(<span class="codekeyword">const</span> <span class="codekeyword">char</span>* filename);
+};</pre></div><p>
+The <kbd>load</kbd> method will load a given MD2 file.  It's a static method, indicated by the keyword "<kbd>static</kbd>".  This means that we can call it using <kbd>MD2Model::load("somefile.md2")</kbd>, and we don't need to call it on a particular <kbd>MD2Model</kbd> object.  Basically, <kbd>load</kbd> is like a normal function, except that it can access the private fields of <kbd>MD2Model</kbd> objects.
+</p><p>
+That's the md2model.h file.  Now let's look at md2model.cpp.
+</p><div class="codeblock"><pre><span class="codekeyword">namespace</span> {
+    <span class="codecomment">//...</span>
+}</pre></div><p>
+A little C++ nuance: we have to put all of the non-class constants and functions into this <kbd>namespace { }</kbd>
+ block so we can have other constants and functions with the same name 
+in different files.  We could, for instance, have a function called "<kbd>foo</kbd>" both in this namespace block and in main.cpp.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Normals used in the MD2 file format</span>
+    <span class="codekeyword">float</span> NORMALS[486] =
+        {-0.525731f,  0.000000f,  0.850651f,
+         -0.442863f,  0.238856f,  0.864188f,
+         <span class="codecomment">//...</span>
+         -0.688191f, -0.587785f, -0.425325f};</pre></div><p>
+Rather than storing normals directly, MD2 has 162 special normals and 
+only gives the indices of the normals.  This array contains all of the 
+normals that MD2 uses.
+</p><p>
+When we load in the file, we're going to have to worry about a little 
+thing called "endianness".  When designing CPUs, the designers had to 
+decide whether to store numbers with their most significant byte first 
+or last.  For example, the short integer 258 = 1(256) + 2 might be 
+stored with the bytes (1, 2), with the most significant byte first, or 
+with the bytes (2, 1), with the least significant byte first.  The first
+ means of storage is called "big-endian"; the second is called 
+"little-endian".  So, the people who designed CPUs, in their infinite 
+wisdom, chose both.  Some CPUs, including the Pentium, store numbers in 
+little-endian form, and other CPUs store numbers in big-endian form.  
+Stupid as it seems, which endianness is "better" has been the source of 
+flame wars.  So, we're stuck with both of them, a problem which has been
+ annoying computer programmers for ages past.
+</p><p>
+What does this have to do with anything?  The problem comes up when an 
+integer that requires multiple bytes is stored in the MD2 file.  It is 
+stored in little-endian form.  But the computer on which we load the 
+file might not use little-endian form.  So when we load the file, we 
+have to write our code carefully to make sure that the endianness of the
+ computer on which the program is running doesn't matter.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Returns whether the system is little-endian</span>
+    <span class="codekeyword">bool</span> littleEndian() {
+        <span class="codecomment">//The short value 1 has bytes (1, 0) in little-endian and (0, 1) in</span>
+        <span class="codecomment">//big-endian</span>
+        <span class="codekeyword">short</span> s = 1;
+        <span class="codekeyword">return</span> (((<span class="codekeyword">char</span>*)&amp;s)[0]) == 1;
+    }</pre></div><p>
+This function will check whether we are on a little-endian or big-endian
+ system.  If the first byte of the short integer 1 is a 1, then we're on
+ a little-endian machine; otherwise, we're on a big-endian machine.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Converts a four-character array to an integer, using little-endian form</span>
+    <span class="codekeyword">int</span> toInt(<span class="codekeyword">const</span> <span class="codekeyword">char</span>* bytes) {
+        <span class="codekeyword">return</span> (<span class="codekeyword">int</span>)(((<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span>)bytes[3] &lt;&lt; 24) |
+                     ((<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span>)bytes[2] &lt;&lt; 16) |
+                     ((<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span>)bytes[1] &lt;&lt; 8) |
+                     (<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span>)bytes[0]);
+    }
+    
+    <span class="codecomment">//Converts a two-character array to a short, using little-endian form</span>
+    <span class="codekeyword">short</span> toShort(<span class="codekeyword">const</span> <span class="codekeyword">char</span>* bytes) {
+        <span class="codekeyword">return</span> (<span class="codekeyword">short</span>)(((<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span>)bytes[1] &lt;&lt; 8) |
+                       (<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span>)bytes[0]);
+    }
+    
+    <span class="codecomment">//Converts a two-character array to an unsigned short, using little-endian</span>
+    <span class="codecomment">//form</span>
+    <span class="codekeyword">unsigned</span> <span class="codekeyword">short</span> toUShort(<span class="codekeyword">const</span> <span class="codekeyword">char</span>* bytes) {
+        <span class="codekeyword">return</span> (<span class="codekeyword">unsigned</span> <span class="codekeyword">short</span>)(((<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span>)bytes[1] &lt;&lt; 8) |
+                                (<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span>)bytes[0]);
+    }</pre></div><p>
+Here, we have functions that will convert a sequence of bytes into an <kbd>int</kbd>, a <kbd>short</kbd>, or an <kbd>unsigned short</kbd>.  They use the <kbd>&lt;&lt;</kbd>
+ bitshift operator, which basically just shoves some number of 0 bits 
+into the end of the number.  For example, the binary number 1001101 bit 
+shifted by 5 is 100110100000.  Any "extra" bits at the front are just 
+removed.  Note that the functions work regardless of the endianness of 
+the machine on which the program is running.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Converts a four-character array to a float, using little-endian form</span>
+    <span class="codekeyword">float</span> toFloat(<span class="codekeyword">const</span> <span class="codekeyword">char</span>* bytes) {
+        <span class="codekeyword">float</span> f;
+        <span class="codekeyword">if</span> (littleEndian()) {
+            ((<span class="codekeyword">char</span>*)&amp;f)[0] = bytes[0];
+            ((<span class="codekeyword">char</span>*)&amp;f)[1] = bytes[1];
+            ((<span class="codekeyword">char</span>*)&amp;f)[2] = bytes[2];
+            ((<span class="codekeyword">char</span>*)&amp;f)[3] = bytes[3];
+        }
+        <span class="codekeyword">else</span> {
+            ((<span class="codekeyword">char</span>*)&amp;f)[0] = bytes[3];
+            ((<span class="codekeyword">char</span>*)&amp;f)[1] = bytes[2];
+            ((<span class="codekeyword">char</span>*)&amp;f)[2] = bytes[1];
+            ((<span class="codekeyword">char</span>*)&amp;f)[3] = bytes[0];
+        }
+        <span class="codekeyword">return</span> f;
+    }</pre></div><p>
+Not even <kbd>float</kbd>s are immune from the endianness issue.  To convert four bytes into a <kbd>float</kbd>, we check whether we're on a little-endian machine and then set each byte of the float <kbd>f</kbd> as appropriate.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Reads the next four bytes as an integer, using little-endian form</span>
+    <span class="codekeyword">int</span> readInt(ifstream &amp;input) {
+        <span class="codekeyword">char</span> buffer[4];
+        input.read(buffer, 4);
+        <span class="codekeyword">return</span> toInt(buffer);
+    }
+    
+    <span class="codecomment">//Reads the next two bytes as a short, using little-endian form</span>
+    <span class="codekeyword">short</span> readShort(ifstream &amp;input) {
+        <span class="codekeyword">char</span> buffer[2];
+        input.read(buffer, 2);
+        <span class="codekeyword">return</span> toShort(buffer);
+    }
+    
+    <span class="codecomment">//Reads the next two bytes as an unsigned short, using little-endian form</span>
+    <span class="codekeyword">unsigned</span> <span class="codekeyword">short</span> readUShort(ifstream &amp;input) {
+        <span class="codekeyword">char</span> buffer[2];
+        input.read(buffer, 2);
+        <span class="codekeyword">return</span> toUShort(buffer);
+    }
+    
+    <span class="codecomment">//Reads the next four bytes as a float, using little-endian form</span>
+    <span class="codekeyword">float</span> readFloat(ifstream &amp;input) {
+        <span class="codekeyword">char</span> buffer[4];
+        input.read(buffer, 4);
+        <span class="codekeyword">return</span> toFloat(buffer);
+    }
+    
+    <span class="codecomment">//Calls readFloat three times and returns the results as a Vec3f object</span>
+    Vec3f readVec3f(ifstream &amp;input) {
+        <span class="codekeyword">float</span> x = readFloat(input);
+        <span class="codekeyword">float</span> y = readFloat(input);
+        <span class="codekeyword">float</span> z = readFloat(input);
+        <span class="codekeyword">return</span> Vec3f(x, y, z);
+    }</pre></div><p>
+These functions make it convenient to read the next few bytes from a file as an <kbd>int</kbd>, <kbd>short</kbd>, <kbd>unsigned short</kbd>, <kbd>float</kbd>, or <kbd>Vec3f</kbd>.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Makes the image into a texture, and returns the id of the texture</span>
+    GLuint loadTexture(Image *image) {
+        <span class="codecomment">//...</span>
+    }
+}</pre></div><p>
+Here's our <kbd>loadTexture</kbd> function from the lesson on textures.
+</p><div class="codeblock"><pre>MD2Model::~MD2Model() {
+    <span class="codekeyword">if</span> (frames != NULL) {
+        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; numFrames; i++) {
+            <span class="codekeyword">delete</span>[] frames[i].vertices;
+        }
+        <span class="codekeyword">delete</span>[] frames;
+    }
+    
+    <span class="codekeyword">if</span> (texCoords != NULL) {
+        <span class="codekeyword">delete</span>[] texCoords;
+    }
+    <span class="codekeyword">if</span> (triangles != NULL) {
+        <span class="codekeyword">delete</span>[] triangles;
+    }
+}</pre></div><p>
+Here's the class's destructor, which frees the memory used by all of the vertices, frames, texture coordinates, and triangles.
+</p><div class="codeblock"><pre>MD2Model::MD2Model() {
+    frames = NULL;
+    texCoords = NULL;
+    triangles = NULL;
+    time = 0;
+}</pre></div><p>
+The constructor initializes a few of the fields.  The constructor doesn't do much; the action is in the <kbd>load</kbd> method.
+</p><div class="codeblock"><pre><span class="codecomment">//Loads the MD2 model</span>
+MD2Model* MD2Model::load(<span class="codekeyword">const</span> <span class="codekeyword">char</span>* filename) {
+    ifstream input;
+    input.open(filename, istream::binary);
+    
+    <span class="codekeyword">char</span> buffer[64];
+    input.read(buffer, 4); <span class="codecomment">//Should be "IPD2", if this is an MD2 file</span>
+    <span class="codekeyword">if</span> (buffer[0] != 'I' || buffer[1] != 'D' ||
+        buffer[2] != 'P' || buffer[3] != '2') {
+        <span class="codekeyword">return</span> NULL;
+    }
+    <span class="codekeyword">if</span> (readInt(input) != 8) { <span class="codecomment">//The version number</span>
+        <span class="codekeyword">return</span> NULL;
+    }</pre></div><p>
+Here's the method that loads in an MD2 file.  First, we check that the 
+first four bytes of the file are "IPD2", which must be the first four 
+bytes of every MD2 file.  Then, we check that the next four bytes, 
+interpreted as an integer, are the number 8, which they must be for the 
+MD2 files that we're loading.
+</p><div class="codeblock"><pre>    <span class="codekeyword">int</span> textureWidth = readInt(input);   <span class="codecomment">//The width of the textures</span>
+    <span class="codekeyword">int</span> textureHeight = readInt(input);  <span class="codecomment">//The height of the textures</span>
+    readInt(input);                      <span class="codecomment">//The number of bytes per frame</span>
+    <span class="codekeyword">int</span> numTextures = readInt(input);    <span class="codecomment">//The number of textures</span>
+    <span class="codekeyword">if</span> (numTextures != 1) {
+        <span class="codekeyword">return</span> NULL;
+    }
+    <span class="codekeyword">int</span> numVertices = readInt(input);    <span class="codecomment">//The number of vertices</span>
+    <span class="codekeyword">int</span> numTexCoords = readInt(input);   <span class="codecomment">//The number of texture coordinates</span>
+    <span class="codekeyword">int</span> numTriangles = readInt(input);   <span class="codecomment">//The number of triangles</span>
+    readInt(input);                      <span class="codecomment">//The number of OpenGL commands</span>
+    <span class="codekeyword">int</span> numFrames = readInt(input);      <span class="codecomment">//The number of frames</span></pre></div><p>
+The MD2 file format dictates that next in the file, there should be 
+certain information about the animation in a certain order.  We read in 
+this information and store it into variables.  Some of the information 
+we don't need, so we don't store it anywhere.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Offsets (number of bytes after the beginning of the file to the beginning</span>
+    <span class="codecomment">//of where certain data appear)</span>
+    <span class="codekeyword">int</span> textureOffset = readInt(input);  <span class="codecomment">//The offset to the textures</span>
+    <span class="codekeyword">int</span> texCoordOffset = readInt(input); <span class="codecomment">//The offset to the texture coordinates</span>
+    <span class="codekeyword">int</span> triangleOffset = readInt(input); <span class="codecomment">//The offset to the triangles</span>
+    <span class="codekeyword">int</span> frameOffset = readInt(input);    <span class="codecomment">//The offset to the frames</span>
+    readInt(input);                      <span class="codecomment">//The offset to the OpenGL commands</span>
+    readInt(input);                      <span class="codecomment">//The offset to the end of the file</span></pre></div><p>
+Next in the MD2 file should be certain values indicating the number of 
+bytes from the beginning of the file where certain data appear.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Load the texture</span>
+    input.seekg(textureOffset, ios_base::beg);
+    input.read(buffer, 64);
+    <span class="codekeyword">if</span> (strlen(buffer) &lt; 5 ||
+        strcmp(buffer + strlen(buffer) - 4, ".bmp") != 0) {
+        <span class="codekeyword">return</span> NULL;
+    }
+    Image* image = loadBMP(buffer);
+    GLuint textureId = loadTexture(image);
+    <span class="codekeyword">delete</span> image;
+    MD2Model* model = <span class="codekeyword">new</span> MD2Model();
+    model-&gt;textureId = textureId;</pre></div><p>
+We go to where the texture is indicated, and load in the next 64 bytes 
+as a string.  The string is a filename where the texture for the model 
+is.  We make sure that the texture is a bitmap and load it in.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Load the texture coordinates</span>
+    input.seekg(texCoordOffset, ios_base::beg);
+    model-&gt;texCoords = <span class="codekeyword">new</span> MD2TexCoord[numTexCoords];
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; numTexCoords; i++) {
+        MD2TexCoord* texCoord = model-&gt;texCoords + i;
+        texCoord-&gt;texCoordX = (<span class="codekeyword">float</span>)readShort(input) / textureWidth;
+        texCoord-&gt;texCoordY = 1 - (<span class="codekeyword">float</span>)readShort(input) / textureHeight;
+    }</pre></div><p>
+Next, we load in the texture coordinates.  Each texture coordinate is represented as two <kbd>short</kbd>s.  To get from each <kbd>short</kbd> to the appropriate <kbd>float</kbd>,
+ we have to divide by the width or height of the texture that we found 
+at the beginning of the file.  For the y coordinate, we have to take 1 
+minus the coordinate because the MD2 file measures the y coordinate from
+ the top of the texture, while OpenGL measures it from the bottom of the
+ texture.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Load the triangles</span>
+    input.seekg(triangleOffset, ios_base::beg);
+    model-&gt;triangles = <span class="codekeyword">new</span> MD2Triangle[numTriangles];
+    model-&gt;numTriangles = numTriangles;
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; numTriangles; i++) {
+        MD2Triangle* triangle = model-&gt;triangles + i;
+        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> j = 0; j &lt; 3; j++) {
+            triangle-&gt;vertices[j] = readUShort(input);
+        }
+        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> j = 0; j &lt; 3; j++) {
+            triangle-&gt;texCoords[j] = readUShort(input);
+        }
+    }</pre></div><p>
+Now, we load in the triangles, which are just a bunch of indices of vertices and texture coordinates.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Load the frames</span>
+    input.seekg(frameOffset, ios_base::beg);
+    model-&gt;frames = <span class="codekeyword">new</span> MD2Frame[numFrames];
+    model-&gt;numFrames = numFrames;
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; numFrames; i++) {
+        MD2Frame* frame = model-&gt;frames + i;
+        frame-&gt;vertices = <span class="codekeyword">new</span> MD2Vertex[numVertices];
+        Vec3f scale = readVec3f(input);
+        Vec3f translation = readVec3f(input);
+        input.read(frame-&gt;name, 16);
+        
+        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> j = 0; j &lt; numVertices; j++) {
+            MD2Vertex* vertex = frame-&gt;vertices + j;
+            input.read(buffer, 3);
+            Vec3f v((<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span>)buffer[0],
+                    (<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span>)buffer[1],
+                    (<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span>)buffer[2]);
+            vertex-&gt;pos = translation + Vec3f(scale[0] * v[0],
+                                              scale[1] * v[1],
+                                              scale[2] * v[2]);
+            input.read(buffer, 1);
+            <span class="codekeyword">int</span> normalIndex = (<span class="codekeyword">int</span>)((<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span>)buffer[0]);
+            vertex-&gt;normal = Vec3f(NORMALS[3 * normalIndex],
+                                   NORMALS[3 * normalIndex + 1],
+                                   NORMALS[3 * normalIndex + 2]);
+        }
+    }</pre></div><p>
+Now, we load in the frames.  Each frame starts with six floats, 
+indicating vectors by which to scale and translate the vertices.  Then, 
+there are 16 bytes indicating the frame's name.  Then come the vertices.
+  For each vertex, we have two unsigned characters indicating the 
+position, which we can convert to floats by scaling and translating 
+them.  Then, we have an unsigned character which gives the normal vertor
+ as an index in the <kbd>NORMALS</kbd> array that we saw earlier.
+</p><div class="codeblock"><pre>    model-&gt;startFrame = 0;
+    model-&gt;endFrame = numFrames - 1;
+    <span class="codekeyword">return</span> model;
+}</pre></div><p>
+Finally, we set the starting and ending frames and return the model.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> MD2Model::setAnimation(<span class="codekeyword">const</span> <span class="codekeyword">char</span>* name) {
+    <span class="codecomment">/* The names of frames normally begin with the name of the animation in
+     * which they are, e.g. "run", and are followed by a non-alphabetical
+     * character.  Normally, they indicate their frame number in the animation,
+     * e.g. "run_1", "run_2", etc.
+     */</span>
+    <span class="codekeyword">bool</span> found = false;
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; numFrames; i++) {
+        MD2Frame* frame = frames + i;
+        <span class="codekeyword">if</span> (strlen(frame-&gt;name) &gt; strlen(name) &amp;&amp;
+            strncmp(frame-&gt;name, name, strlen(name)) == 0 &amp;&amp;
+            !isalpha(frame-&gt;name[strlen(name)])) {
+            <span class="codekeyword">if</span> (!found) {
+                found = true;
+                startFrame = i;
+            }
+            <span class="codekeyword">else</span> {
+                endFrame = i;
+            }
+        }
+        <span class="codekeyword">else</span> <span class="codekeyword">if</span> (found) {
+            <span class="codekeyword">break</span>;
+        }
+    }
+}</pre></div><p>
+This function figures out the start and end frames for the indicated 
+animation using the names of the different frames, which follow the 
+pattern suggested by the comment.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> MD2Model::advance(<span class="codekeyword">float</span> dt) {
+    <span class="codekeyword">if</span> (dt &lt; 0) {
+        <span class="codekeyword">return</span>;
+    }
+    
+    time += dt;
+    <span class="codekeyword">if</span> (time &lt; 1000000000) {
+        time -= (<span class="codekeyword">int</span>)time;
+    }
+    <span class="codekeyword">else</span> {
+        time = 0;
+    }
+}</pre></div><p>
+Now, we have a method for advancing the animation, which we do by increasing the <kbd>time</kbd> field.  To keep it between 0 and 1, we use <kbd>time -= (int)time</kbd> (unless the time is REALLY big, in which case we might run into problems converting it into an integer).
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> MD2Model::draw() {
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);</pre></div><p>
+Here's where we draw the 3D model.  We start by telling OpenGL the texture and the type of texture mapping that we want to use.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Figure out the two frames between which we are interpolating</span>
+    <span class="codekeyword">int</span> frameIndex1 = (<span class="codekeyword">int</span>)(time * (endFrame - startFrame + 1)) + startFrame;
+    <span class="codekeyword">if</span> (frameIndex1 &gt; endFrame) {
+        frameIndex1 = startFrame;
+    }
+    
+    <span class="codekeyword">int</span> frameIndex2;
+    <span class="codekeyword">if</span> (frameIndex1 &lt; endFrame) {
+        frameIndex2 = frameIndex1 + 1;
+    }
+    <span class="codekeyword">else</span> {
+        frameIndex2 = startFrame;
+    }
+    
+    MD2Frame* frame1 = frames + frameIndex1;
+    MD2Frame* frame2 = frames + frameIndex2;</pre></div><p>
+Now, using the <kbd>time</kbd> field, we figure out the two frames between which we want to interpolate.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Figure out the fraction that we are between the two frames</span>
+    <span class="codekeyword">float</span> frac =
+        (time - (<span class="codekeyword">float</span>)(frameIndex1 - startFrame) /
+         (<span class="codekeyword">float</span>)(endFrame - startFrame + 1)) * (endFrame - startFrame + 1);</pre></div><p>
+Now, we figure out what fraction we are between the two frames.  0 means
+ that we are at the first frame, 1 means that we are at the second, and 
+0.5 means that we are halfway in between.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Draw the model as an interpolation between the two frames</span>
+    glBegin(GL_TRIANGLES);
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; numTriangles; i++) {
+        MD2Triangle* triangle = triangles + i;
+        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> j = 0; j &lt; 3; j++) {
+            MD2Vertex* v1 = frame1-&gt;vertices + triangle-&gt;vertices[j];
+            MD2Vertex* v2 = frame2-&gt;vertices + triangle-&gt;vertices[j];
+            Vec3f pos = v1-&gt;pos * (1 - frac) + v2-&gt;pos * frac;</pre></div><p>
+Now, we go through the triangles, and for each vertex, take the position
+ to be an interpolation between their positions in the two frames.
+</p><div class="codeblock"><pre>            Vec3f normal = v1-&gt;normal * (1 - frac) + v2-&gt;normal * frac;
+            <span class="codekeyword">if</span> (normal[0] == 0 &amp;&amp; normal[1] == 0 &amp;&amp; normal[2] == 0) {
+                normal = Vec3f(0, 0, 1);
+            }
+            glNormal3f(normal[0], normal[1], normal[2]);</pre></div><p>
+We do the same thing for the normal vectors.  If the average happens to 
+be the zero vector, we change it to an arbitrary vector, since the zero 
+vector has no direction and can't be used as a normal vector.  Actually 
+there's a better way to average two directions, but we'll stick with a 
+linear average because it's easier.
+</p><div class="codeblock"><pre>            MD2TexCoord* texCoord = texCoords + triangle-&gt;texCoords[j];
+            glTexCoord2f(texCoord-&gt;texCoordX, texCoord-&gt;texCoordY);
+            glVertex3f(pos[0], pos[1], pos[2]);
+        }
+    }
+    glEnd();</pre></div><p>
+Now, we just find the appropriate texture coordinate and call <kbd>glTexCoord2f</kbd> and <kbd>glVertex3f</kbd>.
+</p>
+<center><h2>Our Main Program</h2></center>
+<p>
+That does it for the MD2 file format.  Let's take a look at main.cpp.
+</p><div class="codeblock"><pre><span class="codekeyword">const</span> <span class="codekeyword">float</span> FLOOR_TEXTURE_SIZE = 15.0f; <span class="codecomment">//The size of each floor "tile"</span></pre></div><p>
+This is the size of each "tile" on the floor; that is, each copy of the floor image that you saw in the program's screenshot.
+</p><div class="codeblock"><pre><span class="codekeyword">float</span> _angle = 30.0f;
+MD2Model* _model;
+<span class="codekeyword">int</span> _textureId;
+<span class="codecomment">//The forward position of the guy relative to an arbitrary floor "tile"</span>
+<span class="codekeyword">float</span> _guyPos = 0;</pre></div><p>
+Here are some variables that will store the camera angle, the <kbd>MD2Model</kbd> object, the id of the floor texture, and how far the guy has walked, modulo the size of the floor tile.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> initRendering() {
+    <span class="codecomment">//...</span>
+    
+    <span class="codecomment">//Load the model</span>
+    _model = MD2Model::load("tallguy.md2");
+    <span class="codekeyword">if</span> (_model != NULL) {
+        _model-&gt;setAnimation("run");
+    }
+    
+    <span class="codecomment">//Load the floor texture</span>
+    Image* image = loadBMP("vtr.bmp");
+    _textureId = loadTexture(image);
+    <span class="codekeyword">delete</span> image;
+}</pre></div><p>
+In our <kbd>initRendering</kbd> function, we load the model and the floor texture.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> drawScene() {
+    <span class="codecomment">//...</span>
+    
+    <span class="codecomment">//Draw the guy</span>
+    <span class="codekeyword">if</span> (_model != NULL) {
+        glPushMatrix();
+        glTranslatef(0.0f, 4.5f, 0.0f);
+        glRotatef(-90.0f, 0.0f, 0.0f, 1.0f);
+        glScalef(0.5f, 0.5f, 0.5f);
+        _model-&gt;draw();
+        glPopMatrix();
+    }</pre></div><p>
+Here's where we draw the guy.  We have to translate, rotate, and scale 
+to make him the right size, at the right position, and facing in the 
+right direction.  I found out the appropriate translation and scaling 
+factor by trial and error.  The correct numbers depend on the actual 
+vertex positions that I set up when I created the model in Blender.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Draw the floor</span>
+    glTranslatef(0.0f, -5.4f, 0.0f);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    glBegin(GL_QUADS);
+    
+    glNormal3f(0.0f, 1.0f, 0.0f);
+    glTexCoord2f(2000 / FLOOR_TEXTURE_SIZE, _guyPos / FLOOR_TEXTURE_SIZE);
+    glVertex3f(-1000.0f, 0.0f, -1000.0f);
+    glTexCoord2f(2000 / FLOOR_TEXTURE_SIZE,
+                 (2000 + _guyPos) / FLOOR_TEXTURE_SIZE);
+    glVertex3f(-1000.0f, 0.0f, 1000.0f);
+    glTexCoord2f(0.0f, (2000 + _guyPos) / FLOOR_TEXTURE_SIZE);
+    glVertex3f(1000.0f, 0.0f, 1000.0f);
+    glTexCoord2f(0.0f, _guyPos / FLOOR_TEXTURE_SIZE);
+    glVertex3f(1000.0f, 0.0f, -1000.0f);
+    
+    glEnd();
+    
+    <span class="codecomment">//...</span>
+}</pre></div><p>
+Now, we draw the floor.  The floor will just be a quadrilateral that 
+extends very far in each direction.  To make the guy appear to move 
+forward, we set the texture coordinates so that the floor tiles appear 
+to move in the appropriate direction.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> update(<span class="codekeyword">int</span> value) {
+    _angle += 0.7f;
+    <span class="codekeyword">if</span> (_angle &gt; 360) {
+        _angle -= 360;
+    }
+    
+    <span class="codecomment">//Advance the animation</span>
+    <span class="codekeyword">if</span> (_model != NULL) {
+        _model-&gt;advance(0.025f);
+    }
+    
+    <span class="codecomment">//Update _guyPos</span>
+    _guyPos += 0.08f;
+    <span class="codekeyword">while</span> (_guyPos &gt; FLOOR_TEXTURE_SIZE) {
+        _guyPos -= FLOOR_TEXTURE_SIZE;
+    }
+    
+    glutPostRedisplay();
+    glutTimerFunc(25, update, 0);
+}</pre></div><p>
+Now we have our <kbd>update</kbd> function.  We just increase the camera angle and the guy's position, and call <kbd>advance</kbd> on the <kbd>MD2Model</kbd> object.  I figured out the rate at which to increase the <kbd>_guyPos</kbd> variable using trial and error.
+</p><p>
+And with that code, we have created a 3D walking guy.
+</p>
+
+
+
+
+
+
+
+
+
+<p><i>Next is <a href="http://www.videotutorialsrock.com/opengl_tutorial/collision_detection/home.php">"Lesson 10: Collision Detection"</a>.</i></p><center><div class="lessonlinks">
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/animation/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/animation/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/animation/animation.zip">Download source</a></li></ul>
+</div></center>
+
+		<center><div class="horizontaladslong">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_2_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_2" name="aswift_2" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+		</div></center>
+	</div>
+</div>
+
+	<div id="footer">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Quick Reference</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/links.php">Links</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/about.php">About</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/contact.php">Contact</a></li>
+		</ul>
+		<center><table><tbody><tr><td>
+<a href="http://validator.w3.org/check/referer" target="_blank"><img src="text.php_files/valid_xhtml.png" alt="Valid XHTML" align="bottom" border="0" height="31" width="88"></a>
+		</td><td><center><p>© 2007 - 2011 Bill Jacobs<br>"Rock on!" - Bill</p></center></td><td>
+<a href="http://jigsaw.w3.org/css-validator/check/referer" target="_blank"><img src="text.php_files/valid_css.png" alt="Valid CSS" align="bottom" border="0" height="31" width="88"></a>
+		</td></tr></tbody></table></center>
+	</div>
+</div>
+
+<script src="text.php_files/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1957485-1";
+urchinTracker();
+</script>
+
+
+
+</body></html>

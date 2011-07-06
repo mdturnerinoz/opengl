@@ -1,6 +1,7 @@
 CC = g++
 CFLAGS = -Wall
 PROG = animation
+BROWSER = firefox
 
 SRCS = main.cpp imageloader.cpp md2model.cpp vec3f.cpp
 
@@ -20,3 +21,7 @@ clean:
 
 run:
 	./$(PROG)
+
+text:
+	$(BROWSER) text.php.html &
+
