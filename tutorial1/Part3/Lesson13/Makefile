@@ -19,7 +19,7 @@ $(PROG):	$(SRCS)
 clean:
 	rm -f $(PROG) *~
 
-run:
+run: $(PROG)
 	./$(PROG)
 
 text:
