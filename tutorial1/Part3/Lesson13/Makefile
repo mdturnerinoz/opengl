@@ -1,6 +1,7 @@
 CC = g++
 CFLAGS = -Wall
 PROG = particlesystem
+BROWSER = firefox
 
 SRCS = main.cpp imageloader.cpp vec3f.cpp
 
@@ -16,4 +17,11 @@ $(PROG):	$(SRCS)
 	$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS)
 
 clean:
-	rm -f $(PROG)
+	rm -f $(PROG) *~
+
+run:
+	./$(PROG)
+
+text:
+	$(BROWSER) text.php.html &
+

@@ -1,0 +1,500 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+	<title>OpenGL Video Tutorial - Particle Systems</title>
+	<meta name="title" content="OpenGL Video Tutorial - Particle Systems">
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<meta name="description" content="Free beginner-friendly OpenGL / GLUT tutorial for C++, including both video and text versions.">
+	<meta name="keywords" content="OpenGL, GLUT, OpenGL tutorial, OpenGL tutorials, free, GLUT tutorial, GLUT tutorials, OpenGL video tutorial, OpenGL video tutorials, video, videos, GLUT video tutorial, GLUT video tutorials, video tutorial, video tutorials, 3D, 3-D, Windows, Mac, OS X, Mac OS X, MacOSX, Linux, C, C++, Visual C++, programming, 3D programming, 3-D programming, reference, forum, forums">
+	<meta name="author" content="Bill Jacobs">
+	<meta name="designer" content="Bill Jacobs">
+	<meta name="copyright" content="© 2007 - 2008 Bill Jacobs">
+	<link href="text.php_files/styles.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 6]>
+		<style type="text/css">
+			#container {
+				width: expression(document.documentElement.clientWidth < 808 ? "808px" : "auto");
+			}
+		</style>
+	<![endif]-->
+	<!--[if gte IE 5]>
+		<style type="text/css">
+			#topads {
+				width: expression(document.body.clientWidth > 160 ? "160px" : "auto");
+			}
+		</style>
+	<![endif]-->
+</head>
+
+<body bgcolor="#B0E0FF">
+<div id="container">
+	<div id="header">
+		<img src="text.php_files/top_icon.png" alt="3D Video Tutorials Rock.com logo" height="101" width="165"><h1>OpenGL tutorial</h1>
+	</div>
+	
+	<div id="menu1">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Reference</a></li>
+		</ul>
+	</div>
+	
+	<div id="content">
+		<div id="mainbody">
+
+<center><h1>Lesson 13: Particle Systems</h1></center>
+<center><div class="lessonlinks">
+	<div class="watchnow"><a href="http://www.videotutorialsrock.com/opengl_tutorial/particle_system/video.php">Watch the video now!</a></div>
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/particle_system/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/particle_system/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/particle_system/particlesystem.zip">Download source</a></li></ul>
+</div></center>
+<center><div class="horizontaladslong">
+	<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</div></center>
+<center><h2>Particle Systems</h2></center>
+<p>
+A particle system is basically just a bunch of tiny particles moving 
+around according to simple rules.  Particle systems are useful for 
+simulating certain phenomena, such as sparks, fire, explosions, and 
+snow.  With particle systems, it's relatively simple to make various 
+good-looking effects.  In our program, we're going to have a fountain, 
+which rotates as it shoots out particles of changing colors.  It looks 
+like the picture below:
+</p>
+<center><img src="text.php_files/screenshot.png" alt="Particle system program screenshot" border="3" height="434" width="408"></center>
+<center><h2>Textures With Alpha Channels</h2></center>
+<p>
+In order to make our particle fountain, we're going to use alpha 
+channels.  Basically, alpha channels let us give each pixel in an image a
+ particular transparency.  Each pixel in the image will have not only a 
+red, green, and blue component, but also an alpha component indicating 
+its opacity.
+</p><p>
+In our program, we'll use two separate image files to store our texture:
+ one to store the red, green, and blue components of the pixels in the 
+image, and one to store the alpha components of the image, using a 
+grayscale image.  The grayscale image is our alpha channel.  A white 
+pixel in the image indicates an alpha value of 1, while a black pixel 
+indicates an alpha value of 0.
+</p><p>
+There are some image formats, such as PNG, which allow you to have an 
+image and an alpha channel in a single image file.  But the bitmap file 
+format doesn't really like alpha channels, so we're using two separate 
+images instead.
+</p><p>
+This is what the two image files look like:
+</p>
+<center><img src="text.php_files/texture.png" alt="Particle texture" border="3" height="241" width="400"></center>
+<p>
+We're going to have to have some new code in order to load in textures with alpha channels, and we'll start with the <kbd>addAlphaChannel</kbd> function below.
+</p><div class="codeblock"><pre><span class="codecomment">//Returns an array indicating pixel data for an RGBA image that is the same as</span>
+<span class="codecomment">//image, but with an alpha channel indicated by the grayscale image alphaChannel</span>
+<span class="codekeyword">char</span>* addAlphaChannel(Image* image, Image* alphaChannel) {
+    <span class="codekeyword">char</span>* pixels = <span class="codekeyword">new</span> <span class="codekeyword">char</span>[image-&gt;width * image-&gt;height * 4];
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> y = 0; y &lt; image-&gt;height; y++) {
+        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> x = 0; x &lt; image-&gt;width; x++) {
+            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> j = 0; j &lt; 3; j++) {
+                pixels[4 * (y * image-&gt;width + x) + j] =
+                    image-&gt;pixels[3 * (y * image-&gt;width + x) + j];
+            }
+            pixels[4 * (y * image-&gt;width + x) + 3] =
+                alphaChannel-&gt;pixels[3 * (y * image-&gt;width + x)];
+        }
+    }
+    
+    <span class="codekeyword">return</span> pixels;
+}</pre></div>
+<p>
+If you recall, when we load in an image, there is an array that stores 
+the red, green, and blue components of each pixel, and the array goes 
+through all of the pixels in the image in a particular order.  Since 
+each pixel now needs an alpha component, we'll need a different array 
+for storing the image, one that goes through not only the red, green, 
+and blue components of each pixel, but also the alpha components.
+</p><p>
+That's where the <kbd>addAlphaChannel</kbd> function comes in.  It goes through each pixel of the image.  It sets the red, green, and blue components indicated by the <kbd>pixels</kbd> array to be the same as the red, green, and blue components in <kbd>image</kbd>.  It sets the alpha component for the <kbd>pixels</kbd> array to be the red component of the pixels in the <kbd>alphaChannel</kbd> <kbd>Image</kbd> object.  (It's a grayscale image, so we could have used the green or blue components instead.)
+</p><div class="codeblock"><pre><span class="codecomment">//Makes the image into a texture, using the specified grayscale image as an</span>
+<span class="codecomment">//alpha channel and returns the id of the texture</span>
+GLuint loadAlphaTexture(Image* image, Image* alphaChannel) {
+    <span class="codekeyword">char</span>* pixels = addAlphaChannel(image, alphaChannel);
+    
+    GLuint textureId;
+    glGenTextures(1, &amp;textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 GL_RGBA,
+                 image-&gt;width, image-&gt;height,
+                 0,
+                 GL_RGBA,
+                 GL_UNSIGNED_BYTE,
+                 pixels);
+    
+    <span class="codekeyword">delete</span> pixels;
+    <span class="codekeyword">return</span> textureId;
+}</pre></div><p>
+Now we need a new version of the <kbd>loadTexture</kbd> function, one that can handle an alpha channel.  We'll call this new function "<kbd>loadAlphaTexture</kbd>".  First, it calls <kbd>addAlphaChannel</kbd> to get all of the pixels' color components all set up in an array.  The rest of the function is basically the same as the <kbd>loadTexture</kbd> function from previous lessons, except that the third and seventh parameters are <kbd>GL_RGBA</kbd> rather than <kbd>GL_RGB</kbd>, indicating that the pixels array includes an alpha component for each pixel.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> initRendering() {
+    <span class="codecomment">//...</span>
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
+    Image* image = loadBMP("circle.bmp");
+    Image* alphaChannel = loadBMP("circlealpha.bmp");
+    _textureId = loadAlphaTexture(image, alphaChannel);
+    <span class="codekeyword">delete</span> image;
+    <span class="codekeyword">delete</span> alphaChannel;
+}</pre></div><p>
+In our <kbd>initRendering</kbd> function, we need to enable alpha 
+blending and set up the blending function, in order for the transparent 
+pixels to work.  (We also need alpha blending for a fade-out effect that
+ I'll mention later.)  We also have our call to <kbd>loadAlphaTexture</kbd> to load in the texture.
+</p>
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_1_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_1" name="aswift_1" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</center>
+
+<center><h2>The Particle Fountain</h2></center>
+<p>
+Now, let's get to some code more particular to the particle fountain.
+</p><div class="codeblock"><pre><span class="codecomment">//Represents a single particle.</span>
+<span class="codekeyword">struct</span> Particle {
+    Vec3f pos;
+    Vec3f velocity;
+    Vec3f color;
+    <span class="codekeyword">float</span> timeAlive; <span class="codecomment">//The amount of time that this particle has been alive.</span>
+    <span class="codekeyword">float</span> lifespan;  <span class="codecomment">//The total amount of time that this particle is to live.</span>
+};</pre></div><p>
+We use the structure <kbd>Particle</kbd> to store information about the 
+individual particles.  Each particle has a particular position, 
+velocity, and color, which we represent as three-dimensional vectors.  
+Each particle also has a lifespan indicating how many seconds it will 
+live, and a field <kbd>timeAlive</kbd> indicating how long the particle has been alive so far.
+</p><p>
+We'll use the <kbd>timeAlive</kbd> and <kbd>lifespan</kbd> fields to add
+ a fade-out effect.  Each particle will start out looking like the 
+texture we saw earlier.  When a particle is at half its lifespan, we'll 
+multiply each of the alpha values of the pixels of the texture by 0.5.  
+When a particle is almost dead, we'll multiply the alpha values of the 
+pixels of the texture by almost 0.  This will have the effect of making 
+each particle appear to fade out over its lifespan.
+</p><div class="codeblock"><pre><span class="codecomment">//Rotates the vector by the indicated number of degrees about the specified axis</span>
+Vec3f rotate(Vec3f v, Vec3f axis, <span class="codekeyword">float</span> degrees) {
+    axis = axis.normalize();
+    <span class="codekeyword">float</span> radians = degrees * PI / 180;
+    <span class="codekeyword">float</span> s = sin(radians);
+    <span class="codekeyword">float</span> c = cos(radians);
+    <span class="codekeyword">return</span> v * c + axis * axis.dot(v) * (1 - c) + v.cross(axis) * s;
+}
+
+<span class="codecomment">//Returns the position of the particle, after rotating the camera.</span>
+Vec3f adjParticlePos(Vec3f pos) {
+    <span class="codekeyword">return</span> rotate(pos, Vec3f(1, 0, 0), -30);
+}</pre></div><p>
+We have a function that rotates a vector a certain number of degrees 
+about a particular axis.  We'll need this function because we want the 
+camera to be rotated 30 degrees about the x axis.  We need to know the 
+exact position of each particle, rather than letting <kbd>glRotatef</kbd>
+ figure it out, because we have to sort the particles from back to 
+front, as we always have to do when using alpha blending.  So we'll use <kbd>adjParticlePos</kbd> to tell us the position of each particle, adjusted based on the camera angle.
+</p><div class="codeblock"><pre><span class="codecomment">//Returns whether particle1 is in back of particle2.</span>
+<span class="codekeyword">bool</span> compareParticles(Particle* particle1, Particle* particle2) {
+    <span class="codekeyword">return</span> adjParticlePos(particle1-&gt;pos)[2] &lt;
+        adjParticlePos(particle2-&gt;pos)[2];
+}</pre></div><p>
+The <kbd>compareParticles</kbd> function is used to sort the particles from back to front.  It returns whether the adjusted position of <kbd>particle1</kbd> is in back of the adjusted position of <kbd>particle2</kbd>.
+</p><div class="codeblock"><pre><span class="codekeyword">const</span> <span class="codekeyword">float</span> GRAVITY = 3.0f;
+<span class="codekeyword">const</span> <span class="codekeyword">int</span> NUM_PARTICLES = 1000;
+<span class="codecomment">//The interval of time, in seconds, by which the particle engine periodically</span>
+<span class="codecomment">//steps.</span>
+<span class="codekeyword">const</span> <span class="codekeyword">float</span> STEP_TIME = 0.01f;
+<span class="codecomment">//The length of the sides of the quadrilateral drawn for each particle.</span>
+<span class="codekeyword">const</span> <span class="codekeyword">float</span> PARTICLE_SIZE = 0.05f;</pre></div><p>
+Next, we have a few constants.  We have the gravity that will be applied
+ to each of the particles.  We have a constant indicating the number of 
+particles.  Each time a particle dies, we'll create a new one in its 
+place, so the number of particles will not change.
+</p><p>
+To animate the particle fountain, we'll use a <kbd>step</kbd> method that advances the fountain by a particular amount of time.  This amount of time is <kbd>STEP_TIME</kbd> seconds.
+</p><p>
+Each particle is rendered as a textured square that is parallel to the camera.  <kbd>PARTICLE_SIZE</kbd> indicates the length of each side of the squares.
+</p><div class="codeblock"><pre><span class="codekeyword">class</span> ParticleEngine {
+    <span class="codekeyword">private</span>:
+        GLuint textureId;
+        Particle particles[NUM_PARTICLES];
+        <span class="codecomment">//The amount of time until the next call to step().</span>
+        <span class="codekeyword">float</span> timeUntilNextStep;</pre></div><p>
+Here, we have our <kbd>ParticleEngine</kbd> class, which stores all of 
+the information regarding the particle fountain and the particles it 
+contains.  It has the id of the texture.  It has an array storing each 
+of the particles.  It has a variable called "<kbd>timeUntilNextStep</kbd>" which indicates the amount of time until we have to call <kbd>step()</kbd> again.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The color of particles that the fountain is currently shooting.  0</span>
+        <span class="codecomment">//indicates red, and when it reaches 1, it starts over at red again.  It</span>
+        <span class="codecomment">//always lies between 0 and 1.</span>
+        <span class="codekeyword">float</span> colorTime;</pre></div><p>
+We have a <kbd>colorTime</kbd> field, which is used to change the colors of the particles over time.  Initially, <kbd>colorTime</kbd>
+ is 0, indicating a color of red.  It constantly increases.  When it 
+reaches one third, the current color is green, and when it's at two 
+thirds, the current color is blue.  When it reaches 1, it jumps back to 
+0, and we start over at red.  <kbd>colorTime</kbd> is always between 0 and 1.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The angle at which the fountain is shooting particles, in radians.</span>
+        <span class="codekeyword">float</span> angle;</pre></div><p>
+The <kbd>angle</kbd> field indicates the angle at which particles are 
+being shot out, in radians.  We increase it over time so that the 
+fountain continuously rotates.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Returns the current color of particles produced by the fountain.</span>
+        Vec3f curColor() {
+            Vec3f color;
+            <span class="codekeyword">if</span> (colorTime &lt; 0.166667f) {
+                color = Vec3f(1.0f, colorTime * 6, 0.0f);
+            }
+            <span class="codekeyword">else</span> <span class="codekeyword">if</span> (colorTime &lt; 0.333333f) {
+                color = Vec3f((0.333333f - colorTime) * 6, 1.0f, 0.0f);
+            }
+            <span class="codekeyword">else</span> <span class="codekeyword">if</span> (colorTime &lt; 0.5f) {
+                color = Vec3f(0.0f, 1.0f, (colorTime - 0.333333f) * 6);
+            }
+            <span class="codekeyword">else</span> <span class="codekeyword">if</span> (colorTime &lt; 0.666667f) {
+                color = Vec3f(0.0f, (0.666667f - colorTime) * 6, 1.0f);
+            }
+            <span class="codekeyword">else</span> <span class="codekeyword">if</span> (colorTime &lt; 0.833333f) {
+                color = Vec3f((colorTime - 0.666667f) * 6, 0.0f, 1.0f);
+            }
+            <span class="codekeyword">else</span> {
+                color = Vec3f(1.0f, 0.0f, (1.0f - colorTime) * 6);
+            }</pre></div><p>
+We have a function <kbd>curColor</kbd> which indicates the color that a 
+particle would be if it were shot out right now.  If you look at the 
+code, you'll notice that it ranges from red at <kbd>colorTime == 0</kbd> to green at <kbd>colorTime == 1.0 / 3.0f</kbd> to blue at <kbd>colorTime == 2.0f / 3.0f</kbd> back to red at <kbd>colorTime == 1</kbd>.
+</p><div class="codeblock"><pre>            <span class="codecomment">//Make sure each of the color's components range from 0 to 1</span>
+            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 3; i++) {
+                <span class="codekeyword">if</span> (color[i] &lt; 0) {
+                    color[i] = 0;
+                }
+                <span class="codekeyword">else</span> <span class="codekeyword">if</span> (color[i] &gt; 1) {
+                    color[i] = 1;
+                }
+            }
+            
+            <span class="codekeyword">return</span> color;
+        }</pre></div><p>
+Now we make sure that each component of the color ranges from 0 to 1.  
+This code corrects for rounding errors that might make some component of
+ the color less than 0 or greater than 1.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Returns the average velocity of particles produced by the fountain.</span>
+        Vec3f curVelocity() {
+            <span class="codekeyword">return</span> Vec3f(2 * cos(angle), 2.0f, 2 * sin(angle));
+        }</pre></div><p>
+The <kbd>curVelocity</kbd> function indicates the average velocity of 
+any particles that would be shot out now.  The starting velocity of a 
+newly created particle is a little random, to create a nice dispersal of
+ the particles, but is centered around the return value of <kbd>curVelocity()</kbd>.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Alters p to be a particle newly produced by the fountain.</span>
+        <span class="codekeyword">void</span> createParticle(Particle* p) {
+            p-&gt;pos = Vec3f(0, 0, 0);
+            p-&gt;velocity = curVelocity() + Vec3f(0.5f * randomFloat() - 0.25f,
+                                                0.5f * randomFloat() - 0.25f,
+                                                0.5f * randomFloat() - 0.25f);
+            p-&gt;color = curColor();
+            p-&gt;timeAlive = 0;
+            p-&gt;lifespan = randomFloat() + 1;
+        }</pre></div><p>
+The <kbd>createParticle</kbd> function takes a dead particle <kbd>p</kbd> and alters its fields so that it is a newly created one.  The position is set to the origin.  The initial velocity is <kbd>curVelocity()</kbd> plus a random vector.  The color is set to be <kbd>curColor()</kbd>.  The <kbd>timeAlive</kbd>
+ field is set to 0, as the particle has not been alive for any time.  
+The particle is given a random lifespan of between 1 and 2 seconds.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Advances the particle fountain by STEP_TIME seconds.</span>
+        <span class="codekeyword">void</span> step() {
+            colorTime += STEP_TIME / 10;
+            <span class="codekeyword">while</span> (colorTime &gt;= 1) {
+                colorTime -= 1;
+            }
+            
+            angle += 0.5f * STEP_TIME;
+            <span class="codekeyword">while</span> (angle &gt; 2 * PI) {
+                angle -= 2 * PI;
+            }</pre></div><p>
+Here's our <kbd>step</kbd> method, which advances the state of the fountain by <kbd>STEP_TIME</kbd> seconds.  First, we increase the <kbd>colorTime</kbd> and <kbd>angle</kbd> fields by amounts proportional to <kbd>STEP_TIME</kbd>.  We make sure to keep <kbd>colorTime</kbd> between 0 and 1 and to keep <kbd>angle</kbd> between 0 and <kbd>2 * PI</kbd>.
+</p><div class="codeblock"><pre>            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; NUM_PARTICLES; i++) {
+                Particle* p = particles + i;
+                
+                p-&gt;pos += p-&gt;velocity * STEP_TIME;
+                p-&gt;velocity += Vec3f(0.0f, -GRAVITY * STEP_TIME, 0.0f);
+                p-&gt;timeAlive += STEP_TIME;
+                <span class="codekeyword">if</span> (p-&gt;timeAlive &gt; p-&gt;lifespan) {
+                    createParticle(p);
+                }
+            }</pre></div><p>
+Now, we update each of the particles.  We add <kbd>STEP_TIME</kbd> times the velocity to each particle's position vector.  We decrease the y components of the particles' velocities by <kbd>GRAVITY * STEP_TIME</kbd> to simulate the effects of gravity.  We increase <kbd>timeAlive</kbd> by <kbd>STEP_TIME</kbd>, and if a particle has exceeded its lifespan, we replace it with a new particle.
+</p><div class="codeblock"><pre>    <span class="codekeyword">public</span>:
+        ParticleEngine(GLuint textureId1) {
+            textureId = textureId1;
+            timeUntilNextStep = 0;
+            colorTime = 0;
+            angle = 0;
+            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; NUM_PARTICLES; i++) {
+                createParticle(particles + i);
+            }
+            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 5 / STEP_TIME; i++) {
+                step();
+            }
+        }</pre></div><p>
+In our constructor, we initialize some variables and create all of the 
+particles.  Then, we advance the fountain by 5 seconds, to make it look 
+like it's been running for a while.  It would be weird if we didn't, as 
+all of the particles would be in the center of the fountain at the 
+beginning of the program.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Advances the particle fountain by the specified amount of time.</span>
+        <span class="codekeyword">void</span> advance(<span class="codekeyword">float</span> dt) {
+            <span class="codekeyword">while</span> (dt &gt; 0) {
+                <span class="codekeyword">if</span> (timeUntilNextStep &lt; dt) {
+                    dt -= timeUntilNextStep;
+                    step();
+                    timeUntilNextStep = STEP_TIME;
+                }
+                <span class="codekeyword">else</span> {
+                    timeUntilNextStep -= dt;
+                    dt = 0;
+                }
+            }
+        }</pre></div><p>
+The <kbd>advance</kbd> method advances the particle fountain by a particular amount of time.  It does this just by calling <kbd>step()</kbd> some number of times and altering the <kbd>timeUntilNextStep</kbd> field.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Draws the particle fountain.</span>
+        <span class="codekeyword">void</span> draw() {
+            vector&lt;Particle*&gt; ps;
+            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; NUM_PARTICLES; i++) {
+                ps.push_back(particles + i);
+            }
+            sort(ps.begin(), ps.end(), compareParticles);</pre></div><p>
+Here's where we actually draw the particles.  First, we sort the particles from back to front using the <kbd>sort</kbd> function.
+</p><div class="codeblock"><pre>            glEnable(GL_TEXTURE_2D);
+            glBindTexture(GL_TEXTURE_2D, textureId);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);</pre></div><p>
+We set up some texture stuff.
+</p><div class="codeblock"><pre>            glBegin(GL_QUADS);
+            <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; ps.size(); i++) {
+                Particle* p = ps[i];
+                glColor4f(p-&gt;color[0], p-&gt;color[1], p-&gt;color[2],
+                          (1 - p-&gt;timeAlive / p-&gt;lifespan));
+                <span class="codekeyword">float</span> size = PARTICLE_SIZE / 2;
+                
+                Vec3f pos = adjParticlePos(p-&gt;pos);
+                
+                glTexCoord2f(0, 0);
+                glVertex3f(pos[0] - size, pos[1] - size, pos[2]);
+                glTexCoord2f(0, 1);
+                glVertex3f(pos[0] - size, pos[1] + size, pos[2]);
+                glTexCoord2f(1, 1);
+                glVertex3f(pos[0] + size, pos[1] + size, pos[2]);
+                glTexCoord2f(1, 0);
+                glVertex3f(pos[0] + size, pos[1] - size, pos[2]);
+            }
+            glEnd();</pre></div><p>
+Finally, we actually draw all of the particles.  As I mentioned earlier,
+ each particle is just a square parallel to the camera, with our texture
+ applied to it.
+</p><p>
+The call to <kbd>glColor4f</kbd> gives the fade-out effect I mentioned 
+earlier.  It specifies an amount by which to multiply the alpha 
+component of each pixel of the texture.  When a particle is just 
+created, this amount will be 1, when the particle is at half its 
+lifespan, it will be 0.5, and when the particle is almost dead, it will 
+be almost 0.
+</p><p>
+That's all there is to the program, other than a call to this <kbd>draw</kbd> method in <kbd>drawScene</kbd> and a call to the <kbd>ParticleEngine</kbd> constructor in <kbd>main</kbd>.  This explains how you can make a particle fountain, and how particle systems tend to work in general.
+</p>
+
+
+
+
+
+
+
+
+
+<p><i>Next is <a href="http://www.videotutorialsrock.com/opengl_tutorial/reflections/home.php">"Lesson 14: Drawing Reflections"</a>.</i></p><center><div class="lessonlinks">
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/particle_system/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/particle_system/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/particle_system/particlesystem.zip">Download source</a></li></ul>
+</div></center>
+
+		<center><div class="horizontaladslong">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_2_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_2" name="aswift_2" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+		</div></center>
+	</div>
+</div>
+
+	<div id="footer">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Quick Reference</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/links.php">Links</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/about.php">About</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/contact.php">Contact</a></li>
+		</ul>
+		<center><table><tbody><tr><td>
+<a href="http://validator.w3.org/check/referer" target="_blank"><img src="text.php_files/valid_xhtml.png" alt="Valid XHTML" align="bottom" border="0" height="31" width="88"></a>
+		</td><td><center><p>© 2007 - 2011 Bill Jacobs<br>"Rock on!" - Bill</p></center></td><td>
+<a href="http://jigsaw.w3.org/css-validator/check/referer" target="_blank"><img src="text.php_files/valid_css.png" alt="Valid CSS" align="bottom" border="0" height="31" width="88"></a>
+		</td></tr></tbody></table></center>
+	</div>
+</div>
+
+<script src="text.php_files/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1957485-1";
+urchinTracker();
+</script>
+
+
+
+</body></html>
