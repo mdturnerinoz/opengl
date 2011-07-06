@@ -1,0 +1,354 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+	<title>OpenGL Video Tutorial - Basic Shapes</title>
+	<meta name="title" content="OpenGL Video Tutorial - Basic Shapes">
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<meta name="description" content="Free beginner-friendly OpenGL / GLUT tutorial for C++, including both video and text versions.">
+	<meta name="keywords" content="OpenGL, GLUT, OpenGL tutorial, OpenGL tutorials, free, GLUT tutorial, GLUT tutorials, OpenGL video tutorial, OpenGL video tutorials, video, videos, GLUT video tutorial, GLUT video tutorials, video tutorial, video tutorials, 3D, 3-D, Windows, Mac, OS X, Mac OS X, MacOSX, Linux, C, C++, Visual C++, programming, 3D programming, 3-D programming, reference, forum, forums">
+	<meta name="author" content="Bill Jacobs">
+	<meta name="designer" content="Bill Jacobs">
+	<meta name="copyright" content="© 2007 - 2008 Bill Jacobs">
+	<link href="text.php_files/styles.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 6]>
+		<style type="text/css">
+			#container {
+				width: expression(document.documentElement.clientWidth < 808 ? "808px" : "auto");
+			}
+		</style>
+	<![endif]-->
+	<!--[if gte IE 5]>
+		<style type="text/css">
+			#topads {
+				width: expression(document.body.clientWidth > 160 ? "160px" : "auto");
+			}
+		</style>
+	<![endif]-->
+</head>
+
+<body bgcolor="#B0E0FF">
+<div id="container">
+	<div id="header">
+		<img src="text.php_files/top_icon.png" alt="3D Video Tutorials Rock.com logo" height="101" width="165"><h1>OpenGL tutorial</h1>
+	</div>
+	
+	<div id="menu1">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Reference</a></li>
+		</ul>
+	</div>
+	
+	<div id="content">
+		<div id="mainbody">
+
+<center><h1>Lesson 1: Basic Shapes</h1></center>
+<center><div class="lessonlinks">
+	<div class="watchnow"><a href="http://www.videotutorialsrock.com/opengl_tutorial/basic_shapes/video.php">Watch the video now!</a></div>
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/basic_shapes/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/basic_shapes/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/basic_shapes/basicshapes.zip">Download source</a></li></ul>
+</div></center>
+<center><div class="horizontaladslong">
+	<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</div></center>
+<center><h2>Try it Out</h2></center>
+<p>
+Let's take a look at our first OpenGL program.  Dowload the <a href="http://www.videotutorialsrock.com/opengl_tutorial/basic_shapes/basicshapes.zip">"basic shapes"</a> program, and compile and run it (details on how to do that can be found in <a href="http://www.videotutorialsrock.com/opengl_tutorial/get_opengl_setup/home.php">"Part 0: Getting OpenGL Set Up"</a>).  Take a look at it, and hit ESC when you're done.  It should look like the following image:
+</p>
+<center><img src="text.php_files/screenshot.png" alt="Screenshot" border="3" height="434" width="408"></center>
+<center><h2>Overview of How the Program Works</h2></center>
+<p>
+How does the program work?  The basic idea is that we tell OpenGL the 3D
+ coordinates of all of the vertices of our shapes.  OpenGL uses the 
+standard x and y axes, with the positive x direction pointing toward the
+ right and the positive y direction pointing upward.  However, in 3D we 
+need another dimension, the z dimension.  The positive z direction 
+points out of the screen.
+</p>
+<center><img src="text.php_files/axes.png" alt="Axes" border="3" height="280" width="243"></center>
+<p>
+How does OpenGL use these 3D coordinates?  It simulates the way that our eyes work.  Take a look at the following picture.
+</p>
+<center><img src="text.php_files/eye.png" alt="Eye" border="3" height="309" width="500"></center>
+<p>
+OpenGL converts all of the 3D points to pixel coordinates before it 
+draws anything.  To do this, it draws a line from each point in the 
+scene to your eye and takes the intersection of the lines and the screen
+ rectangle, as in the above picture.  So, when OpenGL wants to draw a 
+triangle, it converts the three vertices into pixel coordinates and 
+draws a "2D" triangle using those coordinates.
+</p><p>
+The user's "eye" is always at the origin and looking in the negative z 
+direction.  Of course, OpenGL doesn't draw anything that is behind the 
+"eye".  (After all, it isn't the all-seeing eye of Sauron.)
+</p><p>
+How far away is the screen rectangle from your eye?  Actually, it 
+doesn't matter.  No matter how far away the screen rectangle is, a given
+ 3D point will map to the same pixel coordinates.  All that matters is 
+the angle that your eye can see.
+</p>
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_1_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_1" name="aswift_1" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</center>
+
+<center><h2>Going Through the Source Code</h2></center>
+<p>
+All of this stuff about pixel coordinates is great and all, but as 
+programmers, we want to see some code.  Take a look at main.cpp.
+</p><p>
+The first thing you'll notice is the license indicating that the code, 
+like all of my code on this site, is completely free.  That's right, 
+F-R-E-E.  You can even use it in commercial projects.
+</p><p>
+The second thing you'll notice is that it's heavily commented, so much 
+so that it's a bit of an eye sore.  That's because this is the first 
+lesson.  Other lessons will not be so heavily commented, but they'll 
+still have comments.
+</p><p>
+Let's go through the file and see if we can understand what it's doing.
+</p><div class="codeblock"><pre><span class="codekeyword">#include</span> &lt;iostream&gt;
+<span class="codekeyword">#include</span> &lt;stdlib.h&gt; <span class="codecomment">//Needed for "exit" function</span>
+
+<span class="codecomment">//Include OpenGL header files, so that we can use OpenGL</span>
+<span class="codekeyword">#ifdef</span> __APPLE__
+<span class="codekeyword">#include</span> &lt;OpenGL/OpenGL.h&gt;
+<span class="codekeyword">#include</span> &lt;GLUT/glut.h&gt;
+<span class="codekeyword">#</span><span class="codekeyword">else</span>
+<span class="codekeyword">#include</span> &lt;GL/glut.h&gt;
+<span class="codekeyword">#endif</span></pre></div><p>
+First, we include our header files.  Pretty standard stuff for C++.  If 
+we're using a Mac, we want our program to include GLUT/glut.h and 
+OpenGL/OpenGL.h; otherwise, we include GL/glut.h.
+</p><div class="codeblock"><pre><span class="codekeyword">using</span> <span class="codekeyword">namespace</span> std;</pre></div><p>
+We'll have this line near the top of main.cpp in all of our programs.  It just makes it so that we don't have to type <kbd>std::</kbd> a lot; for example, so we can use <kbd>cout</kbd> instead of <kbd>std::cout</kbd>.
+</p><div class="codeblock"><pre><span class="codecomment">//Called when a key is pressed</span>
+<span class="codekeyword">void</span> handleKeypress(<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span> key, <span class="codecomment">//The key that was pressed</span>
+                    <span class="codekeyword">int</span> x, <span class="codekeyword">int</span> y) {    <span class="codecomment">//The current mouse coordinates</span>
+    <span class="codekeyword">switch</span> (key) {
+        <span class="codekeyword">case</span> 27: <span class="codecomment">//Escape key</span>
+            exit(0); <span class="codecomment">//Exit the program</span>
+    }
+}</pre></div><p>
+This function handles any keys pressed by the user.  For now, all that 
+it does is quit the program when the user presses ESC, by calling <kbd>exit</kbd>.  The function is passed the x and y coordinates of the mouse, but we don't need them.
+</p><div class="codeblock"><pre><span class="codecomment">//Initializes 3D rendering</span>
+<span class="codekeyword">void</span> initRendering() {
+    <span class="codecomment">//Makes 3D drawing work when something is in front of something else</span>
+    glEnable(GL_DEPTH_TEST);
+}</pre></div><p>
+The <kbd>initRendering</kbd> function initializes our rendering parameters.  For now, it doesn't do much.  We'll pretty much always want to call <kbd>glEnable(GL_DEPTH_TEST)</kbd>
+ when we initialize rendering.  The call makes sure that an object shows
+ up behind an object in front of it that has already been drawn, which 
+we want to happen.
+</p><p>
+Note that <kbd>glEnable</kbd>, like every OpenGL function, begins with "gl".
+</p><div class="codeblock"><pre><span class="codecomment">//Called when the window is resized</span>
+<span class="codekeyword">void</span> handleResize(<span class="codekeyword">int</span> w, <span class="codekeyword">int</span> h) {
+    <span class="codecomment">//Tell OpenGL how to convert from coordinates to pixel values</span>
+    glViewport(0, 0, w, h);
+    
+    glMatrixMode(GL_PROJECTION); <span class="codecomment">//Switch to setting the camera perspective</span>
+    
+    <span class="codecomment">//Set the camera perspective</span>
+    glLoadIdentity(); <span class="codecomment">//Reset the camera</span>
+    gluPerspective(45.0,                  <span class="codecomment">//The camera angle</span>
+                   (<span class="codekeyword">double</span>)w / (<span class="codekeyword">double</span>)h, <span class="codecomment">//The width-to-height ratio</span>
+                   1.0,                   <span class="codecomment">//The near z clipping coordinate</span>
+                   200.0);                <span class="codecomment">//The far z clipping coordinate</span>
+}</pre></div><p>
+The <kbd>handleResize</kbd> function is called whenever the window is resized.  <kbd>w</kbd> and <kbd>h</kbd> are the new width and height of the window.  The content of <kbd>handleResize</kbd> will be not change much in our other projects, so you don't have to worry about it too much.
+</p><p>
+There are a couple of things to notice.  When we pass <kbd>45.0</kbd> to <kbd>gluPerspective</kbd>, we're telling OpenGL the angle that the user's eye can see.  The <kbd>1.0</kbd>
+ indicates not to draw anything with a z coordinate of greater than -1. 
+ This is so that when something is right next to our eye, it doesn't 
+fill up the whole screen.  The <kbd>200.0</kbd> tells OpenGL not to draw
+ anything with a z coordinate less than -200.  We don't care very much 
+about stuff that's really far away.
+</p><p>
+So, why does <kbd>gluPerspective</kbd> begin with "glu" instead of "gl"?
+  That's because technically, it's a GLU (GL Utility) function.  In 
+addition to "gl" and "glu", some functions we call will begin with 
+"glut" (GL Utility Toolkit).  We won't really worry about the difference
+ among OpenGL, GLU, and GLUT.
+</p><div class="codeblock"><pre><span class="codecomment">//Draws the 3D scene</span>
+<span class="codekeyword">void</span> drawScene() {
+    <span class="codecomment">//Clear information from last draw</span>
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);</pre></div><p>
+The <kbd>drawScene</kbd> function is where the 3D drawing actually occurs.  First, we call <kbd>glClear</kbd> to clear information from the last time we drew.  In most every OpenGL program, you'll want to do this.
+</p><div class="codeblock"><pre>    glMatrixMode(GL_MODELVIEW); <span class="codecomment">//Switch to the drawing perspective</span>
+    glLoadIdentity(); <span class="codecomment">//Reset the drawing perspective</span></pre></div><p>
+For now, we'll ignore this.  It'll make sense after the next lesson, which covers transformations.
+</p><div class="codeblock"><pre>    glBegin(GL_QUADS); <span class="codecomment">//Begin quadrilateral coordinates</span>
+    
+    <span class="codecomment">//Trapezoid</span>
+    glVertex3f(-0.7f, -1.5f, -5.0f);
+    glVertex3f(0.7f, -1.5f, -5.0f);
+    glVertex3f(0.4f, -0.5f, -5.0f);
+    glVertex3f(-0.4f, -0.5f, -5.0f);
+    
+    glEnd(); <span class="codecomment">//End quadrilateral coordinates</span></pre></div><p>
+Here, we begin the substance of our program.  This part draws the trapezoid.  To draw a trapezoid, we call <kbd>glBegin(GL_QUADS)</kbd>
+ to tell OpenGL that we want to start drawing quadrilaterals.  Then, we 
+specify the four 3D coordinates of the vertices of the trapezoid, in 
+order, using calls to <kbd>glVertex3f</kbd>.  When we call <kbd>glVertex3f</kbd>, we are specifying three (that's where the "3" comes from) <kbd>float</kbd> (that's where the "f" comes from) coordinates.  Then, since we're done drawing quadrilaterals, we call <kbd>glEnd()</kbd>.  Note that every call to <kbd>glBegin</kbd> must have a matching call to <kbd>glEnd</kbd>.
+</p><p>
+All of the "f"'s after the vertex coordinates force the compiler to treat the numbers as <kbd>float</kbd>s.  Technically, I don't think that they're necessary, but I'm going to be using them everywhere.
+</p><div class="codeblock"><pre>    glBegin(GL_TRIANGLES); <span class="codecomment">//Begin triangle coordinates</span>
+    
+    <span class="codecomment">//Pentagon</span>
+    glVertex3f(0.5f, 0.5f, -5.0f);
+    glVertex3f(1.5f, 0.5f, -5.0f);
+    glVertex3f(0.5f, 1.0f, -5.0f);
+    
+    glVertex3f(0.5f, 1.0f, -5.0f);
+    glVertex3f(1.5f, 0.5f, -5.0f);
+    glVertex3f(1.5f, 1.0f, -5.0f);
+    
+    glVertex3f(0.5f, 1.0f, -5.0f);
+    glVertex3f(1.5f, 1.0f, -5.0f);
+    glVertex3f(1.0f, 1.5f, -5.0f);</pre></div><p>
+Now, we draw the pentagon.  To draw it, we split it up into three 
+triangles, which is pretty standard for OpenGL.  We start by calling <kbd>glBegin(GL_TRIANGLES)</kbd> to tell OpenGL that we want to draw triangles.  Then, we tell it the coordinates of the vertices of the triangles.
+</p><p>
+OpenGL automatically puts the coordinates together in groups of three.  Each group of three coordinates represents one triangle.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Triangle</span>
+    glVertex3f(-0.5f, 0.5f, -5.0f);
+    glVertex3f(-1.0f, 1.5f, -5.0f);
+    glVertex3f(-1.5f, 0.5f, -5.0f);</pre></div><p>
+Finally, we draw the triangle.  We haven't called <kbd>glEnd()</kbd> to tell OpenGL that we're done drawing triangles yet, so it knows that we're still giving it triangle coordinates.
+</p><div class="codeblock"><pre>    glEnd(); <span class="codecomment">//End triangle coordinates</span></pre></div><p>
+Now, we're done drawing triangles, so we call <kbd>glEnd()</kbd>.
+</p><p>
+Note that we could have drawn the above four triangles using four calls to <kbd>glBegin(GL_TRIANGLES)</kbd> and four accompanying calls to <kbd>glEnd()</kbd>.  However, this makes the program slower, and you shouldn't do it.
+</p><p>
+There are other things we can pass to <kbd>glBegin</kbd> in addition to <kbd>GL_TRIANGLES</kbd> and <kbd>GL_QUADS</kbd>, but triangles and quadrilaterals are the most common things to draw.
+</p><div class="codeblock"><pre>    glutSwapBuffers(); <span class="codecomment">//Send the 3D scene to the screen</span>
+}</pre></div><p>
+This line makes OpenGL actually move the scene to the window.  We'll call it whenever we're done drawing a scene.
+</p><div class="codeblock"><pre><span class="codekeyword">int</span> main(<span class="codekeyword">int</span> argc, <span class="codekeyword">char</span>** argv) {
+    <span class="codecomment">//Initialize GLUT</span>
+    glutInit(&amp;argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(400, 400); <span class="codecomment">//Set the window size</span>
+    
+    <span class="codecomment">//Create the window</span>
+    glutCreateWindow("Basic Shapes - videotutorialsrock.com");
+    initRendering(); <span class="codecomment">//Initialize rendering</span></pre></div><p>
+This is the program's main function.  We start by initializing GLUT.  
+Again, something similar will appear in all of our programs, so you 
+don't have to worry too much about it.  In the call to <kbd>glutInitWindowSize</kbd>, we set the window to be 400x400.  When we call <kbd>glutCreateWindow</kbd>, we tell it what title we want for the window.  Then, we call <kbd>initRendering</kbd>, the function that we wrote to initialize OpenGL rendering.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Set handler functions for drawing, keypresses, and window resizes</span>
+    glutDisplayFunc(drawScene);
+    glutKeyboardFunc(handleKeypress);
+    glutReshapeFunc(handleResize);</pre></div><p>
+Now, we point GLUT to the functions that we wrote to handle keypresses 
+and drawing and resizing the window.  One important thing to note: we're
+ not allowed to draw anything except inside the <kbd>drawScene</kbd> function that we explicitly give to GLUT, or inside functions that <kbd>drawScene</kbd> calls (or functions that they call, etc.).
+</p><div class="codeblock"><pre>    glutMainLoop(); <span class="codecomment">//Start the main loop.  glutMainLoop doesn't return.</span>
+    <span class="codekeyword">return</span> 0; <span class="codecomment">//This line is never reached</span>
+}</pre></div><p>
+Next, we call <kbd>glutMainLoop</kbd>, which tells GLUT to do its thing.
+  This is, we tell GLUT to capture key and mouse input, to draw the 
+scene when it has to by calling our <kbd>drawScene</kbd> function, and to do some other stuff.
+</p><p>
+<kbd>glutMainLoop</kbd>, like a defective boomerang, never returns.  
+GLUT just takes care of the rest of our program's execution.  After the 
+call, we have <kbd>return 0</kbd> so that the compiler doesn't complain about the <kbd>main</kbd> function not returning anything, but the program will never get to that line.
+</p><p>
+And that's how our first OpenGL program works.  You may want to try <a href="http://www.videotutorialsrock.com/opengl_tutorial/basic_shapes/exercises.php">the exercises</a> to get more familiar with what you just learned.
+</p>
+
+
+
+
+
+
+
+
+
+<p><i>Next is <a href="http://www.videotutorialsrock.com/opengl_tutorial/transform/home.php">"Lesson 2: Transformations and Timers"</a>.</i></p><center><div class="lessonlinks">
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/basic_shapes/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/basic_shapes/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/basic_shapes/basicshapes.zip">Download source</a></li></ul>
+</div></center>
+
+		<center><div class="horizontaladslong">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_2_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_2" name="aswift_2" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+		</div></center>
+	</div>
+</div>
+
+	<div id="footer">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Quick Reference</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/links.php">Links</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/about.php">About</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/contact.php">Contact</a></li>
+		</ul>
+		<center><table><tbody><tr><td>
+<a href="http://validator.w3.org/check/referer" target="_blank"><img src="text.php_files/valid_xhtml.png" alt="Valid XHTML" align="bottom" border="0" height="31" width="88"></a>
+		</td><td><center><p>© 2007 - 2011 Bill Jacobs<br>"Rock on!" - Bill</p></center></td><td>
+<a href="http://jigsaw.w3.org/css-validator/check/referer" target="_blank"><img src="text.php_files/valid_css.png" alt="Valid CSS" align="bottom" border="0" height="31" width="88"></a>
+		</td></tr></tbody></table></center>
+	</div>
+</div>
+
+<script src="text.php_files/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1957485-1";
+urchinTracker();
+</script>
+
+
+
+</body></html>

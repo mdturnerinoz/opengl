@@ -1,6 +1,7 @@
 CC = g++
 CFLAGS = -Wall
 PROG = basicshapes
+BROWSER = firefox
 
 SRCS = main.cpp
 
@@ -19,4 +20,8 @@ clean:
 	rm -f $(PROG)
 
 run:
-	./basicshapes
+	./$(PROG)
+
+text: 
+	$(BROWSER) text.php.html &
+
