@@ -1,6 +1,7 @@
 CC = g++
 CFLAGS = -Wall
 PROG = lighting
+BROWSER = firefox
 
 SRCS = main.cpp
 
@@ -20,3 +21,7 @@ clean:
 
 run:
 	./$(PROG)
+
+text:
+	$(BROWSER) text.php.html
+
