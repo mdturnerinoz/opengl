@@ -1,6 +1,7 @@
 CC = g++
 CFLAGS = -Wall
 PROG = terrain
+BROWSER = firefox
 
 SRCS = main.cpp imageloader.cpp vec3f.cpp
 
@@ -20,4 +21,7 @@ clean:
 
 run:
 	./$(PROG)
+
+text:
+	$(BROWSER) text.php.html &
 
