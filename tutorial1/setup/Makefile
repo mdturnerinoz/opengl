@@ -1,6 +1,7 @@
 CC = g++
 CFLAGS = -Wall
 PROG = cube
+BROWSER = firefox # change if firefox not installed
 
 SRCS = main.cpp imageloader.cpp
 
@@ -20,3 +21,8 @@ clean:
 
 run:
 	./cube &
+
+text:
+	$(BROWSER) text.php0a.html text.php0b.html text.php0c.html
+
+
