@@ -1,6 +1,7 @@
 CC = g++
 CFLAGS = -Wall
 PROG = textures
+BROWSER = firefox
 
 SRCS = main.cpp imageloader.cpp
 
@@ -20,4 +21,8 @@ clean:
 
 run:
 	./$(PROG)
+
+text:
+	$(BROWSER) text.php.html &
+
 
