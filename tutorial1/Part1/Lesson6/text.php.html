@@ -1,0 +1,347 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+	<title>OpenGL Video Tutorial - Putting It All Together</title>
+	<meta name="title" content="OpenGL Video Tutorial - Putting It All Together">
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<meta name="description" content="Free beginner-friendly OpenGL / GLUT tutorial for C++, including both video and text versions.">
+	<meta name="keywords" content="OpenGL, GLUT, OpenGL tutorial, OpenGL tutorials, free, GLUT tutorial, GLUT tutorials, OpenGL video tutorial, OpenGL video tutorials, video, videos, GLUT video tutorial, GLUT video tutorials, video tutorial, video tutorials, 3D, 3-D, Windows, Mac, OS X, Mac OS X, MacOSX, Linux, C, C++, Visual C++, programming, 3D programming, 3-D programming, reference, forum, forums">
+	<meta name="author" content="Bill Jacobs">
+	<meta name="designer" content="Bill Jacobs">
+	<meta name="copyright" content="© 2007 - 2008 Bill Jacobs">
+	<link href="text.php_files/styles.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 6]>
+		<style type="text/css">
+			#container {
+				width: expression(document.documentElement.clientWidth < 808 ? "808px" : "auto");
+			}
+		</style>
+	<![endif]-->
+	<!--[if gte IE 5]>
+		<style type="text/css">
+			#topads {
+				width: expression(document.body.clientWidth > 160 ? "160px" : "auto");
+			}
+		</style>
+	<![endif]-->
+</head>
+
+<body bgcolor="#B0E0FF">
+<div id="container">
+	<div id="header">
+		<img src="text.php_files/top_icon.png" alt="3D Video Tutorials Rock.com logo" height="101" width="165"><h1>OpenGL tutorial</h1>
+	</div>
+	
+	<div id="menu1">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Reference</a></li>
+		</ul>
+	</div>
+	
+	<div id="content">
+		<div id="mainbody">
+
+<center><h1>Lesson 6: Putting It All Together</h1></center>
+<center><div class="lessonlinks">
+	<div class="watchnow"><a href="http://www.videotutorialsrock.com/opengl_tutorial/cube/video.php">Watch the video now!</a></div>
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/cube/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/cube/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/cube/cube.zip">Download source</a></li></ul>
+</div></center>
+<center><div class="horizontaladslong">
+	<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</div></center>
+<p>
+We've learned a lot so far.  Let's briefly go over the OpenGL we learned
+ in the previous lessons, to make sure we understand everything.  If you
+ want, you can skip this lesson, but you might want to solidify 
+everything you've learned thus far.
+</p><p>
+Since we love spinning objects so much, we want to make a spinning cube 
+with two sides textured, two sides solid-colored, and two sides with a 
+color gradient.
+</p>
+<center><img src="text.php_files/screenshot.png" alt="Cube program screenshot" border="3" height="434" width="408"></center>
+<p>
+Let's take a look at the source code.  We'll briefly go through all of the code (except for the comments at the top).
+</p><div class="codeblock"><pre><span class="codekeyword">#include</span> &lt;iostream&gt;
+<span class="codekeyword">#include</span> &lt;stdlib.h&gt;
+
+<span class="codekeyword">#ifdef</span> __APPLE__
+<span class="codekeyword">#include</span> &lt;OpenGL/OpenGL.h&gt;
+<span class="codekeyword">#include</span> &lt;GLUT/glut.h&gt;
+<span class="codekeyword">#</span><span class="codekeyword">else</span>
+<span class="codekeyword">#include</span> &lt;GL/glut.h&gt;
+<span class="codekeyword">#endif</span>
+
+<span class="codekeyword">#include</span> "imageloader.h"
+
+<span class="codekeyword">using</span> <span class="codekeyword">namespace</span> std;</pre></div><p>
+Our include files.  Plus, we have <kbd>using namespace std</kbd>, which we'll have at the top of all our main.cpp files.
+</p><div class="codeblock"><pre><span class="codekeyword">const</span> <span class="codekeyword">float</span> BOX_SIZE = 7.0f; <span class="codecomment">//The length of each side of the cube</span>
+<span class="codekeyword">float</span> _angle; <span class="codecomment">//The rotation of the box</span>
+GLuint _textureId; <span class="codecomment">//The OpenGL id of the texture</span></pre></div><p>
+<kbd>BOX_SIZE</kbd> is a constant storing the length of each side of the box.  <kbd>_angle</kbd> stores the angle by which the box is currently rotated.  <kbd>_textureId</kbd> has the id of the texture we're applying to two of the faces.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> handleKeypress(<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span> key, <span class="codekeyword">int</span> x, <span class="codekeyword">int</span> y) {
+    <span class="codekeyword">switch</span> (key) {
+        <span class="codekeyword">case</span> 27: <span class="codecomment">//Escape key</span>
+            exit(0);
+    }
+}</pre></div><p>
+Handles keypresses.  It exits the program when the user presses ESC.
+</p><div class="codeblock"><pre><span class="codecomment">//Makes the image into a texture, and returns the id of the texture</span>
+GLuint loadTexture(Image *image) {
+    GLuint textureId;
+    glGenTextures(1, &amp;textureId);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    glTexImage2D(GL_TEXTURE_2D,
+                 0,
+                 GL_RGB,
+                 image-&gt;width, image-&gt;height,
+                 0,
+                 GL_RGB,
+                 GL_UNSIGNED_BYTE,
+                 image-&gt;pixels);
+    <span class="codekeyword">return</span> textureId;
+}</pre></div><p>
+Our function for loading a texture from an <kbd>Image</kbd> object.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> initRendering() {
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_COLOR_MATERIAL);
+    
+    Image *image = loadBMP("vtr.bmp");
+    _textureId = loadTexture(image);
+    <span class="codekeyword">delete</span> image;
+}</pre></div><p>
+Our function for initializing rendering.  We enable depth testing, like 
+always, as well as color, lighting, and light source number 0.  Then, we
+ load vtr.bmp into an <kbd>Image</kbd> object, load it into OpenGL as a texture, and delete the <kbd>Image</kbd> object, since we don't need it any more.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> handleResize(<span class="codekeyword">int</span> w, <span class="codekeyword">int</span> h) {
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, (<span class="codekeyword">float</span>)w / (<span class="codekeyword">float</span>)h, 1.0, 200.0);
+}</pre></div><p>
+Our function for handling window resizes.  It doesn't change very much in our different programs.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> drawScene() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);</pre></div><p>
+<kbd>drawScene</kbd> is our function for drawing the 3D scene.  First, we call <kbd>glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)</kbd> to clear information from the last draw, like we always do.
+</p><div class="codeblock"><pre>    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();</pre></div><p>
+We switch to the "normal" transformation mode, and reset transformations
+ so that we are at the origin and are facing in the negative z 
+direction.
+</p><div class="codeblock"><pre>    glTranslatef(0.0f, 0.0f, -20.0f);</pre></div><p>
+We move forward 20 units, so that our cube will be 20 units in front of the camera.
+</p><div class="codeblock"><pre>    GLfloat ambientLight[] = {0.3f, 0.3f, 0.3f, 1.0f};
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);</pre></div><p>
+We set the scene's ambient light, which shines everywhere, to have an intensity of 0.3.
+</p><div class="codeblock"><pre>    GLfloat lightColor[] = {0.7f, 0.7f, 0.7f, 1.0f};
+    GLfloat lightPos[] = {-2 * BOX_SIZE, BOX_SIZE, 4 * BOX_SIZE, 1.0f};
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPos);</pre></div><p>
+We set up a light source with an intensity of 0.7 at (<kbd>-2 * BOX_SIZE</kbd>, <kbd>BOX_SIZE</kbd>, <kbd>4 * BOX_SIZE</kbd>), relative to the center of the cube.
+</p><div class="codeblock"><pre>    glRotatef(-_angle, 1.0f, 1.0f, 0.0f);</pre></div><p>
+We rotate by the current angle about the vector (1, 1, 0), in order to produce the cube's spinning motion.
+</p><div class="codeblock"><pre>    glBegin(GL_QUADS);
+    
+    <span class="codecomment">//Top face</span>
+    glColor3f(1.0f, 1.0f, 0.0f);
+    glNormal3f(0.0, 1.0f, 0.0f);
+    glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+    glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+    glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+    glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+    
+    <span class="codecomment">//Bottom face</span>
+    glColor3f(1.0f, 0.0f, 1.0f);
+    glNormal3f(0.0, -1.0f, 0.0f);
+    glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+    glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+    glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+    glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);</pre></div><p>
+We draw the top and bottom faces, which are solid-colored.  Before giving the coordinates of each face using <kbd>glVertex3f</kbd>, we specify their colors and their normals, which have magnitude 1.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Left face</span>
+    glNormal3f(-1.0, 0.0f, 0.0f);
+    glColor3f(0.0f, 1.0f, 1.0f);
+    glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+    glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+    glColor3f(0.0f, 0.0f, 1.0f);
+    glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+    glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+    
+    <span class="codecomment">//Right face</span>
+    glNormal3f(1.0, 0.0f, 0.0f);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+    glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+    glColor3f(0.0f, 1.0f, 0.0f);
+    glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+    glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);</pre></div><p>
+We draw the left and right faces.  For each face, we specify the normals
+ first.  Then, we set the current color to the first color of the 
+gradient, and assign this color to the first two vertices by immediately
+ calling <kbd>glVertex3f</kbd> twice.  Then, we change the current color
+ to the second color of the gradient, and assign this color to the other
+ two vertices by subsequently calling <kbd>glVertex3f</kbd> two more times.
+</p><div class="codeblock"><pre>    glEnd();
+    
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, _textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glColor3f(1.0f, 1.0f, 1.0f);</pre></div><p>
+Now, we want to apply our texture.  We call <kbd>glEnd</kbd> to stop drawing quadrilaterals, because some texture functions can't be called in a <kbd>glBegin</kbd>-<kbd>glEnd</kbd> block.  We call <kbd>glEnable(GL_TEXTURE_2D)</kbd> to enable OpenGL to apply textures to subsequent polygons.  We call <kbd>glBindTexture(GL_TEXTURE_2D, _textureId)</kbd> to tell OpenGL that we want to apply the texture with id <kbd>_textureId</kbd>.  We call <kbd>glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)</kbd> ande <kbd>glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)</kbd> to have OpenGL use blurry, rather than blocky, texture mapping.  Then, we call <kbd>glColor3f(1.0f, 1.0f, 1.0f)</kbd> so that OpenGL won't try to change the color of our texture.
+</p><div class="codeblock"><pre>    glBegin(GL_QUADS);
+    
+    <span class="codecomment">//Front face</span>
+    glNormal3f(0.0, 0.0f, 1.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, BOX_SIZE / 2);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, BOX_SIZE / 2);
+    
+    <span class="codecomment">//Back face</span>
+    glNormal3f(0.0, 0.0f, -1.0f);
+    glTexCoord2f(0.0f, 0.0f);
+    glVertex3f(-BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+    glTexCoord2f(1.0f, 0.0f);
+    glVertex3f(-BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+    glTexCoord2f(1.0f, 1.0f);
+    glVertex3f(BOX_SIZE / 2, BOX_SIZE / 2, -BOX_SIZE / 2);
+    glTexCoord2f(0.0f, 1.0f);
+    glVertex3f(BOX_SIZE / 2, -BOX_SIZE / 2, -BOX_SIZE / 2);
+    
+    glEnd();</pre></div><p>
+We draw the last two faces.  For each, we specify the normal and then 
+alternate between specifying the texture coordinates of a vertex and the
+ actual coordinates of a vertex.
+</p><div class="codeblock"><pre>    glDisable(GL_TEXTURE_2D);</pre></div><p>
+Now, we're done drawing textures, so we disable them.  That way, the 
+next time we draw something, OpenGL won't automatically apply our 
+texture.
+</p><div class="codeblock"><pre>    glutSwapBuffers();
+}</pre></div><p>
+We send the scene to the window.
+</p><div class="codeblock"><pre><span class="codecomment">//Called every 25 milliseconds</span>
+<span class="codekeyword">void</span> update(<span class="codekeyword">int</span> value) {
+    _angle += 1.0f;
+    <span class="codekeyword">if</span> (_angle &gt; 360) {
+        _angle -= 360;
+    }</pre></div><p>
+Here's the <kbd>update</kbd> function, which we're going to have GLUT 
+call every 25 milliseconds.  First, we increase the angle by 1 and, to 
+try to keep the <kbd>_angle</kbd> variable low, we decrease it by 360 if it's greater than 360.
+</p><div class="codeblock"><pre>    glutPostRedisplay();</pre></div><p>
+We tell GLUT that our scene has changed, and it should be redrawn.
+</p><div class="codeblock"><pre>    glutTimerFunc(25, update, 0);
+}</pre></div><p>
+We tell GLUT to call <kbd>update</kbd> again in 25 milliseconds.
+</p><div class="codeblock"><pre><span class="codekeyword">int</span> main(<span class="codekeyword">int</span> argc, <span class="codekeyword">char</span>** argv) {
+    glutInit(&amp;argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(400, 400);</pre></div><p>
+We initialize GLUT.
+</p><div class="codeblock"><pre>    glutCreateWindow("Putting it All Together - videotutorialsrock.com");</pre></div><p>
+We tell GLUT to create our window.
+</p><div class="codeblock"><pre>    initRendering();</pre></div><p>
+We call our <kbd>initRendering</kbd> function to initialize some OpenGL rendering stuff.
+</p><div class="codeblock"><pre>    glutDisplayFunc(drawScene);
+    glutKeyboardFunc(handleKeypress);
+    glutReshapeFunc(handleResize);</pre></div><p>
+We tell GLUT what functions to use to draw our scene, handle key presses, and resize the window.
+</p><div class="codeblock"><pre>    glutTimerFunc(25, update, 0);</pre></div><p>
+We tell GLUT to call our timer function in 25 milliseconds.
+</p><div class="codeblock"><pre>    glutMainLoop();
+    <span class="codekeyword">return</span> 0;
+}</pre></div><p>
+We tell GLUT to start doing everything.
+</p><p>
+That's it.  You may want to try the <a href="http://www.videotutorialsrock.com/opengl_tutorial/cube/exercises.php">exercises</a> for this lesson to get a little more practice with the basics of OpenGL.
+</p>
+
+
+
+
+
+
+
+
+
+<p><i>Next is <a href="http://www.videotutorialsrock.com/opengl_tutorial/topics/home.php">"Part 2: Topics in 3D Programming"</a>.</i></p><center><div class="lessonlinks">
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/cube/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/cube/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/cube/cube.zip">Download source</a></li></ul>
+</div></center>
+
+		<center><div class="horizontaladslong">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_1_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_1" name="aswift_1" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+		</div></center>
+	</div>
+</div>
+
+	<div id="footer">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Quick Reference</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/links.php">Links</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/about.php">About</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/contact.php">Contact</a></li>
+		</ul>
+		<center><table><tbody><tr><td>
+<a href="http://validator.w3.org/check/referer" target="_blank"><img src="text.php_files/valid_xhtml.png" alt="Valid XHTML" align="bottom" border="0" height="31" width="88"></a>
+		</td><td><center><p>© 2007 - 2011 Bill Jacobs<br>"Rock on!" - Bill</p></center></td><td>
+<a href="http://jigsaw.w3.org/css-validator/check/referer" target="_blank"><img src="text.php_files/valid_css.png" alt="Valid CSS" align="bottom" border="0" height="31" width="88"></a>
+		</td></tr></tbody></table></center>
+	</div>
+</div>
+
+<script src="text.php_files/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1957485-1";
+urchinTracker();
+</script>
+
+
+
+</body></html>
