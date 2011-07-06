@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+	<title>OpenGL Video Tutorial - Drawing Reflections</title>
+	<meta name="title" content="OpenGL Video Tutorial - Drawing Reflections">
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<meta name="description" content="Free beginner-friendly OpenGL / GLUT tutorial for C++, including both video and text versions.">
+	<meta name="keywords" content="OpenGL, GLUT, OpenGL tutorial, OpenGL tutorials, free, GLUT tutorial, GLUT tutorials, OpenGL video tutorial, OpenGL video tutorials, video, videos, GLUT video tutorial, GLUT video tutorials, video tutorial, video tutorials, 3D, 3-D, Windows, Mac, OS X, Mac OS X, MacOSX, Linux, C, C++, Visual C++, programming, 3D programming, 3-D programming, reference, forum, forums">
+	<meta name="author" content="Bill Jacobs">
+	<meta name="designer" content="Bill Jacobs">
+	<meta name="copyright" content="© 2007 - 2008 Bill Jacobs">
+	<link href="text.php_files/styles.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 6]>
+		<style type="text/css">
+			#container {
+				width: expression(document.documentElement.clientWidth < 808 ? "808px" : "auto");
+			}
+		</style>
+	<![endif]-->
+	<!--[if gte IE 5]>
+		<style type="text/css">
+			#topads {
+				width: expression(document.body.clientWidth > 160 ? "160px" : "auto");
+			}
+		</style>
+	<![endif]-->
+</head>
+
+<body bgcolor="#B0E0FF">
+<div id="container">
+	<div id="header">
+		<img src="text.php_files/top_icon.png" alt="3D Video Tutorials Rock.com logo" height="101" width="165"><h1>OpenGL tutorial</h1>
+	</div>
+	
+	<div id="menu1">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Reference</a></li>
+		</ul>
+	</div>
+	
+	<div id="content">
+		<div id="mainbody">
+
+<center><h1>Lesson 14: Drawing Reflections</h1></center>
+<center><div class="lessonlinks">
+	<div class="watchnow"><a href="http://www.videotutorialsrock.com/opengl_tutorial/reflections/video.php">Watch the video now!</a></div>
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reflections/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reflections/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reflections/reflections.zip">Download source</a></li></ul>
+</div></center>
+<center><div class="horizontaladslong">
+	<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</div></center>
+<center><h2>Reflections</h2></center>
+<p>
+The basic idea behind making reflections is to draw the object or 
+objects that you want to be reflected across the surface, then to draw a
+ second, reflected copy of the objects.  Then, you can use alpha 
+blending to blend the reflective surface onto the screen.  So let's do 
+that.  Let's take the cube from <a href="http://www.videotutorialsrock.com/opengl_tutorial/cube/home.php">this lesson</a>, draw two copies of it, and blend a floor to the screen.
+</p>
+<center><img src="text.php_files/wrong.png" alt="Incorrect reflection" border="3" height="434" width="408"></center>
+<p>
+Oops.  Our cube has "leaked" off of the reflective surface.  We're 
+actually going to need to understand a new concept: the stencil buffer.
+</p><p>
+The stencil buffer gives us a certain amount of memory for each pixel.  
+In this program, we're only going to need one bit per pixel.  In order 
+to make the reflected part of the cube, we're first going to set every 
+pixel covered by the floor to be 1 in the stencil buffer.  Then, we'll 
+draw the reflected version of the cube only where the stencil buffer is 
+1.  After doing this, we get the following outcome:
+</p>
+<center><img src="text.php_files/screenshot.png" alt="Reflection program screenshot" border="3" height="434" width="408"></center>
+<p>
+Aah.  Much better.
+</p>
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_1_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_1" name="aswift_1" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</center>
+
+<center><h2>The Code</h2></center>
+<p>
+It's that time again: time to run through the code.
+</p><div class="codeblock"><pre><span class="codekeyword">const</span> <span class="codekeyword">float</span> BOX_SIZE = 7.0f; <span class="codecomment">//The length of each side of the cube</span>
+<span class="codekeyword">const</span> <span class="codekeyword">float</span> BOX_HEIGHT = BOX_SIZE; <span class="codecomment">//The height of the box off of the ground</span>
+<span class="codekeyword">const</span> <span class="codekeyword">float</span> FLOOR_SIZE = 20.0f; <span class="codecomment">//The length of each side of the floor</span></pre></div><p>
+We have some constants, explained by their comments.
+</p><div class="codeblock"><pre><span class="codecomment">//Draws the cube</span>
+<span class="codekeyword">void</span> drawCube(<span class="codekeyword">int</span> textureId, <span class="codekeyword">float</span> angle) {
+    <span class="codecomment">//...</span>
+}
+
+<span class="codecomment">//Draws the floor</span>
+<span class="codekeyword">void</span> drawFloor(<span class="codekeyword">int</span> textureId) {
+    <span class="codecomment">//...</span>
+}</pre></div><p>
+We have <kbd>drawCube</kbd> and <kbd>drawFloor</kbd> functions.  I'm sure you can guess what they do.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> drawScene() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);</pre></div><p>
+We have a little something new at the top of <kbd>drawScene</kbd>.  In addition to <kbd>GL_COLOR_BUFFER_BIT</kbd> and <kbd>GL_DEPTH_BUFFER_BIT</kbd>, we're adding <kbd>GL_STENCIL_BUFFER_BIT</kbd> to the call to <kbd>glClear</kbd>.  This makes it so that we clear the stencil buffer, so every pixel in the stencil buffer is equal to 0.
+</p><div class="codeblock"><pre>    <span class="codecomment">//...</span>
+    glPushMatrix();
+    glTranslatef(0, BOX_HEIGHT, 0);
+    drawCube(_textureId, _angle);
+    glPopMatrix();</pre></div><p>
+With this code, we draw the normal copy of the cube.
+</p><div class="codeblock"><pre>    glEnable(GL_STENCIL_TEST); <span class="codecomment">//Enable using the stencil buffer</span>
+    glColorMask(0, 0, 0, 0); <span class="codecomment">//Disable drawing colors to the screen</span>
+    glDisable(GL_DEPTH_TEST); <span class="codecomment">//Disable depth testing</span>
+    glStencilFunc(GL_ALWAYS, 1, 1); <span class="codecomment">//Make the stencil test always pass</span>
+    <span class="codecomment">//Make pixels in the stencil buffer be set to 1 when the stencil test passes</span>
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+    <span class="codecomment">//Set all of the pixels covered by the floor to be 1 in the stencil buffer</span>
+    drawFloor(_textureId);</pre></div><p>
+In this section of code, we're going to set every pixel covered by the floor to be 1 in the stencil buffer.  First, we enable <kbd>GL_STENCIL_TEST</kbd> to indicate that we want to start using the stencil buffer.  Then, we call <kbd>glColorMask(0, 0, 0, 0)</kbd> to disable drawing to the screen.  Right now, we only want to draw to the stencil buffer, not to the screen.  Then, we disable <kbd>GL_DEPTH_TEST</kbd>, since we don't need depth testing, in order to speed things up a little.
+</p><p>
+There are actually lots of interesting things you can do with stencil 
+buffers, but I'll only explain what we need to know for reflections.  
+The call to <kbd>glStencilFunc(GL_ALWAYS, 1, 1)</kbd> makes it so that the stencil test always passes.  I'll explain a little about the stencil test later.  Then, we call <kbd>glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE)</kbd>, which makes it so that every pixel where we draw will be set to 1 in the stencil buffer.  As a result, the subsequent call to <kbd>drawFloor</kbd>
+ has the effect of setting every pixel that the floor occupies to be 1 
+in the stencil buffer.  And now, we're all set.  The stencil buffer is 1
+ where the floor is and 0 everywhere else.
+</p><div class="codeblock"><pre>    glColorMask(1, 1, 1, 1); <span class="codecomment">//Enable drawing colors to the screen</span>
+    glEnable(GL_DEPTH_TEST); <span class="codecomment">//Enable depth testing</span>
+    <span class="codecomment">//Make the stencil test pass only when the pixel is 1 in the stencil buffer</span>
+    glStencilFunc(GL_EQUAL, 1, 1);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP); <span class="codecomment">//Make the stencil buffer not change</span>
+    
+    <span class="codecomment">//Draw the cube, reflected vertically, at all pixels where the stencil</span>
+    <span class="codecomment">//buffer is 1</span>
+    glPushMatrix();
+    glScalef(1, -1, 1);
+    glTranslatef(0, BOX_HEIGHT, 0);
+    drawCube(_textureId, _angle);
+    glPopMatrix();</pre></div><p>
+Now, we need to draw the reflected copy of the cube.  We call <kbd>glColorMask(1, 1, 1, 1)</kbd>
+ to re-enable drawing to the screen, since we actually want the 
+reflection to show up on the screen.  We also re-enable depth testing.  
+We call <kbd>glStencilFunc(GL_EQUAL, 1, 1)</kbd>, which makes it so that
+ the stencil test only passes at pixels where the stencil buffer is 1.  
+OpenGL will only draw the reflection where this test passes.  Then, we 
+call <kbd>glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP)</kbd>, which makes it 
+so that we won't alter the stencil buffer while drawing the reflection. 
+ Then, we actually draw the reflection, using a call to <kbd>drawCube</kbd>.
+</p><div class="codeblock"><pre>    glDisable(GL_STENCIL_TEST); <span class="codecomment">//Disable using the stencil buffer</span>
+    
+    <span class="codecomment">//Blend the floor onto the screen</span>
+    glEnable(GL_BLEND);
+    glColor4f(1, 1, 1, 0.7f);
+    drawFloor(_textureId);
+    glDisable(GL_BLEND);</pre></div><p>
+We disable stencil testing now that we're done with the stencil buffer. 
+ Then, we blend the floor onto the screen, using an opacity of 70%.
+</p><p>
+And we're done.  We've successfully fixed reflection, so that the floor appears to be a reflective surface.
+</p>
+
+
+
+
+
+
+
+
+
+<p><i>Next is <a href="http://www.videotutorialsrock.com/opengl_tutorial/fog/home.php">"Lesson 15: Fog"</a>.</i></p><center><div class="lessonlinks">
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reflections/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reflections/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reflections/reflections.zip">Download source</a></li></ul>
+</div></center>
+
+		<center><div class="horizontaladslong">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_2_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_2" name="aswift_2" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+		</div></center>
+	</div>
+</div>
+
+	<div id="footer">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Quick Reference</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/links.php">Links</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/about.php">About</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/contact.php">Contact</a></li>
+		</ul>
+		<center><table><tbody><tr><td>
+<a href="http://validator.w3.org/check/referer" target="_blank"><img src="text.php_files/valid_xhtml.png" alt="Valid XHTML" align="bottom" border="0" height="31" width="88"></a>
+		</td><td><center><p>© 2007 - 2011 Bill Jacobs<br>"Rock on!" - Bill</p></center></td><td>
+<a href="http://jigsaw.w3.org/css-validator/check/referer" target="_blank"><img src="text.php_files/valid_css.png" alt="Valid CSS" align="bottom" border="0" height="31" width="88"></a>
+		</td></tr></tbody></table></center>
+	</div>
+</div>
+
+<script src="text.php_files/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1957485-1";
+urchinTracker();
+</script>
+
+
+
+</body></html>
