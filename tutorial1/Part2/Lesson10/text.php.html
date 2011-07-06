@@ -1,0 +1,896 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+	<title>OpenGL Video Tutorial - Collision Detection</title>
+	<meta name="title" content="OpenGL Video Tutorial - Collision Detection">
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<meta name="description" content="Free beginner-friendly OpenGL / GLUT tutorial for C++, including both video and text versions.">
+	<meta name="keywords" content="OpenGL, GLUT, OpenGL tutorial, OpenGL tutorials, free, GLUT tutorial, GLUT tutorials, OpenGL video tutorial, OpenGL video tutorials, video, videos, GLUT video tutorial, GLUT video tutorials, video tutorial, video tutorials, 3D, 3-D, Windows, Mac, OS X, Mac OS X, MacOSX, Linux, C, C++, Visual C++, programming, 3D programming, 3-D programming, reference, forum, forums">
+	<meta name="author" content="Bill Jacobs">
+	<meta name="designer" content="Bill Jacobs">
+	<meta name="copyright" content="© 2007 - 2008 Bill Jacobs">
+	<link href="text.php_files/styles.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 6]>
+		<style type="text/css">
+			#container {
+				width: expression(document.documentElement.clientWidth < 808 ? "808px" : "auto");
+			}
+		</style>
+	<![endif]-->
+	<!--[if gte IE 5]>
+		<style type="text/css">
+			#topads {
+				width: expression(document.body.clientWidth > 160 ? "160px" : "auto");
+			}
+		</style>
+	<![endif]-->
+</head>
+
+<body bgcolor="#B0E0FF">
+<div id="container">
+	<div id="header">
+		<img src="text.php_files/top_icon.png" alt="3D Video Tutorials Rock.com logo" height="101" width="165"><h1>OpenGL tutorial</h1>
+	</div>
+	
+	<div id="menu1">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Reference</a></li>
+		</ul>
+	</div>
+	
+	<div id="content">
+		<div id="mainbody">
+
+<center><h1>Lesson 10: Collision Detection</h1></center>
+<center><div class="lessonlinks">
+	<div class="watchnow"><a href="http://www.videotutorialsrock.com/opengl_tutorial/collision_detection/video.php">Watch the video now!</a></div>
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/collision_detection/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/collision_detection/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/collision_detection/collisions.zip">Download source</a></li></ul>
+</div></center>
+<center><div class="horizontaladslong">
+	<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</div></center>
+<p>
+Be forwarned: this lesson will be fairly complex.
+</p>
+<center><h2>The Problem of Collision Detection</h2></center>
+<p>
+A common thing to do in video games, simulations, and other programs is 
+to have something happen when two objects hit each other, such as having
+ them bounce off each other or stop.  For this, we need to use collision
+ detection.  The basic idea of collision detection is to locate which 
+objects are intersecting at any given moment, so that we can handle the 
+intersection in some way.  Often, we want to do this in real-time, so 
+our solution had better be fast.
+</p><p>
+It turns out that collision detection is hard.  For this reason, in a 
+lot of demo or test versions of upcoming games, the collision detection 
+is rather buggy.
+</p><p>
+Furthermore, there's no one right answer for collision detection.  It 
+all depends on what program you are making.  Important factors for 
+designing collision detection include when and how collisions "usually" 
+occur, what types of flaws are more or less noticeable to the user, and 
+which collisions matter the most.  In particular, if only collisions 
+with the protagonist really matter, collision detection is a much 
+different problem than if all collisions between a pair of game objects 
+are relevant.
+</p><p>
+I can only cover a fraction of techniques used in collision detection.  
+Frequently, collision detection revolves around tricks that group 
+together closer objects.  Often, it utilizes the fact that the scene 
+doesn't change much between frames.  You can get exact collision 
+detection based on all of the 3D polygons of the objects, but usually 
+it's better to approximate the shapes of objects as one or more simpler 
+shapes such as boxes, cylinders, and spheres.  Another common technique 
+is to have a quick and dirty check that determines whether two objects 
+might be colliding, which one performs before potentially wasting time 
+on a longer check.  For example, one could check whether the bounding 
+spheres of two objects intersect before performing a more complicated 
+check.
+</p>
+<center><h2>Our Problem</h2></center>
+<p>
+Of the many collision detection techniques, I will teach you only one in
+ detail, to give you an idea of possible collision detection strategies.
+  First, let's look at the problem we want to solve.  <a href="http://www.videotutorialsrock.com/opengl_tutorial/collision_detection/collisions.zip">Download</a>,
+ compile, and run the program.  We have a box with the upper and lower 
+walls shown; the rest of the walls are invisible.  Every time you press 
+the space bar, it will randomly add 20 balls to the box.  They fall with
+ gravity and bounce off of each other and the walls.
+</p>
+<center><img src="text.php_files/screenshot.png" alt="Collision detection program screenshot" border="3" height="434" width="408"></center>
+<p>
+The basic idea of the program is to step by 10 milliseconds, updating 
+the balls' positions and velocities, check for collisions and make all 
+colliding balls bounce, and repeat.  We're going to focus on the part 
+where we check for collisions.
+</p><p>
+To find all of the collisions, one thing we could do is check every pair
+ of balls, and see if their distances are less than the sum of their 
+radii.  However, by the time we reached 300 balls, we'd have to check 
+about 50,000 pairs of balls for potential collisions, even though there 
+are usually very few collisions.  Maybe there's a faster way.
+</p><p>
+One thing we could try is to divide the cube in half along each 
+dimension, into eight smaller cubes.  Then, we could figure out in which
+ cube(s) each ball is, and check every pair of balls in each smaller 
+cube for collisions.  Take a look at this diagram of the 2D equivalent 
+of this technique:
+</p>
+<center><img src="text.php_files/half.png" alt="Partitioning a square" border="3" height="400" width="400"></center>
+<p>
+If we were to check every pair of balls in the above picture for 
+collisions, we would have to check 105 pairs of balls.  If instead, we 
+check each pair of balls in each of the four smaller squares, there are 
+only 3 + 3 + 15 + 10 = 31 pairs to check.
+</p><p>
+Note that two of the balls appear in two of the smaller squares.  This 
+will also occur in the 3D version of the problem, but it will be 
+relatively uncommon.
+</p><p>
+We've sped things up a little, but we can do even better.  Our basic 
+strategy to find potential collisions in a cube was to divide the cube 
+into eight smaller cubes, and then give some set of potential collisions
+ within each smaller cube.  For these potential collisions, we took 
+every pair of balls in each smaller cube.  But why stop there?  We can 
+divide the smaller cubes themselves into eight cubes, and take every 
+pair of balls in each even smaller cube, so that we have even fewer 
+pairs of balls to check.
+</p><p>
+We can repeat this indefinitely, but after a while, it ceases to be 
+helpful.  For instance, if there are very few balls in a cube, say 3, 
+then it's easier to just check all of the pairs of balls than to keep 
+dividing up the cube.  Plus, the more we divide up the cubes, the more 
+frequently balls will appear in multiple cubes, which is bad, because 
+this tends to produce duplicate pairs and false positives.  So, let's 
+use the following strategy: for a given cube, if there are a lot of 
+balls in it, make eight smaller cubes, and let them take care of finding
+ potential collisions.  If there are not so many balls, just use every 
+pair of balls as the set of potential collisions.  This results in a 
+tree structure; each cube is a node in the tree, and if it is divided 
+into smaller cubes, these cubes are its eight children.  It's called an 
+"octree", with one "t" (the 2D equivalent is called a "quadtree").  
+Below is an example of the 2D version of the tree structure:
+</p>
+<center><img src="text.php_files/tree.png" alt="Quadtree diagram" border="3" height="177" width="450"></center>
+<p>
+By further dividing the squares, we've reduced the number of pairs of balls to check even further, from 31 to 15.
+</p><p>
+Once the length of the cubes approaches the radius of the balls, 
+subdividing the cubes will make it very common for the balls to appear 
+in many cubes, which is bad.  For this reason, we'll limit the depth of 
+the tree.  That is, if we were going to subdivide a cube, but the cube 
+is already at some depth x in the tree, then we don't subdivide it.
+</p><p>
+Another thing: the scene doesn't change much from moment to moment.  So,
+ rather than constantly creating and destroying an octree, we'll create 
+an octree at the beginning of the program, and whenever a ball moves or 
+is created, we'll just change the octree.  Now, not only do we need to 
+divide up a cube when it has too many balls, but we have to un-divide a 
+cube when it has too few, in order to ensure that each leaf-level cube 
+has not too many, but not too few balls.  So, whenever a cube goes above
+ x balls, we'll divide it (unless the node is at the maximum allowable 
+depth), and whenever a cube drops to below y balls, we'll un-divide it. 
+ We want x to be a little bigger than y, so that we don't have to keep 
+dividing and un-dividing a given cube too frequently.
+</p>
+<center><h2>The Code for Basic Mechanics</h2></center>
+<p>
+Okay, let's take a look at some code.  Be warned: the program is a good 
+deal more complex than the programs in previous lessons.  Before we look
+ at the code for the octree, we'll look at the rest of the code.
+</p><p>
+After the include statements, we define the <kbd>randomFloat</kbd> function, which returns a random <kbd>float</kbd> from 0 to less than 1.
+</p><div class="codeblock"><pre><span class="codecomment">//Stores information regarding a ball</span>
+<span class="codekeyword">struct</span> Ball {
+    Vec3f v; <span class="codecomment">//Velocity</span>
+    Vec3f pos; <span class="codecomment">//Position</span>
+    <span class="codekeyword">float</span> r; <span class="codecomment">//Radius</span>
+    Vec3f color;
+};</pre></div><p>
+We define our ball structure, which has the velocity, position, radius, 
+and color of each ball.  The velocity of the ball indicates how quickly 
+it is moving in each direction.  For example, a velocity of (3, -2, -5) 
+means that it is moving 3 units per second in the positive x direction, 2
+ units per second in the downward direction, and 5 units per second in 
+the negative z direction.
+</p>
+<div class="codeblock"><pre><span class="codekeyword">enum</span> Wall {WALL_LEFT, WALL_RIGHT, WALL_FAR, WALL_NEAR, WALL_TOP, WALL_BOTTOM};</pre></div>
+<p>
+The six walls are represented in an enumeration.
+</p>
+<div class="codeblock"><pre><span class="codecomment">//Stores a pair of balls</span>
+<span class="codekeyword">struct</span> BallPair {
+    Ball* ball1;
+    Ball* ball2;
+};
+
+<span class="codecomment">//Stores a ball and a wall</span>
+<span class="codekeyword">struct</span> BallWallPair {
+    Ball* ball;
+    Wall wall;
+};</pre></div><p>
+We have structures to store ball-ball and ball-wall pairs, so that we 
+can indicate potential collisions.  Note that up until this point, I've 
+been ignoring ball-wall collisions.  This is because they take much less
+ time to compute than ball-ball collisions, so it's not as important to 
+optimize them.  But don't worry, we'll get to them.
+</p><div class="codeblock"><pre><span class="codecomment">//Puts potential ball-ball collisions in potentialCollisions.  It must return</span>
+<span class="codecomment">//all actual collisions, but it need not return only actual collisions.</span>
+<span class="codekeyword">void</span> potentialBallBallCollisions(vector&lt;BallPair&gt; &amp;potentialCollisions,
+                                 vector&lt;Ball*&gt; &amp;balls, Octree* octree) {
+    <span class="codecomment">//Fast method</span>
+    octree-&gt;potentialBallBallCollisions(potentialCollisions);
+    
+    <span class="codecomment">/*
+    //Slow method
+    for(unsigned int i = 0; i &lt; balls.size(); i++) {
+        for(unsigned int j = i + 1; j &lt; balls.size(); j++) {
+            BallPair bp;
+            bp.ball1 = balls[i];
+            bp.ball2 = balls[j];
+            potentialCollisions.push_back(bp);
+        }
+    }
+    */</span>
+}
+
+<span class="codecomment">//Puts potential ball-wall collisions in potentialCollisions.  It must return</span>
+<span class="codecomment">//all actual collisions, but it need not return only actual collisions.</span>
+<span class="codekeyword">void</span> potentialBallWallCollisions(vector&lt;BallWallPair&gt; &amp;potentialCollisions,
+                                 vector&lt;Ball*&gt; &amp;balls, Octree* octree) {
+    <span class="codecomment">//Fast method</span>
+    octree-&gt;potentialBallWallCollisions(potentialCollisions);
+    
+    <span class="codecomment">/*
+    //Slow method
+    Wall walls[] =
+        {WALL_LEFT, WALL_RIGHT, WALL_FAR, WALL_NEAR, WALL_TOP, WALL_BOTTOM};
+    for(unsigned int i = 0; i &lt; balls.size(); i++) {
+        for(int j = 0; j &lt; 6; j++) {
+            BallWallPair bwp;
+            bwp.ball = balls[i];
+            bwp.wall = walls[j];
+            potentialCollisions.push_back(bwp);
+        }
+    }
+    */</span>
+}</pre></div><p>
+In these function, we compute all possible ball-ball and ball-wall collisions, and add them to a C++ <kbd>vector</kbd>.
+  They just ask the octree for the potential collisions.  As I 
+mentioned, we'll worry about how the octree works after we cover the 
+basic mechanics of the program.
+</p><p>
+For those of you who are not familiar with the C++ <kbd>vector</kbd>, it's basically a variable-length array.  To use it, you have to <kbd>#include &lt;vector&gt;</kbd>.  You can add something to the end of a <kbd>vector</kbd> by calling <kbd>vec.push_back(element)</kbd>.  You can get or set the (n + 1)th element using <kbd>vec[n]</kbd>, just like you would with an array.  You can determine the number of elements in a <kbd>vector</kbd> by calling <kbd>vec.size()</kbd>.
+  It can also do plenty of other things.  (It slices, it dices, it does 
+your homework and makes you breakfast.)  And, to declare a vector of <kbd>BallPair</kbd>s, for example, we use <kbd>vector&lt;BallPair&gt;</kbd>.
+</p><p>
+Next, we have the <kbd>moveBalls</kbd> function, which moves all of the balls by their velocity times some float <kbd>dt</kbd>, in order to advance them by some small amount of time.  Then, we have the <kbd>applyGravity</kbd> function, called every <kbd>TIME_BETWEEN_UPDATES</kbd> seconds.  It applies gravity to the balls by decreasing the y coordinate of their velocities by <kbd>GRAVITY * TIME_BETWEEN_UPDATES</kbd>.
+  That's similar to how gravity works in real life; it decreases an 
+object's velocity in the y direction at a rate of 9.8 meters per second 
+per second.
+</p><div class="codeblock"><pre><span class="codecomment">//Returns whether two balls are colliding</span>
+<span class="codekeyword">bool</span> testBallBallCollision(Ball* b1, Ball* b2) {
+    <span class="codecomment">//Check whether the balls are close enough</span>
+    <span class="codekeyword">float</span> r = b1-&gt;r + b2-&gt;r;
+    <span class="codekeyword">if</span> ((b1-&gt;pos - b2-&gt;pos).magnitudeSquared() &lt; r * r) {
+        <span class="codecomment">//Check whether the balls are moving toward each other</span>
+        Vec3f netVelocity = b1-&gt;v - b2-&gt;v;
+        Vec3f displacement = b1-&gt;pos - b2-&gt;pos;
+        <span class="codekeyword">return</span> netVelocity.dot(displacement) &lt; 0;
+    }
+    <span class="codekeyword">else</span>
+        <span class="codekeyword">return</span> false;
+}</pre></div><p>
+This function tests whether two balls are currently colliding.  If <kbd>(b1-&gt;pos - b2-&gt;pos).magnitudeSquared() &lt; r * r</kbd>
+ is false, meaning they balls are farther away than the sum of their 
+radii, then we know they're not colliding.  Otherwise, we have to check 
+whether the balls are moving towards each other or away from each other.
+  If they're moving away from each other, then most likely they just 
+collided, and they shouldn't "collide" again.
+</p><div class="codeblock"><pre><span class="codecomment">//Handles all ball-ball collisions</span>
+<span class="codekeyword">void</span> handleBallBallCollisions(vector&lt;Ball*&gt; &amp;balls, Octree* octree) {
+    vector&lt;BallPair&gt; bps;
+    potentialBallBallCollisions(bps, balls, octree);
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; bps.size(); i++) {
+        BallPair bp = bps[i];
+        
+        Ball* b1 = bp.ball1;
+        Ball* b2 = bp.ball2;
+        <span class="codekeyword">if</span> (testBallBallCollision(b1, b2)) {
+            <span class="codecomment">//Make the balls reflect off of each other</span>
+            Vec3f displacement = (b1-&gt;pos - b2-&gt;pos).normalize();
+            b1-&gt;v -= 2 * displacement * b1-&gt;v.dot(displacement);
+            b2-&gt;v -= 2 * displacement * b2-&gt;v.dot(displacement);
+        }
+    }
+}</pre></div><p>
+<kbd>handleBallBallCollisions</kbd> makes all colliding balls bounce off of each other.  First, we call <kbd>potentialBallBallCollisions</kbd>
+ to find possible collisions.  Then, we go through all of the potential 
+collisions to find which ones are really collisions.  For each one, we 
+make the balls bounce off of each other, by reversing the velocity of 
+each in the direction from the center of one ball to the other.  The 
+following picture illustrates how we compute the velocity of a ball 
+after bouncing:
+</p>
+<center><img src="text.php_files/bounce.png" alt="Bouncing diagram" border="3" height="308" width="400"></center>
+<p>
+In the picture, d is the initial velocity of the ball.  s is its 
+projection onto the vector from the ball to the ball off which it's 
+bouncing.  d - 2s is the velocity of the ball after the bounce.
+</p><p>
+To determine s, we find the direction from the second ball to the first using <kbd>(b1-&gt;pos - b2-&gt;pos).normalize()</kbd>.  Then, we take the dot product of the initial velocity and this direction, which gives s.
+</p><p>
+Since the balls don't slow down when they bounce, the balls will keep 
+bouncing around forever, allowing for days or even years of non-stop 
+entertainment.
+</p><p>
+Then, we have the <kbd>testBallWallCollision</kbd> function, which 
+returns whether a particular ball is colliding with a given wall.  
+Again, we have to check to make sure that the ball is moving toward the 
+wall before we say that they're colliding.
+</p><div class="codeblock"><pre><span class="codecomment">//Handles all ball-wall collisions</span>
+<span class="codekeyword">void</span> handleBallWallCollisions(vector&lt;Ball*&gt; &amp;balls, Octree* octree) {
+    vector&lt;BallWallPair&gt; bwps;
+    potentialBallWallCollisions(bwps, balls, octree);
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; bwps.size(); i++) {
+        BallWallPair bwp = bwps[i];
+        
+        Ball* b = bwp.ball;
+        Wall w = bwp.wall;
+        <span class="codekeyword">if</span> (testBallWallCollision(b, w)) {
+            <span class="codecomment">//Make the ball reflect off of the wall</span>
+            Vec3f dir = (wallDirection(w)).normalize();
+            b-&gt;v -= 2 * dir * b-&gt;v.dot(dir);
+        }
+    }
+}</pre></div><p>
+Now, we have a function that makes all balls that are colliding with a wall bounce.  Like in <kbd>handleBallBallCollisions</kbd>,
+ we compute potential ball-wall collisions, go through them and find the
+ actuall ball-wall collisions, and make the balls bounce.  To bounce, we
+ reverse the velocity of the ball in the direction perpendicular to the 
+wall.
+</p><div class="codeblock"><pre><span class="codecomment">//Applies gravity and handles all collisions.  Should be called every</span>
+<span class="codecomment">//TIME_BETWEEN_UPDATES seconds.</span>
+<span class="codekeyword">void</span> performUpdate(vector&lt;Ball*&gt; &amp;balls, Octree* octree) {
+    applyGravity(balls);
+    handleBallBallCollisions(balls, octree);
+    handleBallWallCollisions(balls, octree);
+}</pre></div><p>
+Now, we lump together the <kbd>applyGravity</kbd>, <kbd>handleBallBallCollisions</kbd>, and <kbd>handleBallWallCollisions</kbd> into a <kbd>performUpdate</kbd> function, which is what we call every <kbd>TIME_BETWEEN_UPDATES</kbd> seconds.
+</p><p>
+Next is a <kbd>advance</kbd> function, which takes care of calling <kbd>moveBalls</kbd>, and calling <kbd>performUpdate</kbd> every <kbd>TIME_BETWEEN_UPDATES</kbd> seconds.
+</p><div class="codeblock"><pre>vector&lt;Ball*&gt; _balls; <span class="codecomment">//All of the balls in play</span>
+<span class="codekeyword">float</span> _angle = 0.0f; <span class="codecomment">//The camera angle</span>
+Octree* _octree; <span class="codecomment">//An octree with all af the balls</span>
+<span class="codecomment">//The amount of time until performUpdate should be called</span>
+<span class="codekeyword">float</span> _timeUntilUpdate = 0;
+GLuint _textureId;</pre></div><p>
+Here are all of our global variables.  Global variables are normally 
+bad, because to understand a global variable, you potentially have to 
+keep the whole main.cpp file in your head at once.  Global variables are
+ easily abused by altering them in ways that may confuse or subtly 
+affect other functions.  There are better approaches than global 
+variables, but I won't use them here because I don't want to distract 
+from collision detection.  Instead, we'll pretend they're not global, 
+and that they can only be accessed in the "toplevel functions" <kbd>initRendering</kbd>, <kbd>drawScene</kbd>, <kbd>handleKeypress</kbd>, <kbd>handleResize</kbd>, and a function we'll see called <kbd>cleanup</kbd>.
+  To make them stand out, we'll have them all start with underscores.  
+(By the way, in C++, you're not allowed to begin a variable with two 
+underscores, or with one underscore followed by a capital letter.)
+</p><div class="codeblock"><pre><span class="codecomment">//Deletes everything.  This should be called when exiting the program.</span>
+<span class="codekeyword">void</span> cleanup() {
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; _balls.size(); i++) {
+        <span class="codekeyword">delete</span> _balls[i];
+    }
+    <span class="codekeyword">delete</span> _octree;
+}</pre></div><p>
+When we exit the program, we need to make sure to delete all of the balls and the octree, since we don't need them any more.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> handleKeypress(<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span> key, <span class="codekeyword">int</span> x, <span class="codekeyword">int</span> y) {
+    <span class="codekeyword">switch</span> (key) {
+        <span class="codekeyword">case</span> 27: <span class="codecomment">//Escape key</span>
+            cleanup();
+            exit(0);</pre></div><p>
+When the user presses ESC, we call <kbd>cleanup</kbd> and exit the program.
+</p><div class="codeblock"><pre>        <span class="codekeyword">case</span> ' ':
+            <span class="codecomment">//Add 20 balls with a random position, velocity, radius, and color</span>
+            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 20; i++) {
+                Ball* ball = <span class="codekeyword">new</span> Ball();
+                ball-&gt;pos = Vec3f(8 * randomFloat() - 4,
+                                  8 * randomFloat() - 4,
+                                  8 * randomFloat() - 4);
+                ball-&gt;v = Vec3f(8 * randomFloat() - 4,
+                                8 * randomFloat() - 4,
+                                8 * randomFloat() - 4);
+                ball-&gt;r = 0.1f * randomFloat() + 0.1f;
+                ball-&gt;color = Vec3f(0.6f * randomFloat() + 0.2f,
+                                    0.6f * randomFloat() + 0.2f,
+                                    0.6f * randomFloat() + 0.2f);
+                _balls.push_back(ball);
+                _octree-&gt;add(ball);
+            }
+    }
+}</pre></div><p>
+When the user presses space bar, we make 20 balls with random positions,
+ velocities, radii, and colors, and add them to the octree and the <kbd>_balls</kbd> <kbd>vector</kbd>.
+</p><p>
+If you look at <kbd>drawScene</kbd>, you'll see that we first draw the top and bottom of the box.  Then, we draw the balls, using the following code:
+</p><div class="codeblock"><pre>    <span class="codecomment">//Draw the balls</span>
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; _balls.size(); i++) {
+        Ball* ball = _balls[i];
+        glPushMatrix();
+        glTranslatef(ball-&gt;pos[0], ball-&gt;pos[1], ball-&gt;pos[2]);
+        glColor3f(ball-&gt;color[0], ball-&gt;color[1], ball-&gt;color[2]);
+        glutSolidSphere(ball-&gt;r, 12, 12); <span class="codecomment">//Draw a sphere</span>
+        glPopMatrix();
+    }</pre></div><p>
+We have a new function here, <kbd>glutSolidSphere</kbd>, which draws a 
+sphere.  The first parameter is the radius of the sphere.  The second 
+and third indicate the number of polygons we'll use to draw the sphere 
+will have; the bigger the numbers, the more polygons we use and the 
+better the sphere will look.
+</p><div class="codeblock"><pre><span class="codecomment">//Called every TIMER_MS milliseconds</span>
+<span class="codekeyword">void</span> update(<span class="codekeyword">int</span> value) {
+    advance(_balls, _octree, (<span class="codekeyword">float</span>)TIMER_MS / 1000.0f, _timeUntilUpdate);
+    _angle += (<span class="codekeyword">float</span>)TIMER_MS / 100;
+    <span class="codekeyword">if</span> (_angle &gt; 360) {
+        _angle -= 360;
+    }
+    
+    glutPostRedisplay();
+    glutTimerFunc(TIMER_MS, update, 0);
+}</pre></div><p>
+Our <kbd>update</kbd> function just calls <kbd>advance</kbd> and increases the angle of rotation.
+</p>
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_1_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_1" name="aswift_1" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</center>
+
+<center><h2>Octree Code</h2></center>
+<p>
+That does it for the basic mechanics; now let's see how our octree works.
+</p><div class="codeblock"><pre><span class="codekeyword">const</span> <span class="codekeyword">int</span> MAX_OCTREE_DEPTH = 6;
+<span class="codekeyword">const</span> <span class="codekeyword">int</span> MIN_BALLS_PER_OCTREE = 3;
+<span class="codekeyword">const</span> <span class="codekeyword">int</span> MAX_BALLS_PER_OCTREE = 6;</pre></div><p>
+These are the parameters of our octree.  We want a maximum depth of 6.  
+When the number of balls in a cube reaches 6, we want to divide it into 
+smaller cubes.  When it goes below 3, we want to un-divide it.
+</p><div class="codeblock"><pre><span class="codecomment">//Our data structure for making collision detection faster</span>
+<span class="codekeyword">class</span> Octree {
+    <span class="codekeyword">private</span>:
+        Vec3f corner1; <span class="codecomment">//(minX, minY, minZ)</span>
+        Vec3f corner2; <span class="codecomment">//(maxX, maxY, maxZ)</span>
+        Vec3f center;<span class="codecomment">//((minX + maxX) / 2, (minY + maxY) / 2, (minZ + maxZ) / 2)</span></pre></div><p>
+We start with the fields in our <kbd>Octree</kbd> class.  We have the <kbd>corner1</kbd>, which is the lower-left-far corner of the cube, <kbd>corner2</kbd>, which is the upper-right-near corner, and <kbd>center</kbd>, which is the middle of the cube.
+</p><div class="codeblock"><pre>        <span class="codecomment">/* The children of this, if this has any.  children[0][*][*] are the
+         * children with x coordinates ranging from minX to centerX.
+         * children[1][*][*] are the children with x coordinates ranging from
+         * centerX to maxX.  Similarly for the other two dimensions of the
+         * children array.
+         */</span>
+        Octree *children[2][2][2];</pre></div><p>
+Now, we have the children nodes of the octree, if there are any.  The 
+children would themselves be octrees.  Read the comment above the field.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Whether this has children</span>
+        <span class="codekeyword">bool</span> hasChildren;
+        <span class="codecomment">//The balls in this, if this doesn't have any children</span>
+        set&lt;Ball*&gt; balls;
+        <span class="codecomment">//The depth of this in the tree</span>
+        <span class="codekeyword">int</span> depth;
+        <span class="codecomment">//The number of balls in this, including those stored in its children</span>
+        <span class="codekeyword">int</span> numBalls;</pre></div><p>
+These fields are pretty self-explanatory.  The <kbd>balls</kbd> variable is a C++ <kbd>set</kbd>.  To use a set, we <kbd>#include &lt;set&gt;</kbd>.  To add an element to it, we call <kbd>s.insert(element)</kbd>.  To remove an element, we call <kbd>s.erase(element)</kbd>.  We can remove all of the elements from a set using <kbd>s.clear()</kbd>.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Adds a ball to or removes a from one to the children of this</span>
+        <span class="codekeyword">void</span> fileBall(Ball* ball, Vec3f pos, <span class="codekeyword">bool</span> addBall) {
+            <span class="codecomment">//Figure out in which child(ren) the ball belongs</span>
+            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> x = 0; x &lt; 2; x++) {
+                <span class="codekeyword">if</span> (x == 0) {
+                    <span class="codekeyword">if</span> (pos[0] - ball-&gt;r &gt; center[0]) {
+                        <span class="codekeyword">continue</span>;
+                    }
+                }
+                <span class="codekeyword">else</span> <span class="codekeyword">if</span> (pos[0] + ball-&gt;r &lt; center[0]) {
+                    <span class="codekeyword">continue</span>;
+                }
+                
+                <span class="codekeyword">for</span>(<span class="codekeyword">int</span> y = 0; y &lt; 2; y++) {
+                    <span class="codekeyword">if</span> (y == 0) {
+                        <span class="codekeyword">if</span> (pos[1] - ball-&gt;r &gt; center[1]) {
+                            <span class="codekeyword">continue</span>;
+                        }
+                    }
+                    <span class="codekeyword">else</span> <span class="codekeyword">if</span> (pos[1] + ball-&gt;r &lt; center[1]) {
+                        <span class="codekeyword">continue</span>;
+                    }
+                    
+                    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> z = 0; z &lt; 2; z++) {
+                        <span class="codekeyword">if</span> (z == 0) {
+                            <span class="codekeyword">if</span> (pos[2] - ball-&gt;r &gt; center[2]) {
+                                <span class="codekeyword">continue</span>;
+                            }
+                        }
+                        <span class="codekeyword">else</span> <span class="codekeyword">if</span> (pos[2] + ball-&gt;r &lt; center[2]) {
+                            <span class="codekeyword">continue</span>;
+                        }
+                        
+                        <span class="codecomment">//Add or remove the ball</span>
+                        <span class="codekeyword">if</span> (addBall) {
+                            children[x][y][z]-&gt;add(ball);
+                        }
+                        <span class="codekeyword">else</span> {
+                            children[x][y][z]-&gt;remove(ball, pos);
+                        }
+                    }
+                }
+            }
+        }</pre></div><p>
+The <kbd>fileBall</kbd> method finds out the children where a ball belongs, based on the position <kbd>pos</kbd> and either adds it to or removes it from those children, calling the <kbd>add</kbd> and <kbd>remove</kbd>
+ methods that we'll see later.  To make things easier, rather than check
+ whether a given ball intersects each cube, we check whether the ball's 
+bounding box intersects each cube.  It's okay for a node to have extra 
+balls like this.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Creates children of this, and moves the balls in this to the children</span>
+        <span class="codekeyword">void</span> haveChildren() {
+            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> x = 0; x &lt; 2; x++) {
+                <span class="codekeyword">float</span> minX;
+                <span class="codekeyword">float</span> maxX;
+                <span class="codekeyword">if</span> (x == 0) {
+                    minX = corner1[0];
+                    maxX = center[0];
+                }
+                <span class="codekeyword">else</span> {
+                    minX = center[0];
+                    maxX = corner2[0];
+                }
+                
+                <span class="codekeyword">for</span>(<span class="codekeyword">int</span> y = 0; y &lt; 2; y++) {
+                    <span class="codekeyword">float</span> minY;
+                    <span class="codekeyword">float</span> maxY;
+                    <span class="codekeyword">if</span> (y == 0) {
+                        minY = corner1[1];
+                        maxY = center[1];
+                    }
+                    <span class="codekeyword">else</span> {
+                        minY = center[1];
+                        maxY = corner2[1];
+                    }
+                    
+                    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> z = 0; z &lt; 2; z++) {
+                        <span class="codekeyword">float</span> minZ;
+                        <span class="codekeyword">float</span> maxZ;
+                        <span class="codekeyword">if</span> (z == 0) {
+                            minZ = corner1[2];
+                            maxZ = center[2];
+                        }
+                        <span class="codekeyword">else</span> {
+                            minZ = center[2];
+                            maxZ = corner2[2];
+                        }
+                        
+                        children[x][y][z] = <span class="codekeyword">new</span> Octree(Vec3f(minX, minY, minZ),
+                                                       Vec3f(maxX, maxY, maxZ),
+                                                       depth + 1);
+                    }
+                }
+            }
+            
+            <span class="codecomment">//Remove all balls from "balls" and add them to the new children</span>
+            <span class="codekeyword">for</span>(set&lt;Ball*&gt;::iterator it = balls.begin(); it != balls.end();
+                    it++) {
+                Ball* ball = *it;
+                fileBall(ball, ball-&gt;pos, true);
+            }
+            balls.clear();
+            
+            hasChildren = true;
+        }</pre></div><p>
+The <kbd>haveChildren</kbd> method is what divides a cube into eight smaller cubes, whenever we need to do that.  To make each child, we call <kbd>new Octree(Vec3f(minX, minY, minZ), Vec3f(maxX, maxY, maxZ), depth + 1)</kbd>, using a constructor that we'll see later.
+</p><p>
+Next, we have the <kbd>collectBalls</kbd> method, which finds all of the balls in a node or one of its children.  We'll need this for when we un-divide a cube.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Destroys the children of this, and moves all balls in its descendants</span>
+        <span class="codecomment">//to the "balls" set</span>
+        <span class="codekeyword">void</span> destroyChildren() {
+            <span class="codecomment">//Move all balls in descendants of this to the "balls" set</span>
+            collectBalls(balls);
+            
+            <span class="codekeyword">for</span>(<span class="codekeyword">int</span> x = 0; x &lt; 2; x++) {
+                <span class="codekeyword">for</span>(<span class="codekeyword">int</span> y = 0; y &lt; 2; y++) {
+                    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> z = 0; z &lt; 2; z++) {
+                        <span class="codekeyword">delete</span> children[x][y][z];
+                    }
+                }
+            }
+            
+            hasChildren = false;
+        }</pre></div><p>
+This is where we un-divide a cube.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Removes the specified ball at the indicated position</span>
+        <span class="codekeyword">void</span> remove(Ball* ball, Vec3f pos) {
+            numBalls--;
+            
+            <span class="codekeyword">if</span> (hasChildren &amp;&amp; numBalls &lt; MIN_BALLS_PER_OCTREE) {
+                destroyChildren();
+            }
+            
+            <span class="codekeyword">if</span> (hasChildren) {
+                fileBall(ball, pos, false);
+            }
+            <span class="codekeyword">else</span> {
+                balls.erase(ball);
+            }
+        }</pre></div><p>
+This removes a ball from the octree.
+</p><p>
+Before we move on, we should know how we identify potential ball-wall 
+collisions.  To find potential collisions with the left wall, we just 
+find the nodes that are at the extreme left, and return all of those 
+balls.  We use the same idea for the other five walls.
+</p><div class="codeblock"><pre>        <span class="codecomment">/* Helper fuction for potentialBallWallCollisions(vector).  Adds
+         * potential ball-wall collisions to cs, where w is the type of wall,
+         * coord is the relevant coordinate of the wall ('x', 'y', or 'z'), and
+         * dir is 0 if the wall is in the negative direction and 1 if it is in
+         * the positive direction.  Assumes that this is in the extreme
+         * direction of the coordinate, e.g. if w is WALL_TOP, the function
+         * assumes that this is in the far upward direction.
+         */</span>
+        <span class="codekeyword">void</span> potentialBallWallCollisions(vector&lt;BallWallPair&gt; &amp;cs,
+                                         Wall w, <span class="codekeyword">char</span> coord, <span class="codekeyword">int</span> dir) {
+            <span class="codekeyword">if</span> (hasChildren) {
+                <span class="codecomment">//Recursively call potentialBallWallCollisions on the correct</span>
+                <span class="codecomment">//half of the children (e.g. if w is WALL_TOP, call it on</span>
+                <span class="codecomment">//children above centerY)</span>
+                <span class="codekeyword">for</span>(<span class="codekeyword">int</span> dir2 = 0; dir2 &lt; 2; dir2++) {
+                    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> dir3 = 0; dir3 &lt; 2; dir3++) {
+                        Octree *child;
+                        <span class="codekeyword">switch</span> (coord) {
+                            <span class="codekeyword">case</span> 'x':
+                                child = children[dir][dir2][dir3];
+                                <span class="codekeyword">break</span>;
+                            <span class="codekeyword">case</span> 'y':
+                                child = children[dir2][dir][dir3];
+                                <span class="codekeyword">break</span>;
+                            <span class="codekeyword">case</span> 'z':
+                                child = children[dir2][dir3][dir];
+                                <span class="codekeyword">break</span>;
+                        }
+                        
+                        child-&gt;potentialBallWallCollisions(cs, w, coord, dir);
+                    }
+                }
+            }
+            <span class="codekeyword">else</span> {
+                <span class="codecomment">//Add (ball, w) for all balls in this</span>
+                <span class="codekeyword">for</span>(set&lt;Ball*&gt;::iterator it = balls.begin(); it != balls.end();
+                        it++) {
+                    Ball *ball = *it;
+                    BallWallPair bwp;
+                    bwp.ball = ball;
+                    bwp.wall = w;
+                    cs.push_back(bwp);
+                }
+            }
+        }</pre></div><p>
+This is a helper function for computing potential ball-wall collisions.  It's explained in the comments.
+</p><div class="codeblock"><pre>    <span class="codekeyword">public</span>:
+        <span class="codecomment">//Constructs a new Octree.  c1 is (minX, minY, minZ), c2 is (maxX, maxY,</span>
+        <span class="codecomment">//maxZ), and d is the depth, which starts at 1.</span>
+        Octree(Vec3f c1, Vec3f c2, <span class="codekeyword">int</span> d) {
+            corner1 = c1;
+            corner2 = c2;
+            center = (c1 + c2) / 2;
+            depth = d;
+            numBalls = 0;
+            hasChildren = false;
+        }</pre></div><p>
+On to our public functions.  First is the constructor, which takes the 
+two corners of the cube and the depth of the node.  It's pretty 
+self-explanatory.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Destructor</span>
+        ~Octree() {
+            <span class="codekeyword">if</span> (hasChildren) {
+                destroyChildren();
+            }
+        }</pre></div><p>
+And now, the destructor, which is called when the node is deleted.  It deletes the children if there are any.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Adds a ball to this</span>
+        <span class="codekeyword">void</span> add(Ball* ball) {
+            numBalls++;
+            <span class="codekeyword">if</span> (!hasChildren &amp;&amp; depth &lt; MAX_OCTREE_DEPTH &amp;&amp;
+                numBalls &gt; MAX_BALLS_PER_OCTREE) {
+                haveChildren();
+            }
+            
+            <span class="codekeyword">if</span> (hasChildren) {
+                fileBall(ball, ball-&gt;pos, true);
+            }
+            <span class="codekeyword">else</span> {
+                balls.insert(ball);
+            }
+        }</pre></div><p>
+The <kbd>add</kbd> method adds a new ball to the octree.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Removes a ball from this</span>
+        <span class="codekeyword">void</span> remove(Ball* ball) {
+            remove(ball, ball-&gt;pos);
+        }</pre></div><p>
+The method for removing a ball just calls our other <kbd>remove</kbd> method, using the ball's current position.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Changes the position of a ball in this from oldPos to ball-&gt;pos</span>
+        <span class="codekeyword">void</span> ballMoved(Ball* ball, Vec3f oldPos) {
+            remove(ball, oldPos);
+            add(ball);
+        }</pre></div><p>
+This method is called whenever the ball moves from a position <kbd>oldPos</kbd> to <kbd>ball-&gt;pos</kbd>.
+  To make our lives easier, we just remove the ball and then add it 
+again.  We could go through the trouble of figuring out exactly in which
+ cubes the ball is now, but wasn't, and in which cubes the ball was, but
+ isn't any more.  But I bet this wouldn't speed things up too much 
+anyway.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Adds potential ball-ball collisions to the specified set</span>
+        <span class="codekeyword">void</span> potentialBallBallCollisions(vector&lt;BallPair&gt; &amp;collisions) {
+            <span class="codekeyword">if</span> (hasChildren) {
+                <span class="codekeyword">for</span>(<span class="codekeyword">int</span> x = 0; x &lt; 2; x++) {
+                    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> y = 0; y &lt; 2; y++) {
+                        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> z = 0; z &lt; 2; z++) {
+                            children[x][y][z]-&gt;
+                                potentialBallBallCollisions(collisions);
+                        }
+                    }
+                }
+            }
+            <span class="codekeyword">else</span> {
+                <span class="codecomment">//Add all pairs (ball1, ball2) from balls</span>
+                <span class="codekeyword">for</span>(set&lt;Ball*&gt;::iterator it = balls.begin(); it != balls.end();
+                        it++) {
+                    Ball *ball1 = *it;
+                    <span class="codekeyword">for</span>(set&lt;Ball*&gt;::iterator it2 = balls.begin();
+                            it2 != balls.end(); it2++) {
+                        Ball *ball2 = *it2;
+                        <span class="codecomment">//This test makes sure that we only add each pair once</span>
+                        <span class="codekeyword">if</span> (ball1 &lt; ball2) {
+                            BallPair bp;
+                            bp.ball1 = ball1;
+                            bp.ball2 = ball2;
+                            collisions.push_back(bp);
+                        }
+                    }
+                }
+            }
+        }</pre></div><p>
+Here's the meat of the octree.  In this method, we compute all potential ball-ball collisions and put them in the <kbd>collisions</kbd> <kbd>vector</kbd>.
+  If there are children, we just ask them for their potential ball-ball 
+collisions; otherwise, we just take every pair of balls.
+</p><p>
+To go through all of the balls in a set, we use a special C++ 
+construction.  To iterate through a set, we used the following form:
+</p><div class="codeblock"><pre><span class="codekeyword">for</span>(set&lt;Type&gt;::iterator it = s.begin(); it != s.end(); it++) {
+    Type element = *it;
+    
+    <span class="codecomment">//Do stuff with element</span>
+    <span class="codecomment">//...</span>
+}</pre></div><p>
+That's just the way <kbd>set</kbd>s work in C++.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Adds potential ball-wall collisions to the specified set</span>
+        <span class="codekeyword">void</span> potentialBallWallCollisions(vector&lt;BallWallPair&gt; &amp;collisions) {
+            potentialBallWallCollisions(collisions, WALL_LEFT, 'x', 0);
+            potentialBallWallCollisions(collisions, WALL_RIGHT, 'x', 1);
+            potentialBallWallCollisions(collisions, WALL_BOTTOM, 'y', 0);
+            potentialBallWallCollisions(collisions, WALL_TOP, 'y', 1);
+            potentialBallWallCollisions(collisions, WALL_FAR, 'z', 0);
+            potentialBallWallCollisions(collisions, WALL_NEAR, 'z', 1);
+        }</pre></div><p>
+In this method, we compute all potential ball-wall collisions by calling our helper function six times, once for each wall.
+</p><p>
+And that's how our octree works.
+</p><p>
+Now, let's make sure we didn't do all that work for nothing, that the 
+octree did speed things up.  Run the program, and keep pressing space 
+bar to see how many balls you can add until things start to slow down.  
+If your computer's too fast, you might want to slow down the program by 
+decreasing <kbd>TIME_BETWEEN_UPDATES</kbd>.  (If your computer's too slow, you could increase <kbd>TIME_BETWEEN_UPDATES</kbd>, but then it'll look pretty cruddy.)
+</p><p>
+Let's compare this with the naive approach, where we check every pair of balls.  In <kbd>potentialBallBallCollisions</kbd> and <kbd>potentialBallWallCollisions</kbd>, comment out the fast versions and uncomment the slow versions.  In <kbd>moveBalls</kbd>, comment out the line that says <kbd>octree-&gt;ballMoved(ball, oldPos)</kbd>.  In <kbd>handleKeypress</kbd>, comment out the line that says <kbd>_octree-&gt;add(ball)</kbd>.
+  Now, see how many balls you can add until the program starts to slow 
+down.  It's much fewer.  On my computer, 300 balls without the octree 
+are about as fast as 1000 balls with the octree.  If we add the line <kbd>cout &lt;&lt; potentialCollisions.size() &lt;&lt; '\n';</kbd> to the end of <kbd>potentialBallBallCollisions</kbd>,
+ we see that if we use an octree, when there are 300 balls, the program 
+checks an average of about 400 pairs of balls for collisions, much 
+better than the roughly 50,000 we have to check if we use the naive 
+approach.
+</p><p>
+So, yay!  We sped up collision detection a lot.
+</p>
+
+
+
+
+
+
+
+
+
+<p><i>Next is <a href="http://www.videotutorialsrock.com/opengl_tutorial/blockhead/home.php">"Lesson 11: Putting It All Together"</a>.</i></p><center><div class="lessonlinks">
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/collision_detection/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/collision_detection/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/collision_detection/collisions.zip">Download source</a></li></ul>
+</div></center>
+
+		<center><div class="horizontaladslong">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_2_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_2" name="aswift_2" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+		</div></center>
+	</div>
+</div>
+
+	<div id="footer">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Quick Reference</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/links.php">Links</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/about.php">About</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/contact.php">Contact</a></li>
+		</ul>
+		<center><table><tbody><tr><td>
+<a href="http://validator.w3.org/check/referer" target="_blank"><img src="text.php_files/valid_xhtml.png" alt="Valid XHTML" align="bottom" border="0" height="31" width="88"></a>
+		</td><td><center><p>© 2007 - 2011 Bill Jacobs<br>"Rock on!" - Bill</p></center></td><td>
+<a href="http://jigsaw.w3.org/css-validator/check/referer" target="_blank"><img src="text.php_files/valid_css.png" alt="Valid CSS" align="bottom" border="0" height="31" width="88"></a>
+		</td></tr></tbody></table></center>
+	</div>
+</div>
+
+<script src="text.php_files/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1957485-1";
+urchinTracker();
+</script>
+
+
+
+</body></html>
