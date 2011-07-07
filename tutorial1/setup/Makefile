@@ -19,10 +19,10 @@ $(PROG):	$(SRCS)
 clean:
 	rm -f $(PROG) *~
 
-run:
-	./cube &
+run: $(PROG)
+	./$(PROG)
 
 text:
-	$(BROWSER) text.php0a.html text.php0b.html text.php0c.html
+	$(BROWSER) text.php0a.html text.php0b.html text.php0c.html &
 
 
