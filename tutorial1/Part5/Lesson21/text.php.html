@@ -1,0 +1,2062 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+	<title>OpenGL Video Tutorial - A Sample Game: Crab Pong</title>
+	<meta name="title" content="OpenGL Video Tutorial - A Sample Game: Crab Pong">
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<meta name="description" content="Free beginner-friendly OpenGL / GLUT tutorial for C++, including both video and text versions.">
+	<meta name="keywords" content="OpenGL, GLUT, OpenGL tutorial, OpenGL tutorials, free, GLUT tutorial, GLUT tutorials, OpenGL video tutorial, OpenGL video tutorials, video, videos, GLUT video tutorial, GLUT video tutorials, video tutorial, video tutorials, 3D, 3-D, Windows, Mac, OS X, Mac OS X, MacOSX, Linux, C, C++, Visual C++, programming, 3D programming, 3-D programming, reference, forum, forums">
+	<meta name="author" content="Bill Jacobs">
+	<meta name="designer" content="Bill Jacobs">
+	<meta name="copyright" content="© 2007 - 2008 Bill Jacobs">
+	<link href="text.php_files/styles.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 6]>
+		<style type="text/css">
+			#container {
+				width: expression(document.documentElement.clientWidth < 808 ? "808px" : "auto");
+			}
+		</style>
+	<![endif]-->
+	<!--[if gte IE 5]>
+		<style type="text/css">
+			#topads {
+				width: expression(document.body.clientWidth > 160 ? "160px" : "auto");
+			}
+		</style>
+	<![endif]-->
+</head>
+
+<body bgcolor="#B0E0FF">
+<div id="container">
+	<div id="header">
+		<img src="text.php_files/top_icon.png" alt="3D Video Tutorials Rock.com logo" height="101" width="165"><h1>OpenGL tutorial</h1>
+	</div>
+	
+	<div id="menu1">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Reference</a></li>
+		</ul>
+	</div>
+	
+	<div id="content">
+		<div id="mainbody">
+
+<center><h1>Lesson 21: A Sample Game: Crab Pong</h1></center>
+<center><div class="lessonlinks">
+	<div class="watchnow"><a href="http://www.videotutorialsrock.com/opengl_tutorial/crab_pong/video.php">Watch the video now!</a></div>
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/crab_pong/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/crab_pong/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/crab_pong/crabpong.zip">Download source</a></li></ul>
+</div></center>
+<center><div class="horizontaladslong">
+	<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</div></center>
+<center><h2>The Game</h2></center>
+<p>
+Now that we've learned so much about OpenGL and 3D programming, let's 
+put it to use!  We're going to make a 3D Pong game.  This game is shown 
+below:
+</p>
+<center><img src="text.php_files/screenshot_large.png" alt="Crab Pong game screenshot" border="3" height="634" width="608"></center>
+<p>
+Each of the paddles is a 3D crab.  The bottom crab is controlled using 
+the left and right keys, while the other three are controlled by the 
+computer using some AI.
+</p><p>
+We'll divide the program into two components: the gameplay and the 
+drawing.  Code for the gameplay will be in game.h and game.cpp, while 
+the 3D drawing code will be in gamedrawer.h and gamedrawer.cpp.
+</p>
+<center><h2>game.h and game.cpp</h2></center>
+<p>
+We'll start by running throug game.h.  Near the top of game.h is a 
+comment that explains a lot about the gameplay.  Begin by reading the 
+comment, which appears below:
+</p><div class="codeblock"><pre><span class="codecomment">/* The game board is a square with corners (0, 0), (0, 1), (1, 0), and (1, 1) in
+ * the x-z plane.  There are balls and four crabs (paddles) in the game board.
+ * There is one crab of length CRAB_LENGTH on each edge of the square.  Each
+ * crab other than the first, the one on the edge connecting (0, 0) and (1, 0),
+ * is controlled by the computer.  A player is scored on when a ball reaches the
+ * player's side, but the crab isn't there to block it.  When a player is scored
+ * on, he loses a point.  When a player reaches 0 points, he's eliminated, and
+ * the side where his crab was turns into a wall.  There are four circles of
+ * radius BARRIER_SIZE centered at the corners that limit balls' and crabs'
+ * positions.  There may be multiple balls in play at once.  New balls are added
+ * to play by fading in at the center of the board.  As in the original Pong,
+ * the direction of a ball after hitting a crab depends on the place where the
+ * ball hit the crab.
+ */</span></pre></div><p>
+Alright, now you know a little about what we'll see in game.h and game.cpp.
+</p><div class="codeblock"><pre><span class="codecomment">//The length of a crab</span>
+<span class="codekeyword">const</span> <span class="codekeyword">float</span> CRAB_LENGTH = 0.2f;
+<span class="codecomment">//The radius of the four barriers positioned at the corners</span>
+<span class="codekeyword">const</span> <span class="codekeyword">float</span> BARRIER_SIZE = 0.12f;</pre></div><p>
+Here, we have the <kbd>CRAB_LENGTH</kbd> and <kbd>BARRIER_SIZE</kbd> constants.
+</p><div class="codeblock"><pre><span class="codecomment">//Represents a single crab (paddle)</span>
+<span class="codekeyword">class</span> Crab {
+    <span class="codekeyword">private</span>:
+        <span class="codecomment">//The maximum speed of the crab</span>
+        <span class="codekeyword">float</span> maximumSpeed;</pre></div><p>
+Now, we have our <kbd>Crab</kbd> class, which represents a single crab.  <kbd>maximumSpeed</kbd> is (you guessed it) the crab's maximum speed, in units per second.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The distance from the center of the crab to the corner on its right</span>
+        <span class="codekeyword">float</span> pos0;</pre></div><p>
+<kbd>pos0</kbd> is the distance between the center of the crab and the 
+corner on its right.  It ranges between 0 and 1, but it won't reach 0 
+and 1 because of the length of the crab and because of the barriers.
+</p><p>
+Note that <kbd>pos0</kbd> ends with "0".  This is to distinguish it from the <kbd>pos</kbd>
+ method that we'll see later.  You'll see this pattern a lot, where 
+variables end with 0 so as not to conflict with methods' names.
+</p><div class="codeblock"><pre>        <span class="codecomment">//-1 if the crab is accelerating toward the corner on its right, 1 if it</span>
+        <span class="codecomment">//is accelerating toward the other corner, and 0 if it is decelerating</span>
+        <span class="codekeyword">int</span> dir0;</pre></div><p>
+The <kbd>dir0</kbd> field is -1 if the crab is going toward the corner 
+on its right, 1 if it's going toward the other corner, and 0 if it's 
+slowing down.  So in the case of the human-controlled crab, this depends
+ on whether the left and right keys are pressed.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The velocity of the crab</span>
+        <span class="codekeyword">float</span> speed0;</pre></div><p>
+<kbd>speed0</kbd> is the velocity of the crab.  A negative number 
+indicates that the crab is moving toward the corner on its right, and a 
+positive number indicates that the crab is moving in the opposite 
+direction.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The amount of game time until the next call to step()</span>
+        <span class="codekeyword">float</span> timeUntilNextStep;
+        
+        <span class="codecomment">//Advances the state of the crab by a short amount of time</span>
+        <span class="codekeyword">void</span> step();</pre></div><p>
+We have a field for the amount of time until we'll call the <kbd>step</kbd> method, which advances the state of the crab by a small amount of time.
+</p><div class="codeblock"><pre>    <span class="codekeyword">public</span>:
+        <span class="codecomment">//Constructs a new Crab with the specified maximum speed</span>
+        Crab(<span class="codekeyword">float</span> maximumSpeed1);</pre></div><p>
+This is the constructor, which takes as a parameter the maximum speed for the crab.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Returns the distance from the center of the crab to the corner to its</span>
+        <span class="codecomment">//right</span>
+        <span class="codekeyword">float</span> pos();
+        <span class="codecomment">//Returns a negative number if the crab is accelerating toward the</span>
+        <span class="codecomment">//corner on its right, a positive number if it is accelerating toward</span>
+        <span class="codecomment">//the other corner, and 0 if it is decelerating</span>
+        <span class="codekeyword">int</span> dir();
+        <span class="codecomment">//Returns the velocity of the crab</span>
+        <span class="codekeyword">float</span> speed();</pre></div><p>
+These are methods for returning the position, direction, and speed of the crab.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Returns the acceleration of the crab when it is accelerating or</span>
+        <span class="codecomment">//decelerating</span>
+        <span class="codekeyword">float</span> acceleration();</pre></div><p>
+The <kbd>acceleration</kbd> method returns the acceleration of the crab whenever it's speeding up or slowing down.
+</p><div class="codeblock"><pre>         <span class="codecomment">//Sets the direction toward which the crab is accelerating.  A negative</span>
+        <span class="codecomment">//number indicates to accelerate toward the corner on its right, a</span>
+        <span class="codecomment">//positive number indicates to accelerate toward the other corner, and 0</span>
+        <span class="codecomment">//indicates to decelerate.</span>
+        <span class="codekeyword">void</span> setDir(<span class="codekeyword">int</span> dir1);</pre></div><p>
+<kbd>setDir</kbd> sets the direction the crab is heading, depending on whether the parameter is negative, positive, or 0.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Advances the state of the crab by the specified amount of time</span>
+        <span class="codekeyword">void</span> advance(<span class="codekeyword">float</span> dt);</pre></div><p>
+Now, we have a method that advances the state of the crab by some amount of time.
+</p><div class="codeblock"><pre><span class="codecomment">//Represents a single ball</span>
+<span class="codekeyword">class</span> Ball {
+    <span class="codekeyword">private</span>:
+        <span class="codecomment">//The radius of the ball</span>
+        <span class="codekeyword">float</span> r;
+        <span class="codecomment">//The x coordinate of the ball</span>
+        <span class="codekeyword">float</span> x0;
+        <span class="codecomment">//The z coordinate of the ball</span>
+        <span class="codekeyword">float</span> z0;</pre></div><p>
+Now, we have the <kbd>Ball</kbd> class, which represents a ball.  There are fields for the radius and position of the ball.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The angle at which the ball is traveling.  An angle of 0 indicates the</span>
+        <span class="codecomment">//positive x direction, while an angle of PI / 2 indicates the positive</span>
+        <span class="codecomment">//z direction.  The angle is always between 0 and 2 * PI.</span>
+        <span class="codekeyword">float</span> angle0;</pre></div><p>
+The <kbd>angle0</kbd> field indicates the direction the ball is traveling.  0 indicates the positive x direction, while <kbd>PI / 2</kbd> indicates the positive z direction.  The field is always between 0 and <kbd>2 * PI</kbd>.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The fraction that the ball is "faded in", from 0 to 1.  It is not 1</span>
+        <span class="codecomment">//when the ball is fading in or out.</span>
+        <span class="codekeyword">float</span> fadeAmount0;
+        <span class="codecomment">//Whether the ball is fading out</span>
+        <span class="codekeyword">bool</span> isFadingOut0;</pre></div><p>
+<kbd>fadeAmount0</kbd> is the amount that the ball is "faded in".  
+Usually, it will be 1, but if the ball is fading in or fading out, it 
+will be some fraction between 0 and 1.  <kbd>isFadingOut0</kbd> stores whether the ball is currently fading out.
+</p><div class="codeblock"><pre>    <span class="codekeyword">public</span>:
+        <span class="codecomment">//Constructs a new ball with the specified radius, x and z coordinates,</span>
+        <span class="codecomment">//and angle of travel.  An angle of 0 indicates the positive x</span>
+        <span class="codecomment">//direction, while an angle of PI / 2 indicates the positive z</span>
+        <span class="codecomment">//direction.  The angle must be between 0 and 2 * PI.</span>
+        Ball(<span class="codekeyword">float</span> radius1, <span class="codekeyword">float</span> x1, <span class="codekeyword">float</span> z1, <span class="codekeyword">float</span> angle1);</pre></div><p>
+The <kbd>Ball</kbd> constructor takes the radius, position, and angle of the ball as parameters.  Each ball is initially fading in.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Returns the radius of the ball</span>
+        <span class="codekeyword">float</span> radius();
+        <span class="codecomment">//Returns the x coordinate of the ball</span>
+        <span class="codekeyword">float</span> x();
+        <span class="codecomment">//Returns the z coordinate of the ball</span>
+        <span class="codekeyword">float</span> z();
+        <span class="codecomment">//Returns the angle at which the ball is traveling.  An angle of 0</span>
+        <span class="codecomment">//indicates the positive x direction, while an angle of PI / 2 indicates</span>
+        <span class="codecomment">//the positive z direction.  The returned angle is between 0 and 2 * PI.</span>
+        <span class="codekeyword">float</span> angle();</pre></div><p>
+There are methods for returning the radius, position, and angle of a ball.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Sets the angle at which the ball is traveling.  An angle of 0</span>
+        <span class="codecomment">//indicates the positive x direction, while an angle of PI / 2 indicates</span>
+        <span class="codecomment">//the positive z direction.  The angle must be between 0 and 2 * PI.</span>
+        <span class="codekeyword">void</span> setAngle(<span class="codekeyword">float</span> angle1);</pre></div><p>
+<kbd>setAngle</kbd> sets the angle at which the ball is traveling.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Returns the fraction that the ball is "faded in", from 0 to 1.  It is</span>
+        <span class="codecomment">//not 1 when the ball is fading in or out.</span>
+        <span class="codekeyword">float</span> fadeAmount();
+        <span class="codecomment">//Causes the ball to begin fading out</span>
+        <span class="codekeyword">void</span> fadeOut();
+        <span class="codecomment">//Returns whether the ball is fading out</span>
+        <span class="codekeyword">bool</span> isFadingOut();</pre></div><p>
+The <kbd>fadeAmount</kbd> method returns the amount that the ball is "faded in".  <kbd>fadeOut</kbd> makes the ball start fading out.  <kbd>isFadingOut</kbd> returns whether the ball is currently fading out.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Advances the state of the ball by the specified amount of time</span>
+        <span class="codekeyword">void</span> advance(<span class="codekeyword">float</span> dt);</pre></div><p>
+<kbd>advance</kbd> advances the state of the ball by moving it.
+</p><div class="codeblock"><pre><span class="codecomment">//Manages the state of the game</span>
+<span class="codekeyword">class</span> Game {
+    <span class="codekeyword">private</span>:
+        <span class="codecomment">//The four crabs.  The first is the one on the edge connecting (0, 0)</span>
+        <span class="codecomment">//and (1, 0), and each subsequent crab is one edge counterclockwise with</span>
+        <span class="codecomment">//respect to the previous one.  A crab is NULL if it has been eliminated</span>
+        <span class="codecomment">//by reaching a score of 0.</span>
+        Crab* crabs0[4];</pre></div><p>
+Now, let's move on to the <kbd>Game</kbd> class, which keeps track of all of the information for a game.  The <kbd>crabs0</kbd> array stores the four crabs, as indicated by its comment.  Note that a crab will be <kbd>NULL</kbd> if it's eliminated from play.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The balls that are currently in play</span>
+        std::vector&lt;Ball*&gt; balls0;</pre></div><p>
+<kbd>balls0</kbd> is a vector of all balls that are in play.
+</p><p>
+Note that we're using <kbd>std::vector</kbd> rather than <kbd>vector</kbd> because this header file doesn't have a line that says <kbd>using namespace std;</kbd>.  You're really not supposed to have that line in a header file, because it pollutes the namespace...er...something.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The scores for each of the players</span>
+        <span class="codekeyword">int</span> scores[4];</pre></div><p>
+The <kbd>scores</kbd> array stores the players' scores.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The amount of game time until the next call to step()</span>
+        <span class="codekeyword">float</span> timeUntilNextStep;</pre></div><p>
+And, yeah, we have our <kbd>timeUntilNextStep</kbd> field.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Handles all collisions at the current instant</span>
+        <span class="codekeyword">void</span> handleCollisions();</pre></div><p>
+The <kbd>handleCollisions</kbd> method handles all of the collisions for balls, much like in <a href="http://www.videotutorialsrock.com/opengl_tutorial/collision_detection/home.php">the lesson on collisions</a>.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Adjusts the directions in which the computer-controlled crabs are</span>
+        <span class="codecomment">//accelerating, using some AI</span>
+        <span class="codekeyword">void</span> doAI();</pre></div><p>
+<kbd>doAI</kbd> uses a little AI to control the directions that the computer-controlled crabs are going.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Advances the state of the game by a short amount of time</span>
+        <span class="codekeyword">void</span> step();</pre></div><p>
+As usual, the <kbd>step</kbd> method will advance the state by a little time.
+</p><div class="codeblock"><pre>    <span class="codekeyword">public</span>:
+        <span class="codecomment">//Constructs a new Game with the specified starting score.</span>
+        <span class="codecomment">//maximumSpeedForOpponents is the maximum speed at which the computer-</span>
+        <span class="codecomment">//controlled crabs move.  It can be used to control the difficulty of</span>
+        <span class="codecomment">//the opponents.</span>
+        Game(<span class="codekeyword">float</span> maximumSpeedForOpponents, <span class="codekeyword">int</span> startingScore);
+        ~Game();</pre></div><p>
+Now, we have the constructor.  It takes as arguments the starting score 
+and the computer-controlled crabs' maximum speeds.  The latter can be 
+used to set the difficulty of the computer crabs; a higher maximum speed
+ will make them more difficult.
+</p><div class="codeblock"><pre>        ~Game();</pre></div><p>
+The <kbd>Game</kbd> class also has a destructor.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Sets the direction toward which the human-controlled crab is</span>
+        <span class="codecomment">//accelerating.  A negative number indicates to accelerate toward the</span>
+        <span class="codecomment">//corner on its right, a positive number indicates to accelerate toward</span>
+        <span class="codecomment">//the other corner, and 0 indicates to decelerate.</span>
+        <span class="codekeyword">void</span> setPlayerCrabDir(<span class="codekeyword">int</span> dir);</pre></div><p>
+The <kbd>setPlayerCrabDir</kbd> method sets the direction in which the human-controlled crab is going.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Returns the score of the specified player</span>
+        <span class="codekeyword">int</span> score(<span class="codekeyword">int</span> crabNum);</pre></div><p>
+The <kbd>score</kbd> method returns a particular player's score.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Advances the state of the game by the specified amount of time</span>
+        <span class="codekeyword">void</span> advance(<span class="codekeyword">float</span> dt);</pre></div><p>
+<kbd>advance</kbd> advances the state of the game.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Returns the four crabs.  The first is the one on the edge connecting</span>
+        <span class="codecomment">//(0, 0) and (1, 0), and each subsequent crab is one edge</span>
+        <span class="codecomment">//counterclockwise with respect to the previous one.  A crab is NULL if</span>
+        <span class="codecomment">//it has been eliminated by reaching a score of 0.</span>
+        Crab** crabs();
+        <span class="codecomment">//Returns the balls that are currently in play</span>
+        std::vector&lt;Ball*&gt; balls();</pre></div><p>
+<kbd>crabs</kbd> and <kbd>balls</kbd> return the crabs and the balls that are in play.
+</p><p>
+That does it for game.h.  Let's go on to game.cpp, where we can see the code for the methods we just saw.
+</p><div class="codeblock"><pre><span class="codekeyword">namespace</span> {
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> PI = 3.1415926535f;</pre></div><p>
+At the top, we have some constants, beginning with everyone's favorite constant, <kbd>PI</kbd>.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The amount of time by which the state of the crab is advanced in each call</span>
+    <span class="codecomment">//to a crab's step() method</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> CRAB_STEP_TIME = 0.01f;</pre></div><p>
+<kbd>CRAB_STEP_TIME</kbd> is the amount of time by which the crab's <kbd>step</kbd> method advances the crab.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The amount of time it takes for a crab to accelerate from no speed to its</span>
+    <span class="codecomment">//maximum speed</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> TIME_TO_MAXIMUM_SPEED = 0.18f;</pre></div><p>
+The <kbd>TIME_TO_MAXIMUM_SPEED</kbd> constant is the amount of time it takes a crab to accelerate from a dead stop to its maximum speed.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The maximum angle formed by the direction at which a ball is hit off of a</span>
+    <span class="codecomment">//crab and the normal direction for the crab</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> MAX_CRAB_BOUNCE_ANGLE_OFFSET = 0.85f * PI / 2;</pre></div><p>
+If the center of the human-controlled crab hits a ball, it will go 
+straight forward.  If the exact left edge of the crab hits the ball, it 
+will go at an angle of <kbd>MAX_CRAB_BOUNCE_ANGLE_OFFSET</kbd> to the left.  That's the idea behind the <kbd>MAX_CRAB_BOUNCE_ANGLE_OFFSET</kbd> constant.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The maximum speed of the human-controlled crab</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> PLAYER_MAXIMUM_SPEED = 2.2f;</pre></div><p>
+This constant is the maximum speed of the human-controlled crab.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The amount of time it takes for a ball to fade into play</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> BALL_FADE_IN_TIME = 0.5f;
+    <span class="codecomment">//The amount of time it takes for a ball to fade out of play</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> BALL_FADE_OUT_TIME = 0.5f;</pre></div><p>
+These constants control how long it takes for a ball to fade into or out of play.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The radius of the balls</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> BALL_RADIUS = 0.04f;
+    <span class="codecomment">//The speed of the balls</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> BALL_SPEED = 1.0f;</pre></div><p>
+Here, we have the radius and speed of the balls.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The ideal number of balls in play</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">int</span> NUM_BALLS = 2;</pre></div><p>
+<kbd>NUM_BALLS</kbd> is the number of balls that ideally will be on the board at one time.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The amount of time by which the state of the game is advanced in each call</span>
+    <span class="codecomment">//to the game's step() method</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> GAME_STEP_TIME = 0.01f;</pre></div><p>
+The <kbd>GAME_STEP_TIME</kbd> constant is the amount of time between calls to the <kbd>Game</kbd> class's <kbd>step</kbd> method.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Returns a random float from 0 to &lt; 1</span>
+    <span class="codekeyword">float</span> randomFloat() {
+        <span class="codekeyword">return</span> (<span class="codekeyword">float</span>)rand() / ((<span class="codekeyword">float</span>)RAND_MAX + 1);
+    }
+}</pre></div><p>
+Here, we have our trusty ol' <kbd>randomFloat</kbd> function.
+</p><div class="codeblock"><pre>Crab::Crab(<span class="codekeyword">float</span> maximumSpeed1) {
+    maximumSpeed = maximumSpeed1;
+    pos0 = 0.5f;
+    dir0 = 0;
+    speed0 = 0;
+    timeUntilNextStep = 0;
+}</pre></div><p>
+On to the <kbd>Crab</kbd> class's constructor.  It just initializes some of the fields.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> Crab::step() {
+    <span class="codecomment">//Accelerate the crab</span>
+    <span class="codekeyword">float</span> ds = CRAB_STEP_TIME * acceleration();
+    <span class="codekeyword">if</span> (dir0 != 0) {
+        speed0 += dir0 * ds;
+        <span class="codekeyword">if</span> (speed0 &gt; maximumSpeed) {
+            speed0 = maximumSpeed;
+        }
+        <span class="codekeyword">else</span> <span class="codekeyword">if</span> (speed0 &lt; -maximumSpeed) {
+            speed0 = -maximumSpeed;
+        }
+    }
+    <span class="codekeyword">else</span> {
+        <span class="codekeyword">float</span> s = abs(speed0);
+        s -= ds;
+        <span class="codekeyword">if</span> (s &lt; 0) {
+            s = 0;
+        }
+        <span class="codekeyword">if</span> (speed0 &gt; 0) {
+            speed0 = s;
+        }
+        <span class="codekeyword">else</span> {
+            speed0 = -s;
+        }
+    }</pre></div><p>
+Here, we have the <kbd>Crab</kbd> class's <kbd>step</kbd> method.  First, it adjusts the <kbd>speed0</kbd> field.  It either increases or decreases or increases the velocity by <kbd>CRAB_STEP_TIME * acceleration()</kbd>, up to the maximum speed of the crab, making sure to allow for stopping the crab if its direction is 0.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Move the crab</span>
+    pos0 += CRAB_STEP_TIME * speed0;
+    <span class="codekeyword">if</span> (pos0 &lt; BARRIER_SIZE + CRAB_LENGTH / 2) {
+        pos0 = BARRIER_SIZE + CRAB_LENGTH / 2;
+        speed0 = 0;
+    }
+    <span class="codekeyword">else</span> <span class="codekeyword">if</span> (pos0 &gt; 1 - BARRIER_SIZE - CRAB_LENGTH / 2) {
+        pos0 = 1 - BARRIER_SIZE - CRAB_LENGTH / 2;
+        speed0 = 0;
+    }
+}</pre></div><p>
+In the remainder of the <kbd>step</kbd> method, we advance the position of the crab by <kbd>CRAB_STEP_TIME * speed0</kbd>, subject to not exceeding the barriers.
+</p><div class="codeblock"><pre><span class="codekeyword">float</span> Crab::pos() {
+    <span class="codekeyword">return</span> pos0;
+}
+
+<span class="codekeyword">int</span> Crab::dir() {
+    <span class="codekeyword">return</span> dir0;
+}
+
+<span class="codekeyword">float</span> Crab::speed() {
+    <span class="codekeyword">return</span> speed0;
+}</pre></div><p>
+These methods return the position, direction, and speed of a crab.
+</p><div class="codeblock"><pre><span class="codekeyword">float</span> Crab::acceleration() {
+    <span class="codekeyword">return</span> maximumSpeed / TIME_TO_MAXIMUM_SPEED;
+}</pre></div><p>
+<kbd>acceleration</kbd> returns the acceleration of the crab when it's 
+speeding up or slowing down.  This is just the maximum speed divided by 
+the amount of time it takes to reach the maximum speed.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> Crab::setDir(<span class="codekeyword">int</span> dir1) {
+    <span class="codekeyword">if</span> (dir1 &lt; 0) {
+        dir0 = -1;
+    }
+    <span class="codekeyword">else</span> <span class="codekeyword">if</span> (dir1 &gt; 0) {
+        dir0 = 1;
+    }
+    <span class="codekeyword">else</span> {
+        dir0 = 0;
+    }
+}</pre></div><p>
+The <kbd>setDir</kbd> method changes the direction of the crab by setting the <kbd>dir0</kbd> field.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> Crab::advance(<span class="codekeyword">float</span> dt) {
+    <span class="codekeyword">while</span> (dt &gt; 0) {
+        <span class="codekeyword">if</span> (timeUntilNextStep &lt; dt) {
+            dt -= timeUntilNextStep;
+            step();
+            timeUntilNextStep = CRAB_STEP_TIME;
+        }
+        <span class="codekeyword">else</span> {
+            timeUntilNextStep -= dt;
+            dt = 0;
+        }
+    }
+}</pre></div><p>
+<kbd>advance</kbd> advances the state of the crab by calling <kbd>step</kbd> the right number of times.
+</p><div class="codeblock"><pre>Ball::Ball(<span class="codekeyword">float</span> radius1, <span class="codekeyword">float</span> x1, <span class="codekeyword">float</span> z1, <span class="codekeyword">float</span> angle1) {
+    r = radius1;
+    x0 = x1;
+    z0 = z1;
+    angle0 = angle1;
+    fadeAmount0 = 0;
+    isFadingOut0 = false;
+}</pre></div><p>
+Now, we have the <kbd>Ball</kbd> class's constructor.  It just initializes a few fields.
+</p><div class="codeblock"><pre><span class="codekeyword">float</span> Ball::radius() {
+    <span class="codekeyword">return</span> r;
+}
+
+<span class="codekeyword">float</span> Ball::x() {
+    <span class="codekeyword">return</span> x0;
+}
+
+<span class="codekeyword">float</span> Ball::z() {
+    <span class="codekeyword">return</span> z0;
+}
+
+<span class="codekeyword">float</span> Ball::angle() {
+    <span class="codekeyword">return</span> angle0;
+}
+
+<span class="codekeyword">void</span> Ball::setAngle(<span class="codekeyword">float</span> angle1) {
+    angle0 = angle1;
+}
+
+<span class="codekeyword">float</span> Ball::fadeAmount() {
+    <span class="codekeyword">return</span> fadeAmount0;
+}
+
+<span class="codekeyword">void</span> Ball::fadeOut() {
+    isFadingOut0 = true;
+}
+
+<span class="codekeyword">bool</span> Ball::isFadingOut() {
+    <span class="codekeyword">return</span> isFadingOut0;
+}</pre></div><p>
+Here are the methods for returning the radius, position, and angle of a 
+ball, setting the angle of a ball, returning the amount that a ball is 
+"faded in", making a ball fade out, and returning whether a ball is 
+currently fading out.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> Ball::advance(<span class="codekeyword">float</span> dt) {
+    <span class="codekeyword">if</span> (isFadingOut0) {
+        <span class="codecomment">//Fade out</span>
+        fadeAmount0 -= dt / BALL_FADE_OUT_TIME;
+        <span class="codekeyword">if</span> (fadeAmount0 &lt; 0) {
+            fadeAmount0 = 0;
+        }
+    }
+    <span class="codekeyword">else</span> <span class="codekeyword">if</span> (fadeAmount0 &lt; 1) {
+        <span class="codecomment">//Fade in</span>
+        fadeAmount0 += dt / BALL_FADE_IN_TIME;
+        <span class="codekeyword">if</span> (fadeAmount0 &gt; 1) {
+            dt = (fadeAmount0 - 1) * BALL_FADE_IN_TIME;
+            fadeAmount0 = 1;
+        }
+        <span class="codekeyword">else</span> {
+            dt = 0;
+        }
+    }</pre></div><p>
+Now, we have the <kbd>advance</kbd> method.  First, we adjust <kbd>fadeAmount0</kbd> if the ball is fading in or fading out.
+</p><div class="codeblock"><pre>    <span class="codekeyword">if</span> (dt &lt;= 0) {
+        <span class="codekeyword">return</span>;
+    }
+    
+    <span class="codecomment">//Advance the position of the ball</span>
+    x0 += dt * cos(angle0) * BALL_SPEED;
+    z0 += dt * sin(angle0) * BALL_SPEED;
+}</pre></div><p>
+Then, we advance the position of the ball using a little trigonometry.
+</p><div class="codeblock"><pre>Game::Game(<span class="codekeyword">float</span> maximumSpeedForOpponents, <span class="codekeyword">int</span> startingScore) {
+    <span class="codekeyword">if</span> (startingScore &gt; 0) {
+        crabs0[0] = <span class="codekeyword">new</span> Crab(PLAYER_MAXIMUM_SPEED);
+        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 1; i &lt; 4; i++) {
+            crabs0[i] = <span class="codekeyword">new</span> Crab(maximumSpeedForOpponents);
+        }
+    }
+    <span class="codekeyword">else</span> {
+        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 4; i++) {
+            crabs0[i] = NULL;
+        }
+    }
+    
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 4; i++) {
+        scores[i] = startingScore;
+    }
+    timeUntilNextStep = 0;
+}</pre></div><p>
+The constructor for the <kbd>Game</kbd> class initializes some fields, including making some new <kbd>Crab</kbd> objects if the starting score is positive.
+</p><div class="codeblock"><pre>Game::~Game() {
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 4; i++) {
+        <span class="codekeyword">if</span> (crabs0[i] != NULL) {
+            <span class="codekeyword">delete</span> crabs0[i];
+        }
+    }
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; balls0.size(); i++) {
+        <span class="codekeyword">delete</span> balls0[i];
+    }
+}</pre></div><p>
+The destructor deletes the crabs and balls.
+</p><div class="codeblock"><pre><span class="codekeyword">namespace</span> {
+    <span class="codecomment">//Returns whether the point (dx, dz) lies within r units of (0, 0)</span>
+    <span class="codekeyword">bool</span> intersectsCircle(<span class="codekeyword">float</span> dx, <span class="codekeyword">float</span> dz, <span class="codekeyword">float</span> r) {
+        <span class="codekeyword">return</span> dx * dx + dz * dz &lt; r * r;
+    }</pre></div><p>
+Now, we'll see some functions that we'll use for collision detection.  <kbd>intersectsCircle</kbd> tells us whether (<kbd>dx</kbd>, <kbd>dz</kbd>) is within <kbd>r</kbd> units of the origin.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Returns whether a ball is colliding with a circle that is dx units to the</span>
+    <span class="codecomment">//right and dz units inward from it, where r is the sum of the radius of the</span>
+    <span class="codecomment">//ball and the radius of the circle and (vx, vz) is the velocity of the ball</span>
+    <span class="codekeyword">bool</span> collisionWithCircle(<span class="codekeyword">float</span> dx, <span class="codekeyword">float</span> dz, <span class="codekeyword">float</span> r, <span class="codekeyword">float</span> vx, <span class="codekeyword">float</span> vz) {
+        <span class="codekeyword">return</span> intersectsCircle(dx, dz, r) &amp;&amp; vx * dx + vz * dz &gt; 0;
+    }</pre></div><p>
+<kbd>collisionWithCircle</kbd> returns whether a ball is colliding with a
+ circle.  It takes as parameters the distance to the circle in x and z 
+directions, the sum of the radius of the ball and the radius of the 
+circle, and the velocity of the ball.  It operates by checking whether 
+the ball intersects the circle and is moving towards the circle, based 
+on the dot product of the displacement and the velocity.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Returns the resultant angle when an object traveling at an angle of angle</span>
+    <span class="codecomment">//bounces off of a wall whose normal is at an angle of normal.  The returned</span>
+    <span class="codecomment">//angle will be between 0 and 2 * PI.  An angle of 0 indicates the positive</span>
+    <span class="codecomment">//x direction, and an angle of PI / 2 indicates the positive z direction.</span>
+    <span class="codekeyword">float</span> reflect(<span class="codekeyword">float</span> angle, <span class="codekeyword">float</span> normal) {
+        angle = 2 * normal - PI - angle;
+        <span class="codekeyword">while</span> (angle &lt; 0) {
+            angle += 2 * PI;
+        }
+        <span class="codekeyword">while</span> (angle &gt; 2 * PI) {
+            angle -= 2 * PI;
+        }
+        <span class="codekeyword">return</span> angle;
+    }</pre></div><p>
+The <kbd>reflect</kbd> function...erm...well...just read the comments.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Adjusts the ball's angle in response to a collision with a circle at the</span>
+    <span class="codecomment">//specified position</span>
+    <span class="codekeyword">void</span> collideWithCircle(Ball* ball, <span class="codekeyword">float</span> x, <span class="codekeyword">float</span> z) {
+        <span class="codekeyword">if</span> (ball-&gt;fadeAmount() &lt; 1) {
+            <span class="codekeyword">return</span>;
+        }
+        
+        <span class="codekeyword">float</span> dx = x - ball-&gt;x();
+        <span class="codekeyword">float</span> dz = z - ball-&gt;z();
+        <span class="codekeyword">float</span> normal = atan2(-dz, -dx);
+        <span class="codekeyword">float</span> newBallAngle = reflect(ball-&gt;angle(), normal);
+        <span class="codekeyword">if</span> (newBallAngle &lt; 0) {
+            newBallAngle += 2 * PI;
+        }
+        <span class="codekeyword">else</span> <span class="codekeyword">if</span> (newBallAngle &gt; 2 * PI) {
+            newBallAngle -= 2 * PI;
+        }
+        ball-&gt;setAngle(newBallAngle);
+    }</pre></div><p>
+The <kbd>collideWithCircle</kbd> function causes a ball to bounce off of
+ a circle.  It just computes the normal vector at the point of contact 
+between the ball and the circle and uses the <kbd>reflect</kbd> function to figure out the new angle for the ball.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Returns whether a crab at the indicated position has intercepted a ball at</span>
+    <span class="codecomment">//the indicated position, where the positions are measured parallel to the</span>
+    <span class="codecomment">//direction in which the crab moves</span>
+    <span class="codekeyword">bool</span> collisionWithCrab(<span class="codekeyword">float</span> crabPos, <span class="codekeyword">float</span> ballPos) {
+        <span class="codekeyword">return</span> abs(crabPos - ballPos) &lt; CRAB_LENGTH / 2;
+    }</pre></div><p>
+<kbd>collisionWithCrab</kbd> returns whether a ball is colliding with a crab.  It just computes whether the ball's position is within <kbd>CRAB_LENGTH / 2</kbd> of the crab's position.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Adjusts the ball's angle in response to a collision with a crab.  The</span>
+    <span class="codecomment">//positions are measured parallel to the direction in which the crab moves,</span>
+    <span class="codecomment">//and the crab's position is its distance from its center to the corner to</span>
+    <span class="codecomment">//its right.</span>
+    <span class="codekeyword">void</span> collideWithCrab(Ball* ball,
+                         <span class="codekeyword">int</span> crabIndex,
+                         <span class="codekeyword">float</span> crabPos,
+                         <span class="codekeyword">float</span> ballPos) {
+        <span class="codekeyword">float</span> angle = (1 - crabIndex) * PI / 2 +
+            MAX_CRAB_BOUNCE_ANGLE_OFFSET *
+                (crabPos - ballPos) / (CRAB_LENGTH / 2);
+        <span class="codekeyword">while</span> (angle &lt; 0) {
+            angle += 2 * PI;
+        }
+        <span class="codekeyword">while</span> (angle &gt;= 2 * PI) {
+            angle -= 2 * PI;
+        }
+        ball-&gt;setAngle(angle);
+    }
+}</pre></div><p>
+<kbd>collideWithCrab</kbd> causes a ball to bounce off of a crab.  If the ball hits the center of the crab, it will bounce off at an angle of <kbd>(1 - crabIndex) * PI / 2</kbd>.  On top of that, we use some math the deviate the angle by some number between <kbd>-MAX_CRAB_BOUNCE_ANGLE_OFFSET</kbd> and <kbd>MAX_CRAB_BOUNCE_ANGLE_OFFSET</kbd>, depending on the spot where the ball hit the crab.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> Game::handleCollisions() {
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; balls0.size(); i++) {
+        Ball* ball = balls0[i];
+        
+        <span class="codekeyword">if</span> (ball-&gt;fadeAmount() &lt; 1 || ball-&gt;isFadingOut()) {
+            <span class="codekeyword">continue</span>;
+        }
+        
+        <span class="codecomment">//Ball-barrier collisions</span>
+        <span class="codekeyword">for</span>(<span class="codekeyword">float</span> z = 0; z &lt; 2; z += 1) {
+            <span class="codekeyword">for</span>(<span class="codekeyword">float</span> x = 0; x &lt; 2; x += 1) {
+                <span class="codekeyword">if</span> (collisionWithCircle(x - ball-&gt;x(), z - ball-&gt;z(),
+                                        ball-&gt;radius() + BARRIER_SIZE,
+                                        BALL_SPEED * cos(ball-&gt;angle()),
+                                        BALL_SPEED * sin(ball-&gt;angle()))) {
+                    collideWithCircle(ball, x, z);
+                }
+            }
+        }</pre></div><p>
+Now, we have the method that takes care of handling all of the 
+collisions with balls.  We have a loop that runs through all of the 
+balls.  For each ball, we first check for ball-barrier collisions.  We 
+go through the four barriers, and if the ball is colliding with one, we 
+call <kbd>collideWithCircle</kbd> to make it bounce off.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Ball-ball collisions</span>
+        <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> j = i + 1; j &lt; balls0.size(); j++) {
+            Ball* ball2 = balls0[j];
+            <span class="codekeyword">if</span> (collisionWithCircle(ball2-&gt;x() - ball-&gt;x(),
+                                    ball2-&gt;z() - ball-&gt;z(),
+                                    ball-&gt;radius() + ball2-&gt;radius(),
+                                    BALL_SPEED * (cos(ball-&gt;angle()) -
+                                                  cos(ball2-&gt;angle())),
+                                    BALL_SPEED * (sin(ball-&gt;angle()) -
+                                                  sin(ball2-&gt;angle())))) {
+                collideWithCircle(ball, ball2-&gt;x(), ball2-&gt;z());
+                collideWithCircle(ball2, ball-&gt;x(), ball-&gt;z());
+            }
+        }</pre></div><p>
+Now, we check for ball-ball collisions.  We go through all of the balls that are later in the <kbd>balls0</kbd> vector; that way, we'll only try each pair of balls once.  If the two balls are colliding, we'll call <kbd>collideWithCircle</kbd> on both of the balls to make them bounce off of each other.
+</p><p>
+Note that sometimes, the ball bouncing is unrealistic.  We're sort of 
+forced to accept this limitation if we don't want the balls to change 
+speed when they hit other balls.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Ball-crab (and ball-pole) collisions</span>
+        <span class="codekeyword">int</span> crabIndex;
+        <span class="codekeyword">float</span> ballPos;
+        <span class="codekeyword">if</span> (ball-&gt;z() &lt; ball-&gt;radius()) {
+            crabIndex = 0;
+            ballPos = ball-&gt;x();
+        }
+        <span class="codekeyword">else</span> <span class="codekeyword">if</span> (ball-&gt;x() &lt; ball-&gt;radius()) {
+            crabIndex = 1;
+            ballPos = 1 - ball-&gt;z();
+        }
+        <span class="codekeyword">else</span> <span class="codekeyword">if</span> (ball-&gt;z() &gt; 1 - ball-&gt;radius()) {
+            crabIndex = 2;
+            ballPos = 1 - ball-&gt;x();
+        }
+        <span class="codekeyword">else</span> <span class="codekeyword">if</span> (ball-&gt;x() &gt; 1 - ball-&gt;radius()) {
+            crabIndex = 3;
+            ballPos = ball-&gt;z();
+        }
+        <span class="codekeyword">else</span> {
+            crabIndex = -1;
+            ballPos = 0;
+        }
+        
+        <span class="codekeyword">if</span> (crabIndex &gt;= 0) {
+            <span class="codekeyword">if</span> (crabs0[crabIndex] != NULL) {
+                <span class="codekeyword">float</span> crabPos = crabs0[crabIndex]-&gt;pos();
+                <span class="codekeyword">if</span> (collisionWithCrab(crabPos, ballPos)) {
+                    collideWithCrab(ball, crabIndex, crabPos, ballPos);
+                }
+            }
+            <span class="codekeyword">else</span> {
+                <span class="codekeyword">float</span> normal = (1 - crabIndex) * PI / 2;
+                <span class="codekeyword">float</span> newAngle = reflect(ball-&gt;angle(), normal);
+                ball-&gt;setAngle(newAngle);
+            }
+        }
+    }
+}</pre></div><p>
+Here, we handle ball-crab and ball-pole collisions.  Poles are walls 
+that appear on an edge whenever a crab is eliminated.  First, we figure 
+out if the ball has exceeded any boundary of the board, and, if so, to 
+which crab the boundary corresponds.  Then, we check whether there's a 
+collision and handle the collision if there is one.
+</p><div class="codeblock"><pre><span class="codekeyword">namespace</span> {
+    <span class="codecomment">//Returns the position at which the specified crab will stop if it</span>
+    <span class="codecomment">//immediately starts decelerating</span>
+    <span class="codekeyword">float</span> stopPos(Crab* crab) {
+        <span class="codekeyword">float</span> d = crab-&gt;speed() * crab-&gt;speed() / crab-&gt;acceleration();
+        <span class="codekeyword">if</span> (crab-&gt;speed() &gt; 0) {
+            <span class="codekeyword">return</span> crab-&gt;pos() + d;
+        }
+        <span class="codekeyword">else</span> {
+            <span class="codekeyword">return</span> crab-&gt;pos() - d;
+        }
+    }
+}</pre></div><p>
+The <kbd>stopPos</kbd> function, which will be used by the <kbd>doAI</kbd>
+ method, returns the position at which a crab would stop if it 
+immediately started decelerating.  It uses a bit of physics to find the 
+right spot.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> Game::doAI() {
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 1; i &lt; 4; i++) {
+        Crab* crab = crabs0[i];
+        <span class="codekeyword">if</span> (crab == NULL) {
+            <span class="codekeyword">continue</span>;
+        }
+        
+        <span class="codecomment">//Find the position of the ball that is nearest the crab's side, and</span>
+        <span class="codecomment">//store the result in targetPos</span>
+        <span class="codekeyword">float</span> closestBallDist = 100;
+        <span class="codekeyword">float</span> targetPos = 0.5f;
+        <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> j = 0; j &lt; balls0.size(); j++) {
+            Ball* ball = balls0[j];
+            
+            <span class="codekeyword">float</span> ballDist;
+            <span class="codekeyword">float</span> ballPos;
+            <span class="codekeyword">switch</span>(i) {
+                <span class="codekeyword">case</span> 1:
+                    ballDist = ball-&gt;x() - ball-&gt;radius();
+                    ballPos = 1 - ball-&gt;z();
+                    <span class="codekeyword">break</span>;
+                <span class="codekeyword">case</span> 2:
+                    ballDist = 1 - ball-&gt;z() - ball-&gt;radius();
+                    ballPos = 1 - ball-&gt;x();
+                    <span class="codekeyword">break</span>;
+                <span class="codekeyword">case</span> 3:
+                    ballDist = 1 - ball-&gt;x() - ball-&gt;radius();
+                    ballPos = ball-&gt;z();
+                    <span class="codekeyword">break</span>;
+            }
+            
+            <span class="codekeyword">if</span> (ballDist &lt; closestBallDist) {
+                targetPos = ballPos;
+                closestBallDist = ballDist;
+            }
+        }</pre></div><p>
+Now we have the code for the AI that moves the computer-controlled 
+crabs.  The AI will actually be rather simple.  The crabs will move 
+toward the nearest ball.  By "nearest ball", I mean nearest in the 
+horizontal direction for the crabs on the left and right and the nearest
+ in the vertical direction for the crab on top.  So, the program loops 
+through the balls, and every time it finds a new closest ball, it 
+changes <kbd>closestBallDist</kbd> to be the ball's distance and <kbd>targetPos</kbd> to be the ball's position.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Move toward targetPos.  Stop so that the ball is in the middle 70% of</span>
+        <span class="codecomment">//the crab.</span>
+        <span class="codekeyword">if</span> (abs(stopPos(crab) - targetPos) &lt; 0.7f * (CRAB_LENGTH / 2)) {
+            crab-&gt;setDir(0);
+        }
+        <span class="codekeyword">else</span> <span class="codekeyword">if</span> (targetPos &lt; crab-&gt;pos()) {
+            crab-&gt;setDir(-1);
+        }
+        <span class="codekeyword">else</span> {
+            crab-&gt;setDir(1);
+        }</pre></div><p>
+We want to have the crab move toward <kbd>targetPos</kbd>.  If after 
+stopping the crab, the ball would be in the middle 70% of the crab, 
+we'll just stop.  This makes it so that we don't keep overshooting the 
+ball and keep oscillating back and forth around the ball's position.  If
+ such is not the case, we'll accelerate towards the ball's position.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> Game::step() {
+    <span class="codecomment">//Advance the crabs</span>
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 4; i++) {
+        Crab* crab = crabs0[i];
+        <span class="codekeyword">if</span> (crab != NULL) {
+            crab-&gt;advance(GAME_STEP_TIME);
+        }
+    }
+    
+    <span class="codecomment">//Advance the balls</span>
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; balls0.size(); i++) {
+        balls0[i]-&gt;advance(GAME_STEP_TIME);
+    }
+    
+    <span class="codecomment">//Handle collisions</span>
+    handleCollisions();</pre></div><p>
+Here's the <kbd>step</kbd> method.  First, it advances the crabs and balls and handles collisions.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Check for balls that have scored on a player</span>
+    vector&lt;Ball*&gt; newBalls;
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; balls0.size(); i++) {
+        Ball* ball = balls0[i];
+        <span class="codekeyword">if</span> (ball-&gt;fadeAmount() == 1 &amp;&amp; !ball-&gt;isFadingOut()) {
+            newBalls.push_back(ball);
+            
+            <span class="codekeyword">int</span> scoredOn;
+            <span class="codekeyword">if</span> (ball-&gt;z() &lt; ball-&gt;radius() &amp;&amp; (ball-&gt;angle() &gt; PI)) {
+                scoredOn = 0;
+            }
+            <span class="codekeyword">else</span> <span class="codekeyword">if</span> (ball-&gt;x() &lt; ball-&gt;radius() &amp;&amp;
+                     (ball-&gt;angle() &gt; PI / 2 &amp;&amp; ball-&gt;angle() &lt; 3 * PI / 2)) {
+                scoredOn = 1;
+            }
+            <span class="codekeyword">else</span> <span class="codekeyword">if</span> (ball-&gt;z() &gt; 1 - ball-&gt;radius() &amp;&amp; (ball-&gt;angle() &lt; PI)) {
+                scoredOn = 2;
+            }
+            <span class="codekeyword">else</span> <span class="codekeyword">if</span> (ball-&gt;x() &gt; 1 - ball-&gt;radius() &amp;&amp;
+                     (ball-&gt;angle() &lt; PI / 2 || ball-&gt;angle() &gt; 3 * PI / 2)) {
+                scoredOn = 3;
+            }
+            <span class="codekeyword">else</span> {
+                scoredOn = -1;
+            }
+            
+            <span class="codekeyword">if</span> (scoredOn &gt;= 0 &amp;&amp; crabs0[scoredOn] != NULL) {
+                scores[scoredOn]--;
+                <span class="codekeyword">if</span> (scores[scoredOn] == 0) {
+                    <span class="codekeyword">delete</span> crabs0[scoredOn];
+                    crabs0[scoredOn] = NULL;
+                }
+                
+                ball-&gt;fadeOut();
+            }
+        }
+        <span class="codekeyword">else</span> <span class="codekeyword">if</span> (ball-&gt;fadeAmount() &gt; 0 || !ball-&gt;isFadingOut()) {
+            newBalls.push_back(ball);
+        }
+        <span class="codekeyword">else</span> {
+            <span class="codekeyword">delete</span> ball;
+        }
+    }
+    balls0 = newBalls;</pre></div><p>
+Now, we're going to see if anyone's been scored on, and we'll get rid of any balls that have completely faded out.  The <kbd>newBalls</kbd> vector stores all of the balls that haven't faded out, and after the loop, <kbd>balls0</kbd> is updated to be equal to <kbd>newBalls</kbd>.
+  The loop goes through the balls and checks whether they've exceeded 
+one of the boundaries of the board.  If so, that crab's score is reduced
+ by 1, if it hasn't been eliminated yet.  Then, if its score reaches 0, 
+the crab is deleted and the appropriate element of <kbd>crabs0</kbd> is set to <kbd>NULL</kbd>.  Finally, the ball is faded out.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Check whether the game is over</span>
+    <span class="codekeyword">bool</span> isGameOver;
+    <span class="codekeyword">if</span> (crabs0[0] != NULL) {
+        isGameOver = true;
+        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 1; i &lt; 4; i++) {
+            <span class="codekeyword">if</span> (crabs0[i] != NULL) {
+                isGameOver = false;
+            }
+        }
+    }
+    <span class="codekeyword">else</span> {
+        isGameOver = true;
+    }</pre></div><p>
+This piece of code determines whether the game is over, by checking 
+whether all of the computer opponents have been eliminated or whether 
+the human-controlled crab has been eliminated.  (We don't want to watch 
+the computer players play each other when the human player been 
+eliminated.)
+</p><div class="codeblock"><pre>    <span class="codekeyword">if</span> (!isGameOver) {
+        <span class="codecomment">//Try to get to NUM_BALLS balls</span>
+        <span class="codekeyword">while</span> (balls0.size() &lt; (<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span>)NUM_BALLS) {
+            <span class="codecomment">//Try to place a ball at the center of the board</span>
+            <span class="codekeyword">bool</span> ballFits = true;
+            <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; balls0.size(); i++) {
+                Ball* ball = balls0[i];
+                <span class="codekeyword">if</span> (intersectsCircle(ball-&gt;x() - 0.5f, ball-&gt;z() - 0.5f,
+                                     2 * BALL_RADIUS)) {
+                    ballFits = false;
+                    <span class="codekeyword">break</span>;
+                }
+            }
+            
+            <span class="codekeyword">if</span> (ballFits) {
+                Ball* ball =
+                    <span class="codekeyword">new</span> Ball(BALL_RADIUS, 0.5f, 0.5f, 2 * PI * randomFloat());
+                balls0.push_back(ball);
+            }
+            <span class="codekeyword">else</span> {
+                <span class="codekeyword">break</span>;
+            }
+        }
+    }
+    <span class="codekeyword">else</span> {
+        <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; balls0.size(); i++) {
+            balls0[i]-&gt;fadeOut();
+        }
+    }</pre></div><p>
+If the game is not over, we'll try to add balls to the board until there are <kbd>NUM_BALLS</kbd>
+ balls.  To try to add a ball at the middle of the board, we check 
+whether there's already a ball there, and if not, we add a new ball 
+moving in a random direction.
+</p><p>
+If the game is over, we make all of the balls fade out.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Run the AI for the computer-controlled crabs</span>
+    doAI();
+}</pre></div><p>
+Finally, we run the AI.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> Game::setPlayerCrabDir(<span class="codekeyword">int</span> dir) {
+    <span class="codekeyword">if</span> (crabs0[0] != NULL) {
+        crabs0[0]-&gt;setDir(dir);
+    }
+}
+
+<span class="codekeyword">int</span> Game::score(<span class="codekeyword">int</span> crabNum) {
+    <span class="codekeyword">return</span> scores[crabNum];
+}</pre></div><p>
+These methods for setting the human-controlled crab's direction and returning a player's score are pretty simple.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> Game::advance(<span class="codekeyword">float</span> dt) {
+    <span class="codekeyword">while</span> (dt &gt; 0) {
+        <span class="codekeyword">if</span> (timeUntilNextStep &lt; dt) {
+            dt -= timeUntilNextStep;
+            step();
+            timeUntilNextStep = CRAB_STEP_TIME;
+        }
+        <span class="codekeyword">else</span> {
+            timeUntilNextStep -= dt;
+            dt = 0;
+        }
+    }
+}</pre></div><p>
+The <kbd>advance</kbd> method just calls <kbd>step</kbd> the appropriate number of times.
+</p><div class="codeblock"><pre>Crab** Game::crabs() {
+    <span class="codekeyword">return</span> crabs0;
+}
+
+vector&lt;Ball*&gt; Game::balls() {
+    <span class="codekeyword">return</span> balls0;
+}</pre></div><p>
+The <kbd>crabs</kbd> and <kbd>balls</kbd> method return all of the crabs and balls that are in play.
+</p><p>
+That does it for the gameplay code.
+</p>
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_1_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_1" name="aswift_1" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</center>
+
+<center><h2>Drawing Code</h2></center>
+<p>
+The main drawing code for the program is in gamedrawer.h and 
+gamedrawer.cpp.  But first, we'll take a look at the MD2Model class, as 
+there are a couple of changes.  We'll look at md2model.h.
+</p><div class="codeblock"><pre>        <span class="codecomment">/* Draws the state of the animated model at the specified time in the
+         * animation.  A time of i, integer i, indicates the beginning of the
+         * animation, and a time of i + 0.5 indicates halfway through the
+         * animation.  textureNum is the index of the texture that is used when
+         * drawing the model.
+         */</span>
+        <span class="codekeyword">void</span> draw(<span class="codekeyword">int</span> textureNum, <span class="codekeyword">float</span> time);
+        
+        <span class="codecomment">//Loads an MD2Model from the specified file, loading texture images from</span>
+        <span class="codecomment">//the indicated files.  Returns NULL if there was an error loading it.</span>
+        <span class="codekeyword">static</span> MD2Model* load(<span class="codekeyword">const</span> <span class="codekeyword">char</span>* filename,
+                              std::vector&lt;<span class="codekeyword">const</span> <span class="codekeyword">char</span>*&gt; textureFilenames);</pre></div><p>
+First of all, there's a second parameter to the <kbd>load</kbd> method 
+so that we can load multiple textures for a single MD2 model.  There are
+ four textures for the four crabs, which are different colors.  The <kbd>draw</kbd> method takes parameters indicating the index of the texture we want to use and the particular time in the animation to use.
+</p><p>
+Now, we'll move over to md2model.cpp and look at the changes there.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Load the textures (ignore the texture suggested by the MD2 file)</span>
+    MD2Model* model = <span class="codekeyword">new</span> MD2Model();
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; textureFilenames.size(); i++) {
+        <span class="codekeyword">const</span> <span class="codekeyword">char</span>* f = textureFilenames[i];
+        <span class="codekeyword">if</span> (strlen(f) &lt; 5 ||
+            strcmp(f + strlen(f) - 4, ".bmp") != 0) {
+            <span class="codekeyword">delete</span> model;
+            <span class="codekeyword">return</span> NULL;
+        }
+        Image* image = loadBMP(f);
+        GLuint textureId = loadTexture(image);
+        <span class="codekeyword">delete</span> image;
+        model-&gt;textureIds.push_back(textureId);
+    }</pre></div><p>
+Here's the new code for loading the textures.  It puts the textures into a <kbd>textureIds</kbd> vector, which has replace the <kbd>textureId</kbd> field.  Then, down in the <kbd>draw</kbd> method, we'll call <kbd>glBindTexture(GL_TEXTURE_2D, textureIds[textureNum])</kbd> rather than <kbd>glBindTexture(GL_TEXTURE_2D, textureId)</kbd> when selecting the texture to use.
+</p><p>
+Also, the way we had it before, the <kbd>draw</kbd> method would specify the vertices of each triangle in clockwise order.  We'll fix that by changing
+</p><div class="codeblock"><pre>        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> j = 0; j &lt; 3; j++) {</pre></div><p>
+to
+</p><div class="codeblock"><pre>        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> j = 2; j &gt;= 0; j--) {</pre></div><p>
+so that the loop goes through the vertices in the opposite order.
+</p><p>
+Now, we'll move on to gamedrawer.h.
+</p><div class="codeblock"><pre><span class="codekeyword">class</span> Game;
+<span class="codekeyword">class</span> MD2Model;</pre></div><p>
+These lines of code tell C++ that the <kbd>Game</kbd> and <kbd>MD2Model</kbd>
+ classes exist.  We don't actually have to include everything in game.h 
+and md2model.h; we just need to know that these classes exist.
+</p><div class="codeblock"><pre><span class="codecomment">//Maitains the state of the game by using an enclosed Game object, and takes</span>
+<span class="codecomment">//care of drawing the game</span>
+<span class="codekeyword">class</span> GameDrawer {
+    <span class="codekeyword">private</span>:
+        <span class="codecomment">//The Game object maintaining the state of the game.  If no game has yet</span>
+        <span class="codecomment">//been started, this is a placeholder game for which the maximum score</span>
+        <span class="codecomment">//is 0.  If the program is waiting for the user to start a new game,</span>
+        <span class="codecomment">//this is the game that was just finished.</span>
+        Game* game;</pre></div><p>
+The <kbd>GameDrawer</kbd> class will take care of drawing the game.  It contains a <kbd>Game</kbd> object for the current game.  Before any game has been started, <kbd>game</kbd> is just a placeholder game with a maximum score of 0.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The model for the crab</span>
+        MD2Model* crabModel;</pre></div><p>
+<kbd>crabModel</kbd> is the model for the crab.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The id of the display list for the four barriers at the corners</span>
+        GLuint barriersDisplayListId;
+        <span class="codecomment">//The id of the display list for a "pole" drawn when a crab has been</span>
+        <span class="codecomment">//eliminated.  It is drawn for the side connecting (0, 0, 0) and</span>
+        <span class="codecomment">//(1, 0, 0).</span>
+        GLuint poleDisplayListId;</pre></div><p>
+The barriers and the pole will be drawn using display lists.  <kbd>barriersDisplayListId</kbd> and <kbd>poleDisplayListId</kbd>
+ store the ids of their display lists.  There's actually one display 
+list that draws all four of the barriers by calling a display list for 
+one barrier four times.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The id of the texture for the sand</span>
+        GLuint sandTextureId;
+        <span class="codecomment">//The id of the texture for the water</span>
+        GLuint waterTextureId;</pre></div><p>
+<kbd>sandTextureId</kbd> and <kbd>waterTextureId</kbd> are the ids of the textures for sand and water.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The fraction that each crab is "faded in", from 0 to 1.  An element is</span>
+        <span class="codecomment">//not 1 when the corresponding crab is shrinking or completely</span>
+        <span class="codecomment">//disappeared after having been eliminated.</span>
+        <span class="codekeyword">float</span> crabFadeAmounts[4];</pre></div><p>
+When a player is eliminated, his crab shrinks until it disappears.  The <kbd>crabFadeAmounts</kbd> field is the amount by which the crab is scaled for this shrinking effect.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The animation times for the crab model for the four crabs</span>
+        <span class="codekeyword">float</span> animTimes[4];</pre></div><p>
+The <kbd>animTimes</kbd> array stores the animation times for the four crabs.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The last known position of each crab.  Kept for when crabs become NULL</span>
+        <span class="codecomment">//after being eliminated from play.</span>
+        <span class="codekeyword">float</span> oldCrabPos[4];</pre></div><p>
+<kbd>oldCrabPos</kbd> is the last known position of each crab.  The 
+array is used so that we don't forget where a crab was when we're making
+ it shrink.  Remember, a crab becomes <kbd>NULL</kbd> when it's removed from play.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The distance that the water has traveled, modulo the size of each</span>
+        <span class="codecomment">//repetition of the water texture</span>
+        <span class="codekeyword">float</span> waterTextureOffset;</pre></div><p>
+The water texture constantly moves forward.  <kbd>waterTextureOffset</kbd> is the distance it has moved, modulo the size of each repetition of the water texture image.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Whether the game is currently over</span>
+        <span class="codekeyword">bool</span> isGameOver0;</pre></div><p>
+The <kbd>isGameOver0</kbd> field is whether the game is over.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Whether any game has been started or finished</span>
+        <span class="codekeyword">bool</span> waitingForFirstGame;</pre></div><p>
+This field is true only at the very beginning, before the first game is started.
+</p><div class="codeblock"><pre>        <span class="codecomment">//A negative number if the human-controlled crab is accelerating toward</span>
+        <span class="codecomment">//the corner on its right, a positive number if it is accelerating</span>
+        <span class="codecomment">//toward the other corner, and 0 if it is decelerating</span>
+        <span class="codekeyword">int</span> playerCrabDir;</pre></div><p>
+The <kbd>playerCrabDir</kbd> field indicates the direction the human-controlled crab is headed.
+</p><div class="codeblock"><pre>        <span class="codecomment">//The amount of game time until the next call to step()</span>
+        <span class="codekeyword">float</span> timeUntilNextStep;</pre></div><p>
+<kbd>timeUntilNextStep</kbd> is the amount of time until we next call the <kbd>GameDrawer</kbd> class's <kbd>step</kbd> method.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Switches to use the specified Game object</span>
+        <span class="codekeyword">void</span> setGame(Game* game);</pre></div><p>
+The <kbd>setGame</kbd> method sets the current game to the given <kbd>Game</kbd> object.  It's called when a new game is started.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Sets up the display list for the four barriers at the corners</span>
+        <span class="codekeyword">void</span> setupBarriers();
+        <span class="codecomment">//Sets up the display list for the pole</span>
+        <span class="codekeyword">void</span> setupPole();</pre></div><p>
+These methods set up the display lists for drawing the barriers and for drawing a pole.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Sets up the lighting in OpenGL</span>
+        <span class="codekeyword">void</span> setupLighting();</pre></div><p>
+The <kbd>setupLighting</kbd> method sets up the ambient light and the light sources.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Draws the crabs and poles.  isReflected indicates whether the</span>
+        <span class="codecomment">//reflections of the crabs and poles are being drawn rather than the</span>
+        <span class="codecomment">//crabs and poles themselves.</span>
+        <span class="codekeyword">void</span> drawCrabsAndPoles(<span class="codekeyword">bool</span> isReflected);
+        <span class="codecomment">//Draws the four barriers at the corners.  isReflected indicates whether</span>
+        <span class="codecomment">//the reflections of the barriers are being drawn rather than the</span>
+        <span class="codecomment">//barriers themselves.</span>
+        <span class="codekeyword">void</span> drawBarriers(<span class="codekeyword">bool</span> isReflected);
+        <span class="codecomment">//Draws the players' scores.  isReflected indicates whether the</span>
+        <span class="codecomment">//reflections of the scores are being drawn rather than the scores</span>
+        <span class="codecomment">//themselves.</span>
+        <span class="codekeyword">void</span> drawScores(<span class="codekeyword">bool</span> isReflected);
+        <span class="codecomment">//Draws the balls.  isReflected indicates whether the reflections of the</span>
+        <span class="codecomment">//balls are being drawn rather than the balls themselves.</span>
+        <span class="codekeyword">void</span> drawBalls(<span class="codekeyword">bool</span> isReflected);</pre></div><p>
+Now, we have some methods for drawing stuff.  Each of these methods has a <kbd>isReflected</kbd>
+ parameter indicating whether we are drawing the reflections or the 
+objects themselves.  If we're drawing the reflections, which we do using
+ a call to <kbd>glScalef(1, -1, 1)</kbd> to reflect about the y axis, we'll want to make sure that <kbd>GL_NORMALIZE</kbd> is enabled.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Draws all of the objects that have reflections in the water.</span>
+        <span class="codecomment">//isReflected indicates whether the reflections of the objects are being</span>
+        <span class="codecomment">//drawn rather than the objects themselves.</span>
+        <span class="codekeyword">void</span> drawReflectableObjects(<span class="codekeyword">bool</span> isReflected);</pre></div><p>
+<kbd>drawReflectableObjects</kbd> calls the four methods we just saw.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Draws the sand</span>
+        <span class="codekeyword">void</span> drawSand();
+        <span class="codecomment">//Draws the water, blending it onto the screen</span>
+        <span class="codekeyword">void</span> drawWater();</pre></div><p>
+These methods take care of drawing the sand and the water.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Draws text indicating the winner of the game and/or some instructions</span>
+        <span class="codecomment">//if a game is not currently in progress</span>
+        <span class="codekeyword">void</span> drawWinner();</pre></div><p>
+The <kbd>drawWinner</kbd> method draws some text whenever there is no 
+game in progress.  It draws some insructions text, as well as the winner
+ of the previous game, if there was a previous game.
+</p><div class="codeblock"><pre>    <span class="codekeyword">public</span>:
+        GameDrawer();
+        ~GameDrawer();</pre></div><p>
+Now, we've got our constructor and our destructor.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Draws the game, positioned according to board coordinates, so that the</span>
+        <span class="codecomment">//board's corners are at (0, 0, 0), (0, 0, 1), (1, 0, 0), and (1, 0, 1).</span>
+        <span class="codekeyword">void</span> draw();</pre></div><p>
+This is the main drawing method for the <kbd>GameDrawer</kbd> class, the method that draws everything.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Advances the state of the game by the specified amount of time</span>
+        <span class="codekeyword">void</span> advance(<span class="codekeyword">float</span> dt);</pre></div><p>
+The <kbd>advance</kbd> method is for advancing the state of the game.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Sets the direction toward which the human-controlled crab is</span>
+        <span class="codecomment">//accelerating.  A negative number indicates to accelerate toward the</span>
+        <span class="codecomment">//corner on its right, a positive number indicates to accelerate toward</span>
+        <span class="codecomment">//the other corner, and 0 indicates to decelerate.</span>
+        <span class="codekeyword">void</span> setPlayerCrabDir(<span class="codekeyword">int</span> dir);</pre></div><p>
+The <kbd>setPlayerCrabDir</kbd> method sets the direction the human-controlled crab is going.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Returns false iff a game is not currently being played</span>
+        <span class="codekeyword">bool</span> isGameOver();</pre></div><p>
+<kbd>isGameOver</kbd> returns whether the game is over.
+</p><div class="codeblock"><pre>        <span class="codecomment">//Starts a new game with the specified starting score.</span>
+        <span class="codecomment">//maximumSpeedForOpponents is the maximum speed at which the computer-</span>
+        <span class="codecomment">//controlled crabs move.  It can be used to control the difficulty of</span>
+        <span class="codecomment">//the opponents.</span>
+        <span class="codekeyword">void</span> startNewGame(<span class="codekeyword">float</span> maximumSpeedForOpponents, <span class="codekeyword">int</span> startingScore);
+};</pre></div><p>
+The <kbd>startNewGame</kbd> method is called to start a new game.
+</p><div class="codeblock"><pre><span class="codecomment">//Performs some initialization required for the GameDrawer class to function</span>
+<span class="codecomment">//properly.</span>
+<span class="codekeyword">void</span> initGameDrawer();
+<span class="codecomment">//Frees some resources used by the GameDrawer class after a call to</span>
+<span class="codecomment">//initGameDrawer().</span>
+<span class="codekeyword">void</span> cleanupGameDrawer();</pre></div><p>
+<kbd>initGameDrawer</kbd> is supposed to be called at the beginning of the program, while <kbd>cleanupGameDrawer</kbd> is supposed to be called at the end.  As we'll see later, the former just calls <kbd>t3dInit</kbd> to set up the text-drawing functionality, while the latter just calls <kbd>t3dCleanup</kbd> to dispose of the text-drawing functionality.
+</p><p>
+Now, we'll go to gamedrawer.cpp to see the implementation of all of these methods.
+</p><div class="codeblock"><pre><span class="codekeyword">namespace</span> {
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> PI = 3.1415926535f;
+    
+    <span class="codecomment">//The amount of time by which the state of the game is advanced in each call</span>
+    <span class="codecomment">//to the step() method</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> STEP_TIME = 0.01f;</pre></div><p>
+We have a main course of <kbd>PI</kbd>, followed by a helping of <kbd>STEP_TIME</kbd>, which is the amount of time between calls to the <kbd>GameDrawer</kbd> class's <kbd>step</kbd> method.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The duration of a single loop of the walking animation</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> WALK_ANIM_TIME = 0.4f;
+    <span class="codecomment">//The duration of a single loop of the standing animation</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> STAND_ANIM_TIME = 2.0f;</pre></div><p>
+These constants indicate the duration of a single loop of the walking and standing animations for the crabs.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The amount of time it takes for a crab that has just been eliminated to</span>
+    <span class="codecomment">//shrink and disappear</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> CRAB_FADE_OUT_TIME = 1.5f;</pre></div><p>
+<kbd>CRAB_FADE_OUT_TIME</kbd> is the amount of time it takes an eliminated crab to shrink to nothing.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The number of points used to approximate a circle in the barrier model</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">int</span> NUM_BARRIER_POINTS = 30;
+    <span class="codecomment">//The number of points used to approximate a circle in the pole model</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">int</span> NUM_POLE_POINTS = 6;</pre></div><p>
+The circular ends of the barriers and the poles are drawn using <kbd>NUM_BARRIER_POINTS</kbd> and <kbd>NUM_POLE_POINTS</kbd> at the outside respectively.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The height of the barrier model</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> BARRIER_HEIGHT = BARRIER_SIZE;</pre></div><p>
+<kbd>BARRIER_HEIGHT</kbd> is the height of each of the cylindrical barriers.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The radius of the pole model</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> POLE_RADIUS = 0.02f;
+    <span class="codecomment">//The height of the center of a pole above the ground</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> POLE_HEIGHT = 0.07f;</pre></div><p>
+These constants indicate the radius of each pole and the height above the ground of the centers of the poles.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The number of units the human player's crab model should be translated in</span>
+    <span class="codecomment">//the z direction, and that other crabs should similarly be translated</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> CRAB_OFFSET = -0.032f;</pre></div><p>
+This constant is the amount by which the human-controlled crab is 
+translated in the z direction.  The other crabs are translated 
+similarly.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The amount of time until the water travels WATER_TEXTURE_SIZE units</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> WATER_TEXTURE_TIME = 8.0f;
+    <span class="codecomment">//The length of a single repetition of the water texture image</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> WATER_TEXTURE_SIZE = 0.7f;</pre></div><p>
+The water moves forward at a rate of <kbd>WATER_TEXTURE_SIZE</kbd> units per <kbd>WATER_TEXTURE_TIME</kbd> seconds.  Each repetition of the water texture is <kbd>WATER_TEXTURE_SIZE</kbd> units square.
+</p><div class="codeblock"><pre>    <span class="codecomment">//The opacity of the water</span>
+    <span class="codekeyword">const</span> <span class="codekeyword">float</span> WATER_ALPHA = 0.8f;</pre></div><p>
+This is the opacity of the water, which is blended onto the screen in order to have reflections.
+</p><p>
+I'll skip over the <kbd>loadTexture</kbd> function to the constructor for the <kbd>GameDrawer</kbd> class.
+</p><div class="codeblock"><pre>GameDrawer::GameDrawer() {
+    game = NULL;
+    playerCrabDir = 0;
+    
+    <span class="codecomment">//Start a new placeholder game with a maximum score of 0</span>
+    startNewGame(0, 0);
+    
+    waterTextureOffset = 0;
+    
+    vector&lt;<span class="codekeyword">const</span> <span class="codekeyword">char</span>*&gt; textureFilenames;
+    textureFilenames.push_back("crab1.bmp");
+    textureFilenames.push_back("crab2.bmp");
+    textureFilenames.push_back("crab3.bmp");
+    textureFilenames.push_back("crab4.bmp");
+    crabModel = MD2Model::load("crab.md2", textureFilenames);
+    
+    setupBarriers();
+    setupPole();
+    
+    Image* image = loadBMP("sand.bmp");
+    sandTextureId = loadTexture(image);
+    <span class="codekeyword">delete</span> image;
+    
+    image = loadBMP("water.bmp");
+    waterTextureId = loadTexture(image);
+    <span class="codekeyword">delete</span> image;
+}</pre></div><p>
+In the constructor, we set the game to be <kbd>NULL</kbd> and the human player's crab's direction to be 0.  Then, we call <kbd>startNewGame</kbd> to set <kbd>game</kbd> to be a placeholder game with a maximum score of 0.  We set <kbd>waterTextureOffset</kbd> to 0.  We call <kbd>MD2Model::load</kbd> to load the crab model.  We call <kbd>setupBarriers</kbd> and <kbd>setupPole</kbd> to set up the display lists for the barriers and poles.  Then, we load in textures for sand and for water.
+</p><div class="codeblock"><pre>GameDrawer::~GameDrawer() {
+    <span class="codekeyword">delete</span> game;
+}</pre></div><p>
+The destructor just deletes the <kbd>game</kbd> object.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::setGame(Game* game1) {
+    <span class="codekeyword">if</span> (game != NULL) {
+        <span class="codekeyword">delete</span> game;
+    }
+    
+    game = game1;
+    game-&gt;setPlayerCrabDir(playerCrabDir);
+    timeUntilNextStep = 0;
+    
+    isGameOver0 = (game-&gt;score(0) == 0);
+    waitingForFirstGame = isGameOver0;
+    
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 4; i++) {
+        animTimes[i] = 0;
+        
+        <span class="codekeyword">if</span> (!isGameOver0) {
+            crabFadeAmounts[i] = 1;
+        }
+        <span class="codekeyword">else</span> {
+            crabFadeAmounts[i] = 0;
+        }
+        
+        Crab* crab = game-&gt;crabs()[i];
+        <span class="codekeyword">if</span> (crab != NULL) {
+            oldCrabPos[i] = game-&gt;crabs()[i]-&gt;pos();
+        }
+        <span class="codekeyword">else</span> {
+            oldCrabPos[i] = 0.5f;
+        }
+    }
+}</pre></div><p>
+The <kbd>setGame</kbd> method deletes the old game if there was one, then sets the <kbd>game</kbd> field to be the new game.  We set the human player's crab's direction to be <kbd>playerCrabDir</kbd>, and set <kbd>timeUntilNextStep</kbd>
+ to 0.  Then, we determine whether the game is already over, that is, 
+whether we're using a placeholder game.  After that, we set some initial
+ values for the <kbd>animTimes</kbd>, <kbd>crabFadeAmounts</kbd>, and <kbd>oldCrabPos</kbd> arrays.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::setupBarriers() {
+    Image* image = loadBMP("vtr.bmp");
+    GLuint textureId = loadTexture(image);
+    <span class="codekeyword">delete</span> image;
+    
+    GLuint barrierDisplayListId = glGenLists(1);
+    glNewList(barrierDisplayListId, GL_COMPILE);
+    
+    <span class="codecomment">//Draw the top circle</span>
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, textureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    
+    GLfloat materialColor[] = {1, 1, 1, 1};
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, materialColor);
+    
+    glNormal3f(0, 1, 0);
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.5f, 0.5f);
+    glVertex3f(0, BARRIER_HEIGHT, 0);
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = NUM_BARRIER_POINTS; i &gt;= 0; i--) {
+        <span class="codekeyword">float</span> angle = 2 * PI * (<span class="codekeyword">float</span>)i / (<span class="codekeyword">float</span>)NUM_BARRIER_POINTS;
+        glTexCoord2f(-cos(angle) / 2 + 0.5f, sin(angle) / 2 + 0.5f);
+        glVertex3f(BARRIER_SIZE * cos(angle),
+                   BARRIER_HEIGHT,
+                   BARRIER_SIZE * sin(angle));
+    }
+    glEnd();</pre></div><p>
+Now, we have the <kbd>setupBarriers</kbd> method, where we make the 
+display list for the barriers.  We load in the texture for the top of 
+the barriers.  Then, we're going to set up a display list for one 
+barrier, which we'll call four times in the display list for all four 
+barriers.
+</p><p>
+You'll notice there's a call to <kbd>glMaterialfv</kbd>.  We'll actually be using materials to make the barriers shiny.
+</p><p>
+First, we draw the top circle of the barrier.  The top circle is drawn using a <kbd>GL_TRIANGLE_FAN</kbd>.
+  This tells OpenGL to draw triangles connecting the first point and 
+each pair of consecutive points after that.  The following diagram 
+illustrates the way we'll specify the circle's vertices:
+</p>
+<center><img src="text.php_files/triangle_fan.png" alt="Triangle fan diagram" border="3" height="374" width="400"></center>
+<p>
+So, with a bit of trigonometry, we get the appropriate points for drawing the circle.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Draw the bottom circle</span>
+    GLfloat materialColor2[] = {1.0f, 0.0f, 0.0f, 1};
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, materialColor2);
+    
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0f, 0.0f, 0.0f);
+    glNormal3f(0, -1, 0);
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex3f(0, 0, 0);
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt;= NUM_BARRIER_POINTS; i++) {
+        <span class="codekeyword">float</span> angle = 2 * PI * (<span class="codekeyword">float</span>)i / (<span class="codekeyword">float</span>)NUM_BARRIER_POINTS;
+        glVertex3f(BARRIER_SIZE * cos(angle), 0, BARRIER_SIZE * sin(angle));
+    }
+    glEnd();</pre></div><p>
+In the same manner, we draw the bottom cirlce.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Draw the cylinder part</span>
+    glBegin(GL_QUAD_STRIP);
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt;= NUM_BARRIER_POINTS; i++) {
+        <span class="codekeyword">float</span> angle = 2 * PI * ((<span class="codekeyword">float</span>)i - 0.5f) / (<span class="codekeyword">float</span>)NUM_BARRIER_POINTS;
+        glNormal3f(cos(angle), 0, sin(angle));
+        <span class="codekeyword">float</span> angle2 = 2 * PI * (<span class="codekeyword">float</span>)i / (<span class="codekeyword">float</span>)NUM_BARRIER_POINTS;
+        glVertex3f(BARRIER_SIZE * cos(angle2), 0, BARRIER_SIZE * sin(angle2));
+        glVertex3f(BARRIER_SIZE * cos(angle2),
+                   BARRIER_HEIGHT,
+                   BARRIER_SIZE * sin(angle2));
+    }
+    glEnd();
+    glEndList();</pre></div><p>
+Now, we draw the cylinder part using a <kbd>GL_QUAD_STRIP</kbd>.  A <kbd>GL_QUAD_STRIP</kbd> lets us draw a bunch of quadrilaterals, as shown below:
+</p>
+<center><img src="text.php_files/quad_strip.png" alt="Quad strip diagram" border="3" height="388" width="400"></center>
+<p>
+So, with more trigonometry, we determine the points for the cylinder part.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Make a display list with four copies of the barrier</span>
+    barriersDisplayListId = glGenLists(1);
+    glNewList(barriersDisplayListId, GL_COMPILE);
+    glDisable(GL_COLOR_MATERIAL);
+    
+    <span class="codecomment">//Add a little specularity</span>
+    GLfloat materialSpecular[] = {1, 1, 1, 1};
+    glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular);
+    glMaterialf(GL_FRONT, GL_SHININESS, 15.0f);
+    
+    <span class="codekeyword">for</span>(<span class="codekeyword">float</span> z = 0; z &lt; 2; z++) {
+        <span class="codekeyword">for</span>(<span class="codekeyword">float</span> x = 0; x &lt; 2; x++) {
+            glPushMatrix();
+            glTranslatef(x, 0, z);
+            glCallList(barrierDisplayListId);
+            glPopMatrix();
+        }
+    }
+    glEnable(GL_COLOR_MATERIAL);
+    
+    <span class="codecomment">//Disable specularity</span>
+    GLfloat materialColor3[] = {1, 1, 1, 1};
+    GLfloat materialSpecular2[] = {0, 0, 0, 1};
+    glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, materialColor3);
+    glMaterialfv(GL_FRONT, GL_SPECULAR, materialSpecular2);
+    
+    glEndList();
+}</pre></div><p>
+Here, we set up the display list for drawing all four barriers at once.  We disable <kbd>GL_COLOR_MATERIAL</kbd> so that we can use the glMaterial functions to make the barriers shiny.  We set up a little shininess with calls to <kbd>glMaterialfv</kbd> and <kbd>glMaterialf</kbd>.  Then, we call the display list for drawing one barrier four times.  Then, we re-enable <kbd>GL_COLOR_MATERIAL</kbd>, and eliminate the specularity we just added.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::setupPole() {
+    poleDisplayListId = glGenLists(1);
+    glNewList(poleDisplayListId, GL_COMPILE);
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(0.0f, 0.8f, 0.0f);
+    
+    <span class="codecomment">//Draw the left circle</span>
+    glNormal3f(-1, 0, 0);
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex3f(BARRIER_SIZE, POLE_HEIGHT, -POLE_RADIUS);
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = NUM_POLE_POINTS; i &gt;= 0; i--) {
+        <span class="codekeyword">float</span> angle = 2 * PI * (<span class="codekeyword">float</span>)i / (<span class="codekeyword">float</span>)NUM_POLE_POINTS;
+        glVertex3f(BARRIER_SIZE,
+                   POLE_HEIGHT + POLE_RADIUS * cos(angle),
+                   POLE_RADIUS * (sin(angle) - 1));
+    }
+    glEnd();
+    
+    <span class="codecomment">//Draw the right circle</span>
+    glNormal3f(1, 0, 0);
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex3f(1 - BARRIER_SIZE, POLE_HEIGHT, -POLE_RADIUS);
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt;= NUM_POLE_POINTS; i++) {
+        <span class="codekeyword">float</span> angle = 2 * PI * (<span class="codekeyword">float</span>)i / (<span class="codekeyword">float</span>)NUM_POLE_POINTS;
+        glVertex3f(1 - BARRIER_SIZE,
+                   POLE_HEIGHT + POLE_RADIUS * cos(angle),
+                   POLE_RADIUS * (sin(angle) - 1));
+    }
+    glEnd();
+    
+    <span class="codecomment">//Draw the cylinder part</span>
+    glBegin(GL_QUAD_STRIP);
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt;= NUM_POLE_POINTS; i++) {
+        <span class="codekeyword">float</span> angle = 2 * PI * ((<span class="codekeyword">float</span>)i - 0.5f) / (<span class="codekeyword">float</span>)NUM_POLE_POINTS;
+        glNormal3f(0, cos(angle), sin(angle));
+        <span class="codekeyword">float</span> angle2 = 2 * PI * (<span class="codekeyword">float</span>)i / (<span class="codekeyword">float</span>)NUM_POLE_POINTS;
+        glVertex3f(1 - BARRIER_SIZE,
+                   POLE_HEIGHT + POLE_RADIUS * cos(angle2),
+                   POLE_RADIUS * (sin(angle2) - 1));
+        glVertex3f(BARRIER_SIZE,
+                   POLE_HEIGHT + POLE_RADIUS * cos(angle2),
+                   POLE_RADIUS * (sin(angle2) - 1));
+    }
+    glEnd();
+    
+    glEndList();
+}</pre></div><p>
+The <kbd>setupPole</kbd> method makes a display list for displaying the cylindrical poles.  It makes a cylinder in much the same way that <kbd>setupBarriers</kbd> does so.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::step() {
+    <span class="codecomment">//Advance the game</span>
+    game-&gt;advance(STEP_TIME);
+    
+    <span class="codecomment">//Advance the water</span>
+    waterTextureOffset += STEP_TIME / WATER_TEXTURE_TIME;
+    <span class="codekeyword">while</span> (waterTextureOffset &gt; WATER_TEXTURE_SIZE) {
+        waterTextureOffset -= WATER_TEXTURE_SIZE;
+    }</pre></div><p>
+In the <kbd>step</kbd> method, we start by calling the <kbd>Game</kbd>'s <kbd>advance</kbd> method.  Then, we change the <kbd>waterTextureOffset</kbd> field to move the water forward.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Update animTimes, crabFadeAmounts, and isGameOver0</span>
+    <span class="codekeyword">bool</span> opponentAlive = false;
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 4; i++) {
+        Crab* crab = game-&gt;crabs()[i];
+        
+        <span class="codekeyword">if</span> (crab != NULL) {
+            oldCrabPos[i] = crab-&gt;pos();
+        }
+        
+        <span class="codecomment">//Update animation time</span>
+        <span class="codekeyword">if</span> (crab != NULL || crabFadeAmounts[i] &gt; 0) {
+            <span class="codekeyword">if</span> (crab != NULL &amp;&amp; crab-&gt;dir() != 0) {
+                <span class="codekeyword">if</span> (crab-&gt;dir() &gt; 0) {
+                    animTimes[i] += STEP_TIME / WALK_ANIM_TIME;
+                }
+                <span class="codekeyword">else</span> {
+                    animTimes[i] -= STEP_TIME / WALK_ANIM_TIME;
+                }
+            }
+            <span class="codekeyword">else</span> {
+                animTimes[i] += STEP_TIME / STAND_ANIM_TIME;
+            }
+            
+            <span class="codekeyword">while</span> (animTimes[i] &gt; 1) {
+                animTimes[i] -= 1;
+            }
+            <span class="codekeyword">while</span> (animTimes[i] &lt; 0) {
+                animTimes[i] += 1;
+            }
+        }
+        
+        <span class="codecomment">//Update fade amount</span>
+        <span class="codekeyword">if</span> (crab == NULL) {
+            crabFadeAmounts[i] -= STEP_TIME / CRAB_FADE_OUT_TIME;
+            <span class="codekeyword">if</span> (crabFadeAmounts[i] &lt; 0) {
+                <span class="codekeyword">if</span> (i == 0) {
+                    isGameOver0 = true;
+                }
+                crabFadeAmounts[i] = 0;
+            }
+            <span class="codekeyword">else</span> <span class="codekeyword">if</span> (i != 0) {
+                opponentAlive = true;
+            }
+        }
+        <span class="codekeyword">else</span> <span class="codekeyword">if</span> (i != 0) {
+            opponentAlive = true;
+        }
+    }
+    
+    <span class="codekeyword">if</span> (!opponentAlive) {
+        isGameOver0 = true;
+    }
+}</pre></div><p>
+Now, we'll loop through the crabs to update <kbd>oldCrabPos</kbd>, <kbd>crabFadeAmounts</kbd>, <kbd>animTimes</kbd>, and <kbd>isGameOver0</kbd>.  Each element of <kbd>animTimes</kbd>
+ is increased a little if the corresponding crab is standing or walking 
+in the positive direction and decreased a little if it's walking in the 
+negative direction, to reverse the walking animation.  Each element of <kbd>crabFadeAmounts</kbd> is decreased a little if the corresponding crab is <kbd>NULL</kbd>.  <kbd>isGameOver0</kbd> is set to true if either the human player's crab has disappeared or all of the other crabs have.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::setupLighting() {
+    GLfloat ambientLight[] = {0.2f, 0.2f, 0.2f, 1};
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientLight);
+    
+    <span class="codecomment">//Put one light above each of the four corners</span>
+    <span class="codekeyword">int</span> index = 0;
+    <span class="codekeyword">for</span>(<span class="codekeyword">float</span> z = 0; z &lt; 2; z += 1) {
+        <span class="codekeyword">for</span>(<span class="codekeyword">float</span> x = 0; x &lt; 2; x += 1) {
+            glEnable(GL_LIGHT0 + index);
+            GLfloat lightColor[] = {0.2f, 0.2f, 0.2f, 1};
+            GLfloat lightPos[] = {x, 1.5f, z, 1};
+            glLightfv(GL_LIGHT0 + index, GL_DIFFUSE, lightColor);
+            glLightfv(GL_LIGHT0 + index, GL_SPECULAR, lightColor);
+            glLightfv(GL_LIGHT0 + index, GL_POSITION, lightPos);
+            index++;
+        }
+    }
+}</pre></div><p>
+The <kbd>setupLighting</kbd> method sets up ambient lighting and adds four lights above the four corners.  This code uses a little trick: that <kbd>GL_LIGHTn</kbd> is the same as <kbd>GL_LIGHT0 + n</kbd>.  For example, <kbd>GL_LIGHT2</kbd> is equal to <kbd>GL_LIGHT0 + 2</kbd>.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::drawCrabsAndPoles(<span class="codekeyword">bool</span> isReflected) {
+    <span class="codekeyword">if</span> (crabModel != NULL) {
+        glEnable(GL_NORMALIZE);
+        <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 4; i++) {
+            Crab* crab = game-&gt;crabs()[i];
+            
+            <span class="codecomment">//Translate and rotate to the appropriate side of the board</span>
+            glPushMatrix();
+            <span class="codekeyword">switch</span>(i) {
+                <span class="codekeyword">case</span> 1:
+                    glTranslatef(0, 0, 1);
+                    glRotatef(90, 0, 1, 0);
+                    <span class="codekeyword">break</span>;
+                <span class="codekeyword">case</span> 2:
+                    glTranslatef(1, 0, 1);
+                    glRotatef(180, 0, 1, 0);
+                    <span class="codekeyword">break</span>;
+                <span class="codekeyword">case</span> 3:
+                    glTranslatef(1, 0, 0);
+                    glRotatef(270, 0, 1, 0);
+                    <span class="codekeyword">break</span>;
+            }</pre></div><p>
+In <kbd>drawCrabsAndPoles</kbd>, we'll go through and draw all of the crabs and poles.  First, we translate and rotate to the correct side of the board.
+</p><div class="codeblock"><pre>            <span class="codekeyword">if</span> (crab != NULL || crabFadeAmounts[i] &gt; 0) {
+                <span class="codecomment">//Draw the crab</span>
+                glPushMatrix();
+                
+                <span class="codekeyword">float</span> crabPos;
+                <span class="codekeyword">if</span> (crab != NULL) {
+                    crabPos = crab-&gt;pos();
+                }
+                <span class="codekeyword">else</span> {
+                    crabPos = oldCrabPos[i];
+                }
+                glTranslatef(crabPos, 0.055f, CRAB_OFFSET);
+                <span class="codekeyword">if</span> (crab == NULL) {
+                    <span class="codecomment">//Used for the shrinking effect, whereby crabs shrink</span>
+                    <span class="codecomment">//until they disappear when they are eliminated from play</span>
+                    glTranslatef(0, -0.055f * (1 - crabFadeAmounts[i]), 0);
+                    glScalef(crabFadeAmounts[i],
+                             crabFadeAmounts[i],
+                             crabFadeAmounts[i]);
+                }
+                
+                glRotatef(-90, 0, 1, 0);
+                glRotatef(-90, 1, 0, 0);
+                glScalef(0.05f, 0.05f, 0.05f);
+                
+                <span class="codekeyword">if</span> (crab == NULL || crab-&gt;dir() == 0) {
+                    crabModel-&gt;setAnimation("stand");
+                }
+                <span class="codekeyword">else</span> {
+                    crabModel-&gt;setAnimation("run");
+                }
+                
+                glColor3f(1, 1, 1);
+                crabModel-&gt;draw(i, animTimes[i]);
+                glPopMatrix();
+            }</pre></div><p>
+Then, we draw the crab model, if the crab hasn't disappeared yet.  Note that if <kbd>crab</kbd> is <kbd>NULL</kbd>, we'll scale the crab by <kbd>crabFadeAmounts[i]</kbd>, in order to make the crab shrink when it's eliminated.
+</p><div class="codeblock"><pre>            <span class="codekeyword">if</span> (crab == NULL) {
+                <span class="codecomment">//Draw the pole</span>
+                <span class="codekeyword">if</span> (isReflected) {
+                    glDisable(GL_NORMALIZE);
+                }
+                glCallList(poleDisplayListId);
+                <span class="codekeyword">if</span> (isReflected) {
+                    glEnable(GL_NORMALIZE);
+                }
+            }
+            
+            glPopMatrix();
+        }
+    }
+}</pre></div><p>
+If the crab has been eliminated, we draw a pole.  If we're drawing the pole itself, rather than its reflection, then <kbd>GL_NORMALIZE</kbd> doesn't have to be enabled, so we disable it.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::drawBarriers(<span class="codekeyword">bool</span> isReflected) {
+    <span class="codekeyword">if</span> (isReflected) {
+        glEnable(GL_NORMALIZE);
+    }
+    <span class="codekeyword">else</span> {
+        glDisable(GL_NORMALIZE);
+    }
+    glCallList(barriersDisplayListId);
+}</pre></div><p>
+<kbd>drawBarriers</kbd> just calls the display list for the barriers, disabling <kbd>GL_NORMALIZE</kbd> if possible.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::drawScores(<span class="codekeyword">bool</span> isReflected) {
+    <span class="codekeyword">float</span> d = 0.1f;
+    <span class="codekeyword">for</span>(<span class="codekeyword">int</span> i = 0; i &lt; 4; i++) {
+        ostringstream oss;
+        oss &lt;&lt; game-&gt;score(i);
+        string str = oss.str();
+        
+        glPushMatrix();
+        <span class="codekeyword">int</span> hAlign;
+        <span class="codekeyword">int</span> vAlign;
+        <span class="codekeyword">switch</span>(i) {
+            <span class="codekeyword">case</span> 0:
+                glTranslatef(0.5f, 0, -d);
+                hAlign = 0;
+                vAlign = -1;
+                <span class="codekeyword">break</span>;
+            <span class="codekeyword">case</span> 1:
+                glTranslatef(-d, 0, 0.5f);
+                hAlign = -1;
+                vAlign = 0;
+                <span class="codekeyword">break</span>;
+            <span class="codekeyword">case</span> 2:
+                glTranslatef(0.5f, 0, 1 + d);
+                hAlign = 0;
+                vAlign = 1;
+                <span class="codekeyword">break</span>;
+            <span class="codekeyword">case</span> 3:
+                glTranslatef(1 + d, 0, 0.5f);
+                hAlign = 1;
+                vAlign = 0;
+                <span class="codekeyword">break</span>;
+        }
+        
+        glTranslatef(0, 0.04f, 0);
+        glRotatef(90, 1, 0, 0);
+        glRotatef(180, 0, 1, 0);
+        glScalef(0.1f, 0.1f, 0.1f);
+        t3dDraw3D(str, hAlign, vAlign, 0.3f);
+        glPopMatrix();
+    }
+}</pre></div><p>
+The <kbd>drawScores</kbd> method draws the players' scores by 
+translating to the appropriate position and drawing strings with each 
+player's score using calls to <kbd>t3dDraw3d</kbd>.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::drawBalls(<span class="codekeyword">bool</span> isReflected) {
+    <span class="codekeyword">if</span> (isReflected) {
+        glEnable(GL_NORMALIZE);
+    }
+    <span class="codekeyword">else</span> {
+        glDisable(GL_NORMALIZE);
+    }
+    
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_BLEND);
+    
+    vector&lt;Ball*&gt; balls = game-&gt;balls();
+    <span class="codekeyword">for</span>(<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span> i = 0; i &lt; balls.size(); i++) {
+        Ball* ball = balls[i];
+        
+        <span class="codekeyword">if</span> (ball-&gt;fadeAmount() &lt; 1) {
+            glEnable(GL_BLEND);
+            glColor4f(0.75f, 0.75f, 0.75f, ball-&gt;fadeAmount());
+        }
+        <span class="codekeyword">else</span> {
+            glColor3f(0.75f, 0.75f, 0.75f);
+        }
+        
+        glPushMatrix();
+        glTranslatef(ball-&gt;x(), ball-&gt;radius() + 0.01f, ball-&gt;z());
+        glutSolidSphere(ball-&gt;radius(), 10, 6);
+        glPopMatrix();
+        
+        <span class="codekeyword">if</span> (ball-&gt;fadeAmount() &lt; 1) {
+            glDisable(GL_BLEND);
+        }
+    }
+}</pre></div><p>
+The <kbd>drawBalls</kbd> method draws each of the balls.  Note that if 
+the ball is a little faded out, we're using alpha blending to draw a 
+transparent ball.  Also, note that the ball is drawn a little above the 
+water.  If they weren't, rounding errors might cause parts of the balls'
+ reflections to appear above the water.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::drawReflectableObjects(<span class="codekeyword">bool</span> isReflected) {
+    drawCrabsAndPoles(isReflected);
+    drawBarriers(isReflected);
+    drawScores(isReflected);
+    drawBalls(isReflected);
+}</pre></div><p>
+<kbd>drawReflectableObjects</kbd> just calls other drawing methods.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::drawSand() {
+    <span class="codecomment">//The height of the sand above the water</span>
+    <span class="codekeyword">float</span> height = 0.01f;
+    
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, sandTextureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glDisable(GL_NORMALIZE);
+    glColor3f(1, 1, 1);
+    glNormal3f(0, 1, 0);
+    glBegin(GL_QUADS);
+    glTexCoord2f(1, 0);
+    glVertex3f(0, height, 0);
+    glTexCoord2f(1, 1);
+    glVertex3f(0, height, 1);
+    glTexCoord2f(0, 1);
+    glVertex3f(1, height, 1);
+    glTexCoord2f(0, 0);
+    glVertex3f(1, height, 0);
+    glEnd();
+}</pre></div><p>
+This method takes care of drawing the sand.  Note that the sand is a 
+little above the water, which is at z = 0, so that it isn't submerged by
+ the water.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::drawWater() {
+    glDisable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, waterTextureId);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glDisable(GL_NORMALIZE);
+    glEnable(GL_BLEND);
+    glColor4f(1, 1, 1, WATER_ALPHA);
+    glNormal3f(0, 1, 0);
+    
+    glBegin(GL_QUADS);
+    glTexCoord2f(200 / WATER_TEXTURE_SIZE,
+                 -waterTextureOffset / WATER_TEXTURE_SIZE);
+    glVertex3f(-100, 0, -100);
+    glTexCoord2f(200 / WATER_TEXTURE_SIZE,
+                 (200 - waterTextureOffset) / WATER_TEXTURE_SIZE);
+    glVertex3f(-100, 0, 100);
+    glTexCoord2f(0, (200 - waterTextureOffset) / WATER_TEXTURE_SIZE);
+    glVertex3f(100, 0, 100);
+    glTexCoord2f(0, -waterTextureOffset / WATER_TEXTURE_SIZE);
+    glVertex3f(100, 0, -100);
+    glEnd();
+    
+    glDisable(GL_BLEND);
+    glEnable(GL_LIGHTING);
+}</pre></div><p>
+<kbd>drawWater</kbd> draws the water.  We're disabling lighting on the water.  As in the floor of <a href="http://www.videotutorialsrock.com/opengl_tutorial/animation/home.php">the animation lesson</a>,
+ the water is a giant quadrilateral that's supposed to look like it 
+extends forever in each direction, and the water is moved forward just 
+by messing with the texture coordinates.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::drawWinner() {
+    <span class="codekeyword">if</span> (!isGameOver0) {
+        <span class="codekeyword">return</span>;
+    }
+    
+    glColor3f(0.2f, 0.2f, 1.0f);
+    
+    <span class="codekeyword">if</span> (!waitingForFirstGame) {
+        <span class="codecomment">//Draw the winner</span>
+        string str;
+        <span class="codekeyword">if</span> (game-&gt;score(0) &gt; 0) {
+            str = "You win!";
+        }
+        <span class="codekeyword">else</span> {
+            str = "You lose.";
+        }
+        
+        glPushMatrix();
+        glTranslatef(0.5f, 0.05f, 0.5f);
+        glScalef(0.1f, 0.1f, 0.1f);
+        glTranslatef(0, 0.15f, 0);
+        glRotatef(180, 0, 1, 0);
+        glRotatef(-90, 1, 0, 0);
+        t3dDraw3D(str, 0, 0, 0.3f);
+        glPopMatrix();
+    }</pre></div><p>
+<kbd>drawWinner</kbd> draws some text if the game is not in progress.  
+If we've started a game already, and the game is over, we draw text 
+indicating the winner by calling <kbd>t3dDraw3D</kbd>.
+</p><div class="codeblock"><pre>    <span class="codecomment">//Draw instructions</span>
+    glPushMatrix();
+    glTranslatef(0.5f, 0.05f, 0.35f);
+    glScalef(0.05f, 0.05f, 0.05f);
+    glTranslatef(0, 0.15f, 0);
+    glRotatef(180, 0, 1, 0);
+    glRotatef(-90, 1, 0, 0);
+    t3dDraw3D("Press ENTER <span class="codekeyword">for</span> a <span class="codekeyword">new</span> game\nPress ESC to quit\n"
+              "(Use left and right to move)", 0, -1, 0.3f);
+    glPopMatrix();
+}</pre></div><p>
+If there is no game in progress, we'll draw some instructions.
+</p><p>
+Note that the instructions string spans multiple lines.  You can do that
+ in C++.  C++ will interpret it as one string: "Press ENTER for a new 
+game\nPress ESC to quit\n(Use left and right to move)".
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::draw() {
+    <span class="codecomment">//Set the background to be sky blue</span>
+    glClearColor(0.7f, 0.9f, 1.0f, 1);
+    
+    <span class="codecomment">//Draw reflections</span>
+    glCullFace(GL_FRONT);
+    glPushMatrix();
+    glScalef(1, -1, 1);
+    setupLighting();
+    drawReflectableObjects(true);
+    glPopMatrix();
+    
+    <span class="codecomment">//Draw normally</span>
+    glCullFace(GL_BACK);
+    setupLighting();
+    drawWater();
+    drawSand();
+    drawWinner();
+    drawReflectableObjects(false);
+}</pre></div><p>
+And now (drumroll please), we have our main drawing function.  It sets 
+the background color to sky blue.  This color shows up in the reflection
+ on the water.  Then, we draw the reflections, by using <kbd>glScalef(1, -1, 1)</kbd> to reflect everything.  Then, we draw everything normally.
+</p><p>
+Note that when we're drawing the reflections, we cull the front faces.  
+That's because reflecting about the y axis changes the faces' vertices 
+from being given in counterclockwise order to their being given in 
+clockwise order.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::advance(<span class="codekeyword">float</span> dt) {
+    <span class="codekeyword">while</span> (dt &gt; 0) {
+        <span class="codekeyword">if</span> (timeUntilNextStep &lt; dt) {
+            dt -= timeUntilNextStep;
+            step();
+            timeUntilNextStep = STEP_TIME;
+        }
+        <span class="codekeyword">else</span> {
+            timeUntilNextStep -= dt;
+            dt = 0;
+        }
+    }
+}</pre></div><p>
+The <kbd>advance</kbd> method calls <kbd>step</kbd> the proper number of times.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::setPlayerCrabDir(<span class="codekeyword">int</span> dir) {
+    playerCrabDir = dir;
+    game-&gt;setPlayerCrabDir(dir);
+}</pre></div><p>
+The <kbd>setPlayerCrabDir</kbd> method sets the <kbd>playerCrabDir</kbd> field and calls the <kbd>setPlayerCrabDir</kbd> on the game.
+</p><div class="codeblock"><pre><span class="codekeyword">bool</span> GameDrawer::isGameOver() {
+    <span class="codekeyword">return</span> isGameOver0;
+}</pre></div><p>
+<kbd>isGameOver</kbd> simply returns the <kbd>isGameOver0</kbd> field.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> GameDrawer::startNewGame(<span class="codekeyword">float</span> maximumSpeedForOpponents,
+                              <span class="codekeyword">int</span> startingScore) {
+    setGame(<span class="codekeyword">new</span> Game(maximumSpeedForOpponents, startingScore));
+}</pre></div><p>
+The <kbd>startNewGame</kbd> method starts a new game by setting the current game to be a new <kbd>Game</kbd> object.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> initGameDrawer() {
+    t3dInit();
+}
+
+<span class="codekeyword">void</span> cleanupGameDrawer() {
+    t3dCleanup();
+}</pre></div><p>
+As promised, <kbd>initGameDrawer</kbd> and <kbd>cleanupGameDrawer</kbd> just call <kbd>t3dInit</kbd> and <kbd>t3dCleanup</kbd>.
+</p>
+<center><h2>main.cpp</h2></center>
+<p>
+Let's go to main.cpp.
+</p><div class="codeblock"><pre><span class="codekeyword">const</span> <span class="codekeyword">float</span> PI = 3.1415926535f;
+
+<span class="codecomment">//The number of milliseconds between calls to update</span>
+<span class="codekeyword">const</span> <span class="codekeyword">int</span> TIMER_MS = 25;</pre></div><p>
+We have pi, as well as a constant indicating the number of seconds between calls to <kbd>update</kbd>.
+  You can increase this constant if your computer is too slow to run at 
+40 FPS, so that at least the speed of the game will match the drawing 
+speed.  Ideally, in each call to <kbd>update</kbd>, we'd measure the amount of time since the last call to <kbd>update</kbd>
+ and advance the game by that amount of time.  That way, the speed of 
+the game would automatically match the speed of the computer.  But we're
+ just doing things the easy way.
+</p><div class="codeblock"><pre>GameDrawer* gameDrawer;
+<span class="codecomment">//Whether the left key is currently depressed</span>
+<span class="codekeyword">bool</span> isLeftKeyPressed = false;
+<span class="codecomment">//Whether the right key is currently depressed</span>
+<span class="codekeyword">bool</span> isRightKeyPressed = false;</pre></div><p>
+<kbd>gameDrawer</kbd> is the <kbd>GameDrawer</kbd> object we're using.  <kbd>isLeftKeyPressed</kbd> and <kbd>isRightKeyPressed</kbd> will keep track of whether the left and right keys are currently being pressed.
+</p><div class="codeblock"><pre><span class="codecomment">//Starts at 0, then increases until it reaches 2 * PI, then jumps back to 0 and</span>
+<span class="codecomment">//repeats.  Used to have the camera angle slowly change.</span>
+<span class="codekeyword">float</span> rotationVar = 0;</pre></div><p>
+If you watch the program, you'll notice that the camera angle is actually changing very slowly.  The <kbd>rotationVar</kbd> variable will be used to make this happen.  <kbd>rotationVar</kbd> starts at 0, then climbs to <kbd>2 * PI</kbd>, then jumps back down to 0 and repeats.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> cleanup() {
+    <span class="codekeyword">delete</span> gameDrawer;
+    cleanupGameDrawer();
+}</pre></div><p>
+The <kbd>cleanup</kbd> function just has to delete <kbd>gameDrawer</kbd> and call <kbd>cleanupGameDrawer</kbd>.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> handleKeypress(<span class="codekeyword">unsigned</span> <span class="codekeyword">char</span> key, <span class="codekeyword">int</span> x, <span class="codekeyword">int</span> y) {
+    <span class="codekeyword">switch</span> (key) {
+        <span class="codekeyword">case</span> '\r': <span class="codecomment">//Enter key</span>
+            <span class="codekeyword">if</span> (gameDrawer-&gt;isGameOver()) {
+                gameDrawer-&gt;startNewGame(2.2f, 20);
+            }
+            <span class="codekeyword">break</span>;
+        <span class="codekeyword">case</span> 27: <span class="codecomment">//Escape key</span>
+            cleanup();
+            exit(0);
+    }
+}</pre></div><p>
+The enter key, <kbd>'\r'</kbd>, starts a new game if none is currently in progress.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> handleSpecialKeypress(<span class="codekeyword">int</span> key, <span class="codekeyword">int</span> x, <span class="codekeyword">int</span> y) {
+    <span class="codekeyword">switch</span> (key) {
+        <span class="codekeyword">case</span> GLUT_KEY_LEFT:
+            isLeftKeyPressed = true;
+            <span class="codekeyword">if</span> (isRightKeyPressed) {
+                gameDrawer-&gt;setPlayerCrabDir(0);
+            }
+            <span class="codekeyword">else</span> {
+                gameDrawer-&gt;setPlayerCrabDir(1);
+            }
+            <span class="codekeyword">break</span>;
+        <span class="codekeyword">case</span> GLUT_KEY_RIGHT:
+            isRightKeyPressed = true;
+            <span class="codekeyword">if</span> (isLeftKeyPressed) {
+                gameDrawer-&gt;setPlayerCrabDir(0);
+            }
+            <span class="codekeyword">else</span> {
+                gameDrawer-&gt;setPlayerCrabDir(-1);
+            }
+            <span class="codekeyword">break</span>;
+    }
+}</pre></div><p>
+The left and right keys don't have ASCII equivalents, so we can't handle them in the <kbd>handleKeypress</kbd> function.  We need a new function called "<kbd>handleSpecialKeypress</kbd>", which takes an integer key rather than a character key.  A key of <kbd>GLUT_KEY_LEFT</kbd> indicates the left key, while <kbd>GLUT_KEY_RIGHT</kbd> indicates the right key.  The function just updates <kbd>isLeftKeyPressed</kbd> and <kbd>isRightKeyPressed</kbd> and sets the direction the human player's crab is going.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> handleSpecialKeyReleased(<span class="codekeyword">int</span> key, <span class="codekeyword">int</span> x, <span class="codekeyword">int</span> y) {
+    <span class="codekeyword">switch</span> (key) {
+        <span class="codekeyword">case</span> GLUT_KEY_LEFT:
+            isLeftKeyPressed = false;
+            <span class="codekeyword">if</span> (isRightKeyPressed) {
+                gameDrawer-&gt;setPlayerCrabDir(-1);
+            }
+            <span class="codekeyword">else</span> {
+                gameDrawer-&gt;setPlayerCrabDir(0);
+            }
+            <span class="codekeyword">break</span>;
+        <span class="codekeyword">case</span> GLUT_KEY_RIGHT:
+            isRightKeyPressed = false;
+            <span class="codekeyword">if</span> (isLeftKeyPressed) {
+                gameDrawer-&gt;setPlayerCrabDir(1);
+            }
+            <span class="codekeyword">else</span> {
+                gameDrawer-&gt;setPlayerCrabDir(0);
+            }
+            <span class="codekeyword">break</span>;
+    }
+}</pre></div><p>
+This function will be called whenever a special key is released.  Like <kbd>handleSpecialKeypress</kbd>, this function will update <kbd>isLeftKeyPressed</kbd> and <kbd>isRightKeyPressed</kbd> and set the direction of the human player's crab.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> initRendering() {
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_NORMALIZE);
+    glEnable(GL_CULL_FACE);
+    glShadeModel(GL_SMOOTH);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    initGameDrawer();
+}</pre></div><p>
+This is the <kbd>initRendering</kbd> function.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> handleResize(<span class="codekeyword">int</span> w, <span class="codekeyword">int</span> h) {
+    glViewport(0, 0, w, h);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0, (<span class="codekeyword">double</span>)w / (<span class="codekeyword">double</span>)h, 0.02, 5.0);
+}</pre></div><p>
+Note that in <kbd>handleResize</kbd>, we're indicating not to draw anything closer to the camera than 0.02 units or farther from the camera than 5 units.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> drawScene() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glTranslatef(0.5f, -0.3f, -1.8f);
+    glRotatef(50, 1, 0, 0);
+    glRotatef(180, 0, 1, 0);
+    
+    <span class="codecomment">//This makes the camera rotate slowly over time</span>
+    glTranslatef(0.5f, 0, 0.5f);
+    glRotatef(3 * sin(rotationVar), 0, 1, 0);
+    glTranslatef(-0.5f, 0, -0.5f);
+    
+    gameDrawer-&gt;draw();
+    
+    glutSwapBuffers();
+}</pre></div><p>
+In <kbd>drawScene</kbd>, we translate a little, then rotate by 50 
+degrees to have a camera angle between an overhead view (90 degrees) and
+ a straight-on view (0 degrees).  Then, we translate to the center of 
+the board and rotate a little using <kbd>rotationVar</kbd>.  The amount of rotation will oscillate slowly between -3 and 3.  Then, we translate back to the corner of the board and call <kbd>draw</kbd> on the <kbd>GameDrawer</kbd>.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> update(<span class="codekeyword">int</span> value) {
+    gameDrawer-&gt;advance((<span class="codekeyword">float</span>)TIMER_MS / 1000);
+    
+    rotationVar += 0.2f * (<span class="codekeyword">float</span>)TIMER_MS / 1000;
+    <span class="codekeyword">while</span> (rotationVar &gt; 2 * PI) {
+        rotationVar -= 2 * PI;
+    }
+    
+    glutPostRedisplay();
+    glutTimerFunc(TIMER_MS, update, 0);
+}</pre></div><p>
+The <kbd>update</kbd> function advances the <kbd>GameDrawer</kbd> and increases the <kbd>rotationVar</kbd> variable a little, decreasing it if it exceeds <kbd>2 * PI</kbd>.
+</p><div class="codeblock"><pre><span class="codekeyword">int</span> main(<span class="codekeyword">int</span> argc, <span class="codekeyword">char</span>** argv) {
+    srand((<span class="codekeyword">unsigned</span> <span class="codekeyword">int</span>)time(0)); <span class="codecomment">//Seed the random number generator</span>
+    
+    <span class="codecomment">//...</span>
+    
+    gameDrawer = <span class="codekeyword">new</span> GameDrawer();
+    
+    <span class="codecomment">//...</span>
+    
+    glutSpecialFunc(handleSpecialKeypress);
+    glutSpecialUpFunc(handleSpecialKeyReleased);
+    
+    <span class="codecomment">//...</span>
+}</pre></div><p>
+The <kbd>main</kbd> function is mostly familiar stuff.  We seed the random number generator and set <kbd>gameDrawer</kbd> to be a new <kbd>GameDrawer</kbd> object.  However, there are two new function calls: <kbd>glutSpecialFunc</kbd> and <kbd>glutSpecialUpFunc</kbd>, which let GLUT know the functions that we want to use to handle when a special key is pressed or released.
+</p><p>
+And now, we're done!  We've made a fairly cool 3D game, the culmination of all the OpenGL we've learned.
+</p><p>
+And they all lived happily ever after.  THE END.
+</p>
+
+
+
+
+
+
+
+
+
+<center><div class="lessonlinks">
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/crab_pong/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/crab_pong/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/crab_pong/crabpong.zip">Download source</a></li></ul>
+</div></center>
+
+		<center><div class="horizontaladslong">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_2_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_2" name="aswift_2" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+		</div></center>
+	</div>
+</div>
+
+	<div id="footer">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Quick Reference</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/links.php">Links</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/about.php">About</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/contact.php">Contact</a></li>
+		</ul>
+		<center><table><tbody><tr><td>
+<a href="http://validator.w3.org/check/referer" target="_blank"><img src="text.php_files/valid_xhtml.png" alt="Valid XHTML" align="bottom" border="0" height="31" width="88"></a>
+		</td><td><center><p>© 2007 - 2011 Bill Jacobs<br>"Rock on!" - Bill</p></center></td><td>
+<a href="http://jigsaw.w3.org/css-validator/check/referer" target="_blank"><img src="text.php_files/valid_css.png" alt="Valid CSS" align="bottom" border="0" height="31" width="88"></a>
+		</td></tr></tbody></table></center>
+	</div>
+</div>
+
+<script src="text.php_files/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1957485-1";
+urchinTracker();
+</script>
+
+
+
+</body></html>
