@@ -19,9 +19,9 @@ $(PROG):	$(SRCS)
 clean:
 	rm -f $(PROG) *~
 
-run:
+run: $(PROG)
 	./$(PROG)
 
 text:
-	$(BROWSER) text.php.html
+	$(BROWSER) text.php.html &
 

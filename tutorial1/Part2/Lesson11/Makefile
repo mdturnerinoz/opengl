@@ -1,6 +1,7 @@
 CC = g++
 CFLAGS = -Wall
 PROG = blockhead
+BROWSER = firefox
 
 SRCS = main.cpp imageloader.cpp md2model.cpp text3d.cpp vec3f.cpp
 
@@ -18,9 +19,9 @@ $(PROG):	$(SRCS)
 clean:
 	rm -f $(PROG) *~
 
-run:
+run: $(PROG)
 	./$(PROG)
 
 text:
-	firefox text.php.html &
+	$(BROWSER) text.php.html &
 
