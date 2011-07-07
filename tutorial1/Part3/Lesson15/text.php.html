@@ -1,0 +1,240 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en"><head>
+	<title>OpenGL Video Tutorial - Fog</title>
+	<meta name="title" content="OpenGL Video Tutorial - Fog">
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<meta name="description" content="Free beginner-friendly OpenGL / GLUT tutorial for C++, including both video and text versions.">
+	<meta name="keywords" content="OpenGL, GLUT, OpenGL tutorial, OpenGL tutorials, free, GLUT tutorial, GLUT tutorials, OpenGL video tutorial, OpenGL video tutorials, video, videos, GLUT video tutorial, GLUT video tutorials, video tutorial, video tutorials, 3D, 3-D, Windows, Mac, OS X, Mac OS X, MacOSX, Linux, C, C++, Visual C++, programming, 3D programming, 3-D programming, reference, forum, forums">
+	<meta name="author" content="Bill Jacobs">
+	<meta name="designer" content="Bill Jacobs">
+	<meta name="copyright" content="© 2007 - 2008 Bill Jacobs">
+	<link href="text.php_files/styles.css" rel="stylesheet" type="text/css">
+	<!--[if lte IE 6]>
+		<style type="text/css">
+			#container {
+				width: expression(document.documentElement.clientWidth < 808 ? "808px" : "auto");
+			}
+		</style>
+	<![endif]-->
+	<!--[if gte IE 5]>
+		<style type="text/css">
+			#topads {
+				width: expression(document.body.clientWidth > 160 ? "160px" : "auto");
+			}
+		</style>
+	<![endif]-->
+</head>
+
+<body bgcolor="#B0E0FF">
+<div id="container">
+	<div id="header">
+		<img src="text.php_files/top_icon.png" alt="3D Video Tutorials Rock.com logo" height="101" width="165"><h1>OpenGL tutorial</h1>
+	</div>
+	
+	<div id="menu1">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Reference</a></li>
+		</ul>
+	</div>
+	
+	<div id="content">
+		<div id="mainbody">
+
+<center><h1>Lesson 15: Fog</h1></center>
+<center><div class="lessonlinks">
+	<div class="watchnow"><a href="http://www.videotutorialsrock.com/opengl_tutorial/fog/video.php">Watch the video now!</a></div>
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/fog/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/fog/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/fog/fog.zip">Download source</a></li></ul>
+</div></center>
+<center><div class="horizontaladslong">
+	<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_0_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_0" name="aswift_0" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</div></center>
+<center><h2>Adding a Fog Effect</h2></center>
+<p>
+The basic idea behind fog in OpenGL is that whenever we draw a pixel to 
+the screen, we're going to average the color gray with the pixel.  
+Pixels that are farther away from the camera have a heigher weighting 
+for the gray color, while pixels closer to the camera have a lower 
+weighting.  In other words, pixels farther from the camera will be more 
+gray.
+</p>
+<center>
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_1_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_1" name="aswift_1" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+</center>
+
+<center><h2>Adding Fog to the Spinning Cube Program</h2></center>
+<p>
+Let's add fog to the spinning cube program from <a href="http://www.videotutorialsrock.com/opengl_tutorial/cube/home.php">this earlier lesson</a>.
+</p><p>
+First of all, we'll add a call to <kbd>glEnable(GL_FOG)</kbd> to the <kbd>initRendering</kbd> function, to enable fog.  We'll also call <kbd>glClearColor(0.5f, 0.5f, 0.5f, 1)</kbd> to change the background color to match the color of the fog.  Then, we'll add some code to <kbd>drawScene</kbd> to set up the fog.
+</p><div class="codeblock"><pre><span class="codekeyword">void</span> drawScene() {
+    <span class="codecomment">//...</span>
+    GLfloat fogColor[] = {0.5f, 0.5f, 0.5f, 1};
+    glFogfv(GL_FOG_COLOR, fogColor);
+    glFogi(GL_FOG_MODE, GL_LINEAR);
+    glFogf(GL_FOG_START, 10.0f);
+    glFogf(GL_FOG_END, 20.0f);
+    <span class="codecomment">//...</span>
+}</pre></div><p>
+First of all, we'll let OpenGL know the color of the fog.  The array <kbd>fogColor</kbd>
+ stores the color that we will use for the fog; the first three elements
+ are the RGB color of the fog, and the last element is 1.  You could 
+actually use fog that's red, green, or any kind of weird color, but 
+we'll just use gray.
+</p><p>
+There's another important thing that OpenGL needs to know about the fog.
+  It needs a function that takes the distance of a pixel from the camera
+ and returns the weighting that will be assigned to the color gray.  The
+ weights range from 0, indicating no gray, to 1, indicating 100% gray.  
+OpenGL allows us to use a few different functions.  Below are the three 
+functions that we'll try.
+</p>
+<center><img src="text.php_files/graph.png" alt="Fog graph" border="3" height="328" width="475"></center>
+<p>
+First, we'll use the linear function.  The linear function starts at 0 
+until we reach a certain distance, then linearly climbs to 1 at a second
+ distance, then stays at 1.  To indicate a linear function, we call <kbd>glFogi(GL_FOG_MODE, GL_LINEAR)</kbd>.
+  Then, we have to tell OpenGL the near and far distances that are 
+needed for the function; in this case, we'll use distances of 10 and 20.
+  We do this by calling <kbd>glFogf(GL_FOG_START, 10.0f)</kbd> and <kbd>glFogf(GL_FOG_END, 20.0f)</kbd>.  With this code, our program looks like this:
+</p>
+<center><img src="text.php_files/screenshot.png" alt="Fog program screenshot" border="3" height="434" width="408"></center>
+<p>
+We have a nice fog effect.  Points on the cube that are closer to the 
+camera are less gray, while points that are farther from the camera are 
+more gray.
+</p><p>
+Now let's try an exponential function.  We'll switch from <kbd>GL_LINEAR</kbd> to <kbd>GL_EXP</kbd>.  Then, we comment out the calls to <kbd>glFogf</kbd>,
+ since the near and far distances no longer have any meaning.  They only
+ matter for the linear function.  In their place, we put a call to <kbd>glFogf(GL_FOG_DENSITY, 0.05f)</kbd>, indicating a density parameter of 0.05.  The function we've just set up is y = 1 - e<sup>-0.05x</sup>,
+ where y is the weighting for the color gray, x is the distance from the
+ camera, and 0.05 is the fog density.  If we use this function, the 
+program looks like this:
+</p>
+<center><img src="text.php_files/exponential.png" alt="Exponential fog" border="3" height="434" width="408"></center>
+<p>
+It still kind of looks like there's fog, but it doesn't look as good as 
+when we were using the linear function.  There's less difference between
+ the grayness of the different points on the cube.  That's because most 
+of the points on the cube are a distance of roughly 15 to 20 units from 
+the camera.  With an exponential function, this corresponds to a small 
+range of weightings for the color gray.  So, in this program, the linear
+ function works better than an exponential function.  In more complex 
+scenes or in other programs, an exponential function might look better. 
+ For a given program, you need to try out each function and see which 
+works best.
+</p><p>
+Now, we'll switch to an exponential-squared function.  This is a function of the form y = 1 - e<sup>-(0.05x)<sup>2</sup></sup>.  To do this, we just have to change from <kbd>GL_EXP</kbd> to <kbd>GL_EXP2</kbd>.
+  Like the exponential function, it uses the density parameter to 
+indicate the constant in the function.  If we do this, the program looks
+ like this:
+</p>
+<center><img src="text.php_files/exponential2.png" alt="Exponential squared fog" border="3" height="434" width="408"></center>
+<p>
+This function also doesn't work as well as a linear function, but again, it may work better in other programs.
+</p><p>
+I've been saying that OpenGL computes the distance of each pixel from 
+the camera, but I should mention that this may not be the case.  OpenGL 
+might just compute the distance from each vertex to the camera, and 
+interpolate the fog effect across a face.  I just thought I'd point that
+ out.
+</p><p>
+Anyway, that's how fog works in OpenGL.
+</p>
+
+
+
+
+
+
+
+
+
+<p><i>Next is <a href="http://www.videotutorialsrock.com/opengl_tutorial/improving/home.php">"Part 4: Improving Speed and Appearance"</a>.</i></p><center><div class="lessonlinks">
+	<ul>	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/fog/home.php">Summary</a></li><li>*</li>
+	<li>Text version</li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/fog/exercises.php">Exercises</a></li><li>*</li>
+	<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/fog/fog.zip">Download source</a></li></ul>
+</div></center>
+
+		<center><div class="horizontaladslong">
+<script type="text/javascript"><!--
+google_ad_client = "pub-9144854455296170";
+google_ad_width = 728;
+google_ad_height = 90;
+google_ad_format = "728x90_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+google_color_border = "A0A0A0";
+google_color_bg = "B8FFB8";
+google_color_link = "000080";
+google_color_text = "800000";
+google_color_url = "008000";
+//-->
+</script>
+<script type="text/javascript" src="text.php_files/show_ads.js">
+</script><ins style="display:inline-table;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><ins id="aswift_2_anchor" style="display:block;border:none;height:90px;margin:0;padding:0;position:relative;visibility:visible;width:728px"><iframe allowtransparency="true" hspace="0" marginwidth="0" marginheight="0" onload="var i=this.id,s=window.google_iframe_oncopy,H=s&amp;&amp;s.handlers,h=H&amp;&amp;H[i],w=this.contentWindow,d;try{d=w.document}catch(e){}if(h&amp;&amp;d&amp;&amp;(!d.body||!d.body.firstChild)){if(h.call){i+='.call';setTimeout(h,0)}else if(h.match){i+='.nav';w.location.replace(h)}s.log&amp;&amp;s.log.push(i)}" vspace="0" id="aswift_2" name="aswift_2" style="left: 0pt; position: absolute; top: 0pt;" frameborder="0" height="90" scrolling="no" width="728"></iframe></ins></ins>
+		</div></center>
+	</div>
+</div>
+
+	<div id="footer">
+		<ul>
+			<li><a href="http://www.videotutorialsrock.com/index.php">Home</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/intro.php">Intro</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/forums/" target="_blank">Forums</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/opengl_tutorial/reference.php">Quick Reference</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/links.php">Links</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/about.php">About</a></li><li>|</li>
+			<li><a href="http://www.videotutorialsrock.com/contact.php">Contact</a></li>
+		</ul>
+		<center><table><tbody><tr><td>
+<a href="http://validator.w3.org/check/referer" target="_blank"><img src="text.php_files/valid_xhtml.png" alt="Valid XHTML" align="bottom" border="0" height="31" width="88"></a>
+		</td><td><center><p>© 2007 - 2011 Bill Jacobs<br>"Rock on!" - Bill</p></center></td><td>
+<a href="http://jigsaw.w3.org/css-validator/check/referer" target="_blank"><img src="text.php_files/valid_css.png" alt="Valid CSS" align="bottom" border="0" height="31" width="88"></a>
+		</td></tr></tbody></table></center>
+	</div>
+</div>
+
+<script src="text.php_files/urchin.js" type="text/javascript">
+</script>
+<script type="text/javascript">
+_uacct = "UA-1957485-1";
+urchinTracker();
+</script>
+
+
+
+</body></html>
