@@ -23,4 +23,9 @@ list:
 	echo "-------  $$i  -------"; \
    (cd $$i; ls --color); done
 
+nompp:
+	@for i in $(SUBDIRS); do \
+	echo "Cleaning mpp in $$i..."; \
+	(cd $$i; rm -fr ./.makepp); done 
+
 
