@@ -25,7 +25,7 @@ list:
 
 nompp:
 	@for i in $(SUBDIRS); do \
-	echo "Cleaning mpp in $$i..."; \
+	echo "Cleaning makepp subdir in $$i..."; \
 	(cd $$i; rm -fr ./.makepp); done 
 
 
