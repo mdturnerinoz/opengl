@@ -23,6 +23,8 @@ of the tutorial (./Tutorial1). The top-level make targets and project strict is 
 
 TOP-LEVEL Makefile (follow each subdir via the tutorial website table of contents):
 
+cd to tutorial1
+
 SUBDIRS: setup 
          Part1/Lesson1 Part1/Lesson2 Part1/Lesson3 Part1/Lesson4 Part1/Lesson5 Part1/Lesson6 
          Part2/Lesson7 Part2/Lesson8 Part2/Lesson9 Part2/Lesson10 Part2/Lesson11             
