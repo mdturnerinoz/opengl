@@ -4,6 +4,7 @@ PROG = drawtext
 BROWSER = firefox
 
 SRCS = main.cpp text3d.cpp
+DEPS = text3d.h
 
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
@@ -13,14 +14,14 @@ endif
 
 all: $(PROG)
 
-$(PROG):	$(SRCS)
+$(PROG):	$(SRCS) $(DEPS)
 	$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS)
 
 clean:
 	rm -f $(PROG) *~
 
-run:
-	./$(PROG)
+run: $(PROG)
+	./$(PROG) &
 
 text:
 	$(BROWSER) text.php.html &

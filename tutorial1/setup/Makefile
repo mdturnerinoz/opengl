@@ -21,7 +21,7 @@ clean:
 	rm -f $(PROG) *~
 
 run: $(PROG)
-	./$(PROG)
+	./$(PROG) &
 
 text:
 	$(BROWSER) text.php0a.html text.php0b.html text.php0c.html &

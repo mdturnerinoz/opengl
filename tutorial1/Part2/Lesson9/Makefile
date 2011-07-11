@@ -4,6 +4,7 @@ PROG = animation
 BROWSER = firefox
 
 SRCS = main.cpp imageloader.cpp md2model.cpp vec3f.cpp
+DEPS = imageloader.h  md2model.h  vec3f.h
 
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
@@ -13,14 +14,14 @@ endif
 
 all: $(PROG)
 
-$(PROG):	$(SRCS)
+$(PROG):	$(SRCS) $(DEPS)
 	$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS)
 
 clean:
 	rm -f $(PROG) *~
 
 run: $(PROG)
-	./$(PROG)
+	./$(PROG) &
 
 text:
 	$(BROWSER) text.php.html &

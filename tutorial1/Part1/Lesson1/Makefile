@@ -20,7 +20,7 @@ clean:
 	rm -f $(PROG)
 
 run: $(PROG)
-	./$(PROG)
+	./$(PROG) &
 
 text: 
 	$(BROWSER) text.php.html &
