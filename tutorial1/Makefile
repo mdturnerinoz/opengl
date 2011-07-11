@@ -4,6 +4,13 @@ SUBDIRS = setup Part1/Lesson1 Part1/Lesson2 Part1/Lesson3 Part1/Lesson4 Part1/Le
                 Part4/Lesson16 Part4/Lesson17 Part4/Lesson18 Part4/Lesson19 Part4/Lesson20          \
                 Part5/Lesson21
 
+
+ifeq ($(shell uname),Darwin)
+	COLOR = -G
+else
+	COLOR = --color
+endif
+
 all:
 	@for i in $(SUBDIRS); do \
 	echo "make all in $$i..."; \
@@ -18,7 +25,7 @@ clean:
 list:
 	@for i in $(SUBDIRS); do  \
 	echo "-------  $$i  -------"; \
-   (ls --color $$i); done
+   (ls $(COLOR) $$i); done
 
 nompp:
 	@for i in $(SUBDIRS); do \
