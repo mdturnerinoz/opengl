@@ -4,6 +4,7 @@ PROG = cube
 BROWSER = firefox # change if firefox not installed
 
 SRCS = main.cpp imageloader.cpp
+DEPS = imageloader.h
 
 ifeq ($(shell uname),Darwin)
 	LIBS = -framework OpenGL -framework GLUT
@@ -13,7 +14,7 @@ endif
 
 all: $(PROG)
 
-$(PROG):	$(SRCS)
+$(PROG):	$(SRCS) $(DEPS)
 	$(CC) $(CFLAGS) -o $(PROG) $(SRCS) $(LIBS)
 
 clean:
