@@ -1,3 +1,4 @@
+<pre>
 This series of files represents my efforts to understand OpenGL using a (quite good) tutorial 
 found at http://www.videotutorialsrock.com/index.php.
 
@@ -57,3 +58,5 @@ text:    Output the local saved html pages captured from the webiste (in case th
 Marty Turner (mdturnerinoz@gmail.com) July 2011
 
 
+
+</pre>
